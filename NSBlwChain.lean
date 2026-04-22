@@ -53,4 +53,5 @@ import NSBlwChain.BLW.LipschitzMScalar
 import NSBlwChain.BLW.GradientBoundSqrt
 import NSBlwChain.BLW.ScalarProductRule
 import NSBlwChain.BLW.MaxPrinciple
+import NSBlwChain.BLW.HessianFrameFromMaxPrinciple
 import NSBlwChain.Analyticity.IdentityTheorem
