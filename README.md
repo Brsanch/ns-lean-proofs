@@ -74,6 +74,19 @@ For everything else, push and let CI build.
 
 ## Status
 
+**v0.5 (2026-04-22 morning)** — 67 files, ~9900 LOC, all CI-green.
+All six originally-listed OPEN.md items fully closed.  No `sorry`
+in the BLW chain.  Pre-review audit pipeline executed: 4
+review-preprocessing memos in `noethersolve/docs/findings/` (obstructions,
+citation audit, model correctness, journal cross-check).
+Citation-audit findings propagated into the Lean axioms:
+growth-regime hypothesis now explicit on axiom 1; Masuda 1967 +
+Foias-Temam 1979 J. Math. Pures Appl. 58 citation corrected for
+axiom 3; `DecayAtInfinity` hypothesis now explicit via a new
+structure in `Setup/ClassicalAxioms.lean` plus constructors
+(`of_compactSupport_vorticity`, `of_uniform_polynomial_bound`) in
+`Setup/DecayConstructors.lean`.
+
 **v0.4 (2026-04-22 late-overnight)** — 66 files, ~9650 LOC,
 all CI-green.  **All six originally-listed OPEN.md items fully
 closed.**  No `sorry` in the BLW chain.  Axiom footprint: three
