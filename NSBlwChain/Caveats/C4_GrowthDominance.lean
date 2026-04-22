@@ -324,13 +324,14 @@ theorem sigma_le_4MlogM_via_growth_dominance
     (hImplicit :
       σ ≤ M * (1 + Real.log L + (1 / 2) * Real.log (σ / ν)) + K) :
     σ ≤ 4 * M * Real.log M := by
-  have B : ImplicitBoundBundle :=
-    ImplicitBoundBundle.ofLargeM hν hL hσ hK h_bootstrap hM hImplicit
+  have hM_ge_one : 1 ≤ M := by
+    have h2 : (2 : ℝ) ≤ M := le_trans (le_max_left _ _) hM
+    linarith
   have hLarge :
       1 + Real.log L + (1 / 2) * Real.log (σ / ν)
         ≤ 4 * Real.log M - K / M :=
     ImplicitBoundBundle.ofLargeM_hLarge hν hL hσ hK h_bootstrap hM
-  exact B.σ_le_of_largeness hLarge
+  exact σ_le_4M_log_M_of_implicit hν hL hM_ge_one hσ hK hImplicit hLarge
 
 /-! ## Sanity check -/
 
