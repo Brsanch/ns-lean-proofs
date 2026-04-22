@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.3 — 2026-04-22 (overnight)
+
+**Analytical discharge pass — five of six OPEN.md items closed,
+one reduced to a single residual.** 65 files, ~9500 LOC, all CI-green.
+
+**Item 5 (closed)** — 1-D 2nd-derivative test at local max
+(`MaxPrincipleFromLocalMax`).  Constructor
+`ScalarLocalMaxSecondDeriv.ofIsLocalMax` discharges all three
+`d_i_nonpos` fields from `IsLocalMax g xStar` + slice
+differentiability via `HasDerivAt.tendsto_slope` +
+`strictMonoOn_of_deriv_pos`.
+
+**Item 4 (closed)** — pointwise `(f²)'' = 2(f')² + 2 f · f''`
+(`HessianExpansionFromC2`).  `HasDerivAt.pow` + second product
+rule delivers the scalar identity; constructor
+`HessianExpansionData.ofScalarIdentities` assembles per-component
+identities into the bundle's `sum_scalar_identity` field.
+
+**Item 3 (closed)** — FTC-for-Lipschitz
+(`C1_FTC_Discharge.GrowthMomentBundle.ofLipschitzAndPointwiseBound`).
+Discharged via mathlib chain `LipschitzWith` →
+`LipschitzOnWith.absolutelyContinuousOnInterval` →
+`AbsolutelyContinuousOnInterval.integral_deriv_eq_sub`.
+
+**Item 2 (closed)** — §C4 "Banach fixed-point" largeness
+(`C4_GrowthDominance`).  The paper's Banach framing turns out to
+be structural scaffolding; the mathematical content is elementary
+growth dominance (for `M ≥ M_crit(L, ν, K)`, the threshold
+inequality holds via `Real.log_le_self` + linear arithmetic).
+
+**Item 6 (closed, structural wiring)** — `NSEvolutionAxioms` →
+scalar bundles (`FromNSEvolution`).  `MOfVelocityField` defines
+the `L∞` envelope; `NSArgmaxInputs` packages the NS-side
+analytical inputs at `(t, xStar)`;
+`argmaxBundle_of_NSEvolutionAxioms` plumbs velocity-field data
+through to `ArgmaxAnalyticalBundle` + gradient bound.
+
+**Item 1 (partial)** — ODE integration §12.4 step 7→8
+(`ODEIntegration_Discharge`).  Algebraic core
+`integrated_bound_of_substituted_bound` + constructor
+`DifferentialInequalityBundle.ofSubstitutedBound` reduce
+`(T-t)·M·logM ≤ 1/4` to a single residual:
+
+  `hW_lower_bound : ∀ t ∈ (t_start, T), 4·(T-t) ≤ 1/(M(t)·log M(t))`
+
+derivable from `Ṁ ≤ 4 M² log M` via quotient rule on
+`w = 1/(M log M)` + FTC + boundary limit + tail absorption.
+
 ## v0.2 — 2026-04-22 (late-evening)
 
 **Full §12 BLW-chain skeleton.**  60 files, ~8200 LOC, all CI-green.
