@@ -82,4 +82,30 @@ theorem NSEvolutionAxioms.vorticity_contDiff
   unfold vorticity
   exact curl_contDiff (n := 3) h_smooth
 
+/-- **Smoothness of `|ω|²`.**
+
+    The scalar field `|ω(t, ·)|² = ∑_k (ω(t, ·) k)²` is `ContDiff ℝ 3`
+    for every `t ∈ [0, T)`, as a sum of squares of `ContDiff 3`
+    component functions.  Consumed by step (ii) of the BLW chain
+    (Hessian / max-principle analysis on `|ω|²`). -/
+theorem NSEvolutionAxioms.vorticitySqNorm_contDiff
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T) :
+    ContDiff ℝ 3
+      (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y)) := by
+  have h_vort : ContDiff ℝ 3 (fun y => vorticity u t y) :=
+    ax.vorticity_contDiff ht htT
+  -- Each component `fun y => vorticity u t y k` is ContDiff 3 (via contDiff_pi).
+  have h_comp : ∀ k : Fin 3, ContDiff ℝ 3 (fun y => vorticity u t y k) := by
+    intro k
+    rw [contDiff_pi] at h_vort
+    exact h_vort k
+  -- `Vec3.dot v v = ∑ i, v i * v i`.
+  unfold Vec3.dot
+  -- Goal: ContDiff 3 (fun y => ∑ i, (vorticity u t y i) * (vorticity u t y i))
+  -- Each summand is a product of two ContDiff 3 functions.
+  apply ContDiff.sum
+  intro k _
+  exact (h_comp k).mul (h_comp k)
+
 end NSBlwChain
