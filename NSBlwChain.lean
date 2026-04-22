@@ -6,6 +6,7 @@ import NSBlwChain.Setup.LipschitzToAE
 import NSBlwChain.Setup.EnergyEnstrophy
 import NSBlwChain.Setup.ClassicalAxioms
 import NSBlwChain.Setup.DecayConstructors
+import NSBlwChain.Setup.CurlSmoothness
 import NSBlwChain.Caveats.AngularIntegrals
 import NSBlwChain.Caveats.C1_GrowthMoment
 import NSBlwChain.Caveats.C1_FTC
