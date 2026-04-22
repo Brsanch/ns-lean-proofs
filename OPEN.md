@@ -47,17 +47,39 @@ with zero structural gaps.
 
 ## Remaining — three substantive analytical items
 
-### 1. ODE integration (§12.4 step 7→8)
+### 1. ODE integration (§12.4 step 7→8) — **PARTIAL DISCHARGE**
 
-**Target:** `DifferentiableInequalityBundle.integrated_bound` field.
-Currently a hypothesis: `(T-t) · M(t) · log M(t) ≤ 1/4`.
+**Target:** `DifferentialInequalityBundle.integrated_bound` field.
+Stated: `(T-t) · M(t) · log M(t) ≤ 1/4`.
 
-**Derivation:** Given a.e. `Ṁ ≤ 4 M² log M` near `T`, let `v = 1/M`.
-Then `v̇ = -Ṁ/M² ≥ -4 log M = 4 log v`.  Integration by parts delivers
-the integrated bound.
+**Status (2026-04-22):** partially discharged.  The algebraic core
+`integrated_bound_of_substituted_bound` plus the bundle constructor
+`DifferentialInequalityBundle.ofSubstitutedBound` in
+`NSBlwChain/BLW/ODEIntegration_Discharge.lean` reduce the field to
+a **single** clean residual hypothesis:
 
-**Location:** `NSBlwChain/BLW/ODEIntegration.lean` (infrastructure
-landed, proof remaining).
+  `hW_lower_bound : ∀ t ∈ (t_start, T), 4·(T-t) ≤ 1/(M(t) · log M(t))`.
+
+This is the substitution-level bound for `w := 1/(M·log M)`.  The
+algebraic step `w(t) ≥ 4(T-t) ⇒ (T-t)·M·logM ≤ 1/4` is unconditional.
+
+**Remaining:** derive `hW_lower_bound` from the a.e. ODE inequality
+`Ṁ ≤ 4 M² log M` via:
+1. quotient rule on `w = 1/(M·log M)` to get `ẇ ≥ -4 - 4/log M`;
+2. FTC integration from `t` to `T⁻`
+   (`intervalIntegral.integral_eq_sub_of_hasDerivAt`);
+3. boundary limit `w(T⁻) = 0` from `log M → ∞` and `M > 1`;
+4. tail absorption of `∫_t^T 4/log M ds = o(T-t)` as `t → T⁻`.
+
+**Derivation sketch (paper §12.4):** Given a.e. `Ṁ ≤ 4 M² log M`, the
+function `w := 1/(M · log M)` satisfies
+`ẇ = -Ṁ(log M + 1)/(M · log M)² ≥ -4 - 4/log M`.  Integrating from
+`t` to `T⁻` with `w(T⁻) = 0` (from `log M → ∞`) and absorbing the
+`4/log M` tail yields `w(t) ≥ 4(T-t)`, i.e., the clean residual
+above.
+
+**Location:** `NSBlwChain/BLW/ODEIntegration.lean` (bundle) +
+`NSBlwChain/BLW/ODEIntegration_Discharge.lean` (partial discharge).
 
 ### 2. Banach fixed-point for C4 largeness
 
