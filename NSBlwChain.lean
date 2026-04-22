@@ -1,4 +1,8 @@
 import NSBlwChain.Basic
 import NSBlwChain.Setup.VectorFields
 import NSBlwChain.Setup.NSHypothesis
+import NSBlwChain.Setup.ArgmaxFrame
+import NSBlwChain.Setup.LipschitzToAE
+import NSBlwChain.Setup.EnergyEnstrophy
 import NSBlwChain.Caveats.C2_Envelope
+import NSBlwChain.BLW.GradientBound
