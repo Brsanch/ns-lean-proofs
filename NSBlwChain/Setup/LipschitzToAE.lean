@@ -30,10 +30,10 @@ only to confirm the file compiles against the current mathlib.
 namespace NSBlwChain.Setup
 
 /-- Boilerplate: a Lipschitz constant is finite, so `K < ∞` as an
-    `ℝ≥0∞`.  Trivial, but recurs enough to be named. -/
+    `ENNReal` (= `ℝ≥0∞`).  Trivial, but recurs enough to be named. -/
 lemma lipschitzWith_edist_lt_top
     {α β : Type*} [PseudoEMetricSpace α] [PseudoEMetricSpace β]
     {K : NNReal} {f : α → β} (_ : LipschitzWith K f) :
-    (K : ℝ≥0∞) < ⊤ := ENNReal.coe_lt_top
+    (K : ENNReal) < ⊤ := ENNReal.coe_lt_top
 
 end NSBlwChain.Setup
