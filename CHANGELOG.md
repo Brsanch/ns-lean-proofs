@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.6 — 2026-04-22 (late morning)
+
+**NSEvolutionAxioms → steps (i) and (ii) of the BLW chain, fully
+derived.**  Seven new files composing a foundation chain that lets
+callers produce `LocalFrameDerivativeData` (step (i)) and
+`ScalarLocalMaxSecondDeriv` (step (ii)) **directly from**
+`NSEvolutionAxioms u ν T` + local-frame alignment + argmax
+existence, with **zero** residual differentiability hypotheses
+on the caller side.  ~74 files, ~10,700 LOC, all CI-green.
+
+**Foundation layer (L1–L5, ~340 LOC):**
+
+- `NSBlwChain/Setup/CurlSmoothness.lean` (L1) — `curl : C^{n+1} → C^n`
+  via `ContDiff.fderiv_right` + continuous-linear-map evaluation.
+  Component-pointwise differentiability corollary for `C^4` fields
+  (the NS-regularity class).
+- `NSBlwChain/Setup/VorticityDifferentiable.lean` (L2, L4) —
+  `NSEvolutionAxioms.vorticity_component_differentiableAt`,
+  `.vorticity_contDiff` (vort is `C^3`), `.vorticitySqNorm_contDiff`
+  (`|ω|²` is `C^3`).
+- `NSBlwChain/BLW/SliceSmoothness.lean` (L5) — `sliceMap_contDiff`,
+  `slice_contDiff_of_contDiff`, plus three NSEv-keyed corollaries:
+  `sqNormVort_slice_contDiff` (C^3 slice), `.sqNormVort_slice_differentiableAt_nhds`
+  (slice diff on nbhd of 0), `.sqNormVort_sliceDeriv_differentiableAt_zero`
+  (deriv slice diff at 0, via `iteratedDeriv 1` + `iteratedDeriv_one`).
+
+**Step wrappers (L3, L6, ~160 LOC):**
+
+- `NSBlwChain/BLW/DerivFrameFromNSEvolution.lean` (L3) —
+  `LocalFrameDerivativeData.ofNSEvolutionAxioms`: step (i) bundle
+  from NS axioms + alignment.
+- `NSBlwChain/BLW/ScalarMaxFromNSEvolution.lean` (L6) —
+  `ScalarLocalMaxSecondDeriv.ofNSEvolutionAxioms`: step (ii) bundle
+  from NS axioms + `IsLocalMax |ω|² xStar`.
+
+**Diagnostic workflow proven out.**  Three CI iteration cycles on
+L5 surfaced (a) `𝓝` needs `open Topology`, (b) mathlib 4.29's
+`ContDiff.differentiable` uses `n ≠ 0` not `1 ≤ n`, (c) `ContDiff.deriv`
+dot-resolution to `Exists.deriv` — root-caused by enabling
+`set_option diagnostics true` + `threshold 100`.  Noted in
+`feedback_lean_diagnostic_workflow` memory.
+
 ## v0.5 — 2026-04-22 (morning)
 
 **Pre-review pipeline executed.** Four review-preprocessing deliverables

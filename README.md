@@ -74,6 +74,16 @@ For everything else, push and let CI build.
 
 ## Status
 
+**v0.6 (2026-04-22 late morning)** — 74 files, ~10,700 LOC, all CI-green.
+**Steps (i) and (ii) of the BLW chain now derivable from `NSEvolutionAxioms`**:
+callers produce `LocalFrameDerivativeData` (step i) and
+`ScalarLocalMaxSecondDeriv` (step ii) directly from a smooth NS
+solution bundle + local-frame alignment + argmax existence, with
+no residual per-direction differentiability hypotheses.  Six new
+files: `Setup/CurlSmoothness.lean`, `Setup/VorticityDifferentiable.lean`,
+`BLW/DerivFrameFromNSEvolution.lean`, `BLW/SliceSmoothness.lean`,
+`BLW/ScalarMaxFromNSEvolution.lean`.
+
 **v0.5 (2026-04-22 morning)** — 67 files, ~9900 LOC, all CI-green.
 All six originally-listed OPEN.md items fully closed.  No `sorry`
 in the BLW chain.  Pre-review audit pipeline executed: 4
