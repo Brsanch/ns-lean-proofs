@@ -85,12 +85,14 @@ noncomputable def proposition_four_of_hypotheses
     (H : BLWChainHypotheses u ν T) :
     SereginTypeOneExclusion u ν T := by
   -- Step 1: land the `(T-t) · M ≤ ε` form on a one-sided neighborhood.
+  have hM_nn_strict : ∀ t : ℝ, 0 < t → t < T → 0 ≤ H.M t :=
+    fun t ht htT => H.M_nonneg t (le_of_lt ht) htT
   have h_subTypeI_scalar :
       ∀ ε : ℝ, 0 < ε →
         ∃ δ : ℝ, 0 < δ ∧
           ∀ t : ℝ, T - δ < t → t < T →
             (T - t) * H.M t ≤ ε :=
-    subTypeI_rate_of_log_blowup H.ode_bound H.log_M_pos H.M_nonneg
+    subTypeI_rate_of_log_blowup H.ode_bound H.log_M_pos hM_nn_strict
       H.T_pos H.δ_of_ε H.δ_of_ε_pos H.δ_of_ε_le H.log_M_large
   -- Step 2: translate into Seregin's signature `|ω| ≤ ε/(T-t)`.
   have h_subTypeI_omega :
