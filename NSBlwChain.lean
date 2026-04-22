@@ -24,5 +24,6 @@ import NSBlwChain.BLW.SubTypeOneRate
 import NSBlwChain.BLW.ClassicalAxiomDischarge
 import NSBlwChain.BLW.PropositionFour
 import NSBlwChain.BLW.GrowthBoundFromStrain
+import NSBlwChain.BLW.FullScalarChain
 import NSBlwChain.Unconditional.Theorem1
 import NSBlwChain.Unconditional.Theorem2
