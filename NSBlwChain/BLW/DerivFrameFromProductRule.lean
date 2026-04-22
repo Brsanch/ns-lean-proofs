@@ -71,9 +71,12 @@ noncomputable def LocalFrameDerivativeData.ofDifferentiableVectorField
     -- `partialDeriv_dot_self_eq hω i` gives:
     --   `partialDeriv (dot ω ω) i x_star
     --      = 2 * ∑ k : Fin 3, ω x_star k * partialDeriv (ω y k) i x_star`.
-    -- Expand the sum over `Fin 3 = {0, 1, 2}`:
+    -- Expand the sum over `Fin 3 = {0, 1, 2}` and reshape.
     have h := partialDeriv_dot_self_eq hω i
-    rw [h, Fin.sum_univ_three]
-    ring
+    -- After `rw [h, Fin.sum_univ_three]`, the goal closes by `rfl`
+    -- (the 3-term sum equals the concrete field-access form
+    -- `ω x_star 0 * ∂ω_0 + ω x_star 1 * ∂ω_1 + ω x_star 2 * ∂ω_2`
+    -- by definition of `Fin.sum_univ_three`).
+    simpa [Fin.sum_univ_three] using h
 
 end NSBlwChain.BLW
