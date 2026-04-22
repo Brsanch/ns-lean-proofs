@@ -41,4 +41,5 @@ import NSBlwChain.Unconditional.Theorem2
 import NSBlwChain.Torus.EpsteinZeta
 import NSBlwChain.BLW.TorusToC4
 import NSBlwChain.BLW.LogInequalities
+import NSBlwChain.BLW.BootstrapDischarge
 import NSBlwChain.Analyticity.IdentityTheorem
