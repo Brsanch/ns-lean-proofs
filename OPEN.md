@@ -45,7 +45,7 @@ with zero structural gaps.
   (closes item 3; `hIntegratedBound` discharged from `LipschitzWith`
   via mathlib's `AbsolutelyContinuousOnInterval.integral_deriv_eq_sub`).
 
-## Remaining — three substantive analytical items
+## Remaining — two substantive items (1 partial, 1 open)
 
 ### 1. ODE integration (§12.4 step 7→8) — **PARTIAL DISCHARGE**
 
