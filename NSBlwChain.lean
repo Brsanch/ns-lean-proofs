@@ -46,4 +46,5 @@ import NSBlwChain.BLW.ChainRuleMSquared
 import NSBlwChain.BLW.EnvelopeIdentity
 import NSBlwChain.BLW.SanityExamples
 import NSBlwChain.BLW.AdvectionVanishes
+import NSBlwChain.BLW.HessianExpansionIdentity
 import NSBlwChain.Analyticity.IdentityTheorem
