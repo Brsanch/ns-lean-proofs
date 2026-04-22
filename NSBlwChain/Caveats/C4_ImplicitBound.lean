@@ -131,28 +131,24 @@ theorem σ_le_of_largeness
         ≤ 4 * Real.log B.M - B.K / B.M) :
     B.σ ≤ 4 * B.M * Real.log B.M := by
   have hM_pos : 0 < B.M := B.M_pos
+  have hM_ne : B.M ≠ 0 := ne_of_gt hM_pos
   -- Multiply (C4-large) through by M > 0.
   have hMul :
       B.M * (1 + Real.log B.L + (1/2) * Real.log (B.σ / B.ν))
-        ≤ B.M * (4 * Real.log B.M - B.K / B.M) := by
-    exact mul_le_mul_of_nonneg_left hLarge (le_of_lt hM_pos)
-  -- Expand the RHS.  `M * (4 log M - K/M) = 4 M log M - K`.
+        ≤ B.M * (4 * Real.log B.M - B.K / B.M) :=
+    mul_le_mul_of_nonneg_left hLarge (le_of_lt hM_pos)
+  -- Expand the RHS.  `M * (4 log M - K/M) = 4 M log M - K` via
+  -- `M * (K/M) = K` using `M ≠ 0`.
   have hExpand :
       B.M * (4 * Real.log B.M - B.K / B.M)
         = 4 * B.M * Real.log B.M - B.K := by
-    field_simp
-    ring
+    have hMK : B.M * (B.K / B.M) = B.K := by
+      field_simp
+    linarith [hMK]
   rw [hExpand] at hMul
   -- Combine with the implicit inequality (C4.1):
   --   σ ≤ M * (...) + K ≤ (4 M log M - K) + K = 4 M log M.
-  have hChain :
-      B.σ ≤ 4 * B.M * Real.log B.M - B.K + B.K := by
-    calc
-      B.σ ≤ B.M * (1 + Real.log B.L + (1/2) * Real.log (B.σ / B.ν)) + B.K :=
-            B.hImplicit
-      _ ≤ (4 * B.M * Real.log B.M - B.K) + B.K :=
-            add_le_add_right hMul _
-  linarith
+  linarith [B.hImplicit, hMul]
 
 /-- **Simplified form when `K = 0`.**  The whole-space (no
     torus-correction) version of `σ_le_of_largeness`. -/
@@ -166,9 +162,8 @@ theorem σ_le_of_largeness_of_K_zero
   -- we need `4 log M - K/M ≥ 1 + log L + (1/2) log(σ/ν)`, and with
   -- K = 0 this is just `4 log M ≥ ...`.
   apply B.σ_le_of_largeness
-  rw [hK]
-  simp
-  exact hLarge
+  have hKM : B.K / B.M = 0 := by rw [hK]; simp
+  linarith [hLarge, hKM]
 
 /-- **Monotonicity of the RHS in `M`.**  Once we have `σ ≤ 4 M log M`,
     any weaker bound `σ ≤ 4 M' log M'` for `M' ≥ M` also holds,
@@ -246,6 +241,10 @@ example : ∃ (B : ImplicitBoundBundle), B.M = 1 := by
       hK_nonneg := le_refl 0,
       hImplicit := ?_ }, rfl⟩
   -- Show: 1 ≤ 1 * (1 + log 1 + (1/2) * log (1/1)) + 0
-  simp [Real.log_one]
+  have h1 : Real.log (1 : ℝ) = 0 := Real.log_one
+  have h11 : Real.log ((1 : ℝ) / 1) = 0 := by
+    rw [div_self (one_ne_zero)]; exact Real.log_one
+  rw [h1, h11]
+  norm_num
 
 end NSBlwChain.Caveats

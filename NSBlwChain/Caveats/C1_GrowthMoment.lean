@@ -134,16 +134,17 @@ theorem M_le_M0_of_Φ_nonpos
     B.M t ≤ B.M 0 := by
   -- Integrated form.
   have h := B.pointwise_bound h0t htT
-  -- The integrand is ≤ 0 on [0, t], so the integral is ≤ 0.
+  -- The integrand is ≤ 0 on [0, t], so the integral is ≤ 0 via
+  -- monotonicity against the zero function.
   have h_int_nonpos : ∫ τ in (0 : ℝ)..t, B.Φ (B.M τ) ≤ 0 := by
-    -- Use `intervalIntegral.integral_nonpos`.
-    have hle : (0 : ℝ) ≤ t := h0t
-    apply intervalIntegral.integral_nonpos hle
-    intro τ hτ
-    -- hτ : τ ∈ Set.Ioc 0 t
-    have hτ_nonneg : 0 ≤ τ := le_of_lt hτ.1
-    have hτ_ltT : τ < T B := lt_of_le_of_lt hτ.2 htT
-    exact hΦ_nonpos τ hτ_nonneg hτ_ltT
+    have h_int_mono :
+        ∫ τ in (0 : ℝ)..t, B.Φ (B.M τ) ≤ ∫ _ in (0 : ℝ)..t, (0 : ℝ) := by
+      apply intervalIntegral.integral_mono_on h0t
+        (B.hInt_loc (le_refl 0) h0t htT) intervalIntegrable_const
+      intro τ hτ
+      -- hτ : τ ∈ Set.Icc 0 t
+      exact hΦ_nonpos τ hτ.1 (lt_of_le_of_lt hτ.2 htT)
+    simpa using h_int_mono
   linarith
 
 /-- **Monotonicity refinement.**  Under the same non-positivity
@@ -155,11 +156,14 @@ theorem M_antitone_of_Φ_nonpos
     B.M t ≤ B.M s := by
   have h := B.hIntegratedBound h0s hst htT
   have h_int_nonpos : ∫ τ in s..t, B.Φ (B.M τ) ≤ 0 := by
-    apply intervalIntegral.integral_nonpos hst
-    intro τ hτ
-    have hτ_nonneg : 0 ≤ τ := le_trans h0s (le_of_lt hτ.1)
-    have hτ_ltT : τ < T B := lt_of_le_of_lt hτ.2 htT
-    exact hΦ_nonpos τ hτ_nonneg hτ_ltT
+    have h_int_mono :
+        ∫ τ in s..t, B.Φ (B.M τ) ≤ ∫ _ in s..t, (0 : ℝ) := by
+      apply intervalIntegral.integral_mono_on hst
+        (B.hInt_loc h0s hst htT) intervalIntegrable_const
+      intro τ hτ
+      have hτ_nonneg : 0 ≤ τ := le_trans h0s hτ.1
+      exact hΦ_nonpos τ hτ_nonneg (lt_of_le_of_lt hτ.2 htT)
+    simpa using h_int_mono
   linarith
 
 /-- **Sub-additivity in time.**  The total-variation form implies
