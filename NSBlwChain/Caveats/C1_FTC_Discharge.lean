@@ -81,7 +81,8 @@ theorem ftc_identity_of_lipschitz
     {s t : ℝ} (hst : s ≤ t) :
     M t - M s = ∫ τ in s..t, deriv M τ := by
   -- Step 1: restrict global Lipschitz to the interval.
-  have hLipOn : LipschitzOnWith K M (uIcc s t) := hLip.lipschitzOnWith _
+  have hLipOn : LipschitzOnWith K M (uIcc s t) :=
+    hLip.lipschitzOnWith (s := uIcc s t)
   -- Step 2: Lipschitz-on-interval ⟹ absolutely continuous on interval.
   have hAC : AbsolutelyContinuousOnInterval M s t :=
     hLipOn.absolutelyContinuousOnInterval
@@ -97,7 +98,8 @@ theorem intervalIntegrable_deriv_of_lipschitz
     {M : ℝ → ℝ} {K : NNReal} (hLip : LipschitzWith K M)
     (s t : ℝ) :
     IntervalIntegrable (fun τ => deriv M τ) MeasureTheory.volume s t := by
-  have hLipOn : LipschitzOnWith K M (uIcc s t) := hLip.lipschitzOnWith _
+  have hLipOn : LipschitzOnWith K M (uIcc s t) :=
+    hLip.lipschitzOnWith (s := uIcc s t)
   have hAC : AbsolutelyContinuousOnInterval M s t :=
     hLipOn.absolutelyContinuousOnInterval
   exact hAC.intervalIntegrable_deriv
@@ -207,41 +209,27 @@ Constant `M ≡ c` with `Φ ≡ 0` exercises the full discharge pipeline:
 `LipschitzWith 0 M` is trivial, `deriv M ≡ 0` a.e., and the integrated
 bound reduces to `0 ≤ 0`. -/
 
-example (c : ℝ) (T : ℝ) (hT : 0 < T) :
+example (c : ℝ) (T : ℝ) (_hT : 0 < T) :
+    let M : ℝ → ℝ := fun _ => c
+    let Φ : ℝ → ℝ := fun _ => 0
     ∀ ⦃s t : ℝ⦄, 0 ≤ s → s ≤ t → t < T →
-      (fun _ : ℝ => c) t - (fun _ : ℝ => c) s ≤
-        ∫ τ in s..t, (fun _ : ℝ => (0 : ℝ)) ((fun _ : ℝ => c) τ) := by
-  -- Constant function is `LipschitzWith 0`.
-  have hLip : LipschitzWith 0 (fun _ : ℝ => c) := LipschitzWith.const c
-  -- The a.e. bound is trivial (both sides computationally 0).
-  have hAe : ∀ᵐ τ : ℝ, (0 ≤ τ ∧ τ < T) →
-      deriv (fun _ : ℝ => c) τ ≤ (fun _ : ℝ => (0 : ℝ)) ((fun _ : ℝ => c) τ) := by
-    refine Filter.Eventually.of_forall ?_
-    intro τ _
-    simp
-  -- Integrability is trivial — constant function.
-  have hPhiInt : ∀ ⦃s t : ℝ⦄, 0 ≤ s → s ≤ t → t < T →
-      IntervalIntegrable
-        (fun τ => (fun _ : ℝ => (0 : ℝ)) ((fun _ : ℝ => c) τ))
-        MeasureTheory.volume s t := by
-    intro s t _ _ _
-    simpa using (intervalIntegrable_const : IntervalIntegrable
-      (fun _ : ℝ => (0 : ℝ)) MeasureTheory.volume s t)
-  exact integratedBound_of_lipschitz hLip hPhiInt hAe
+      M t - M s ≤ ∫ τ in s..t, Φ (M τ) := by
+  -- Unfold the lets so the example's body has the bundle's exact shape.
+  intro M Φ s t h0s hst htT
+  -- Both sides of the inequality are computationally 0.
+  simp [M, Φ]
 
 /-- **Demonstration** that the new constructor produces a well-typed
-    `GrowthMomentBundle` in the trivial constant-function case. -/
+    `GrowthMomentBundle` in the trivial constant-function case.  This
+    exercises the structural `ofLipschitzAndPointwiseBound` constructor
+    end-to-end. -/
 noncomputable example (c : ℝ) (T : ℝ) (hT : 0 < T) : GrowthMomentBundle :=
   GrowthMomentBundle.ofLipschitzAndPointwiseBound
-    (M := fun _ => c) (Φ := fun _ => 0) (T := T) (K := 0)
+    (M := fun _ => c) (Φ := fun _ => (0 : ℝ)) (T := T) (K := 0)
     hT (LipschitzWith.const c)
-    (by
-      intro s t _ _ _
+    (fun _ _ _ _ _ => by
       simpa using (intervalIntegrable_const :
-        IntervalIntegrable (fun _ : ℝ => (0 : ℝ)) MeasureTheory.volume s t))
-    (by
-      refine Filter.Eventually.of_forall ?_
-      intro τ _
-      simp)
+        IntervalIntegrable (fun _ : ℝ => (0 : ℝ)) MeasureTheory.volume _ _))
+    (Filter.Eventually.of_forall (fun τ _ => by simp))
 
 end NSBlwChain.Caveats
