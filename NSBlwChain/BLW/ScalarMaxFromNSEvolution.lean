@@ -5,9 +5,6 @@ import Mathlib
 import NSBlwChain.BLW.SliceSmoothness
 import NSBlwChain.BLW.MaxPrincipleFromLocalMax
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # `ScalarLocalMaxSecondDeriv` from `NSEvolutionAxioms`
 
