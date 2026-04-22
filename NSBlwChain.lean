@@ -27,6 +27,7 @@ import NSBlwChain.BLW.GrowthBoundFromStrain
 import NSBlwChain.BLW.FullScalarChain
 import NSBlwChain.BLW.ODEToSeregin
 import NSBlwChain.BLW.ChainHypotheses
+import NSBlwChain.BLW.AnalyticalToImplicit
 import NSBlwChain.Unconditional.Theorem1
 import NSBlwChain.Unconditional.Theorem2
 import NSBlwChain.Torus.EpsteinZeta
