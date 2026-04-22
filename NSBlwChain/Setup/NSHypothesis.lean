@@ -38,6 +38,45 @@ without carrying a long list of prerequisites in every signature.
    the full Kato-type analyticity statement is a *separate* classical
    axiom (`NS_time_analyticity` in `ClassicalAxioms.lean`), not part
    of this bundle.
+
+## Implicit assumptions (not recorded as bundle fields)
+
+Per the model-correctness audit
+(`noethersolve/docs/findings/ns_model_correctness_memo_2026_04_22.md`),
+the following four assumptions are **standard in the smooth regime
+on $\mathbb{R}^3$** and are not asserted as explicit fields here.
+They are enumerated for transparency; downstream consumers that
+actually need them (notably the Biot–Savart axiom) rely on them
+implicitly:
+
+(a) **Time-differentiability of `u`.**  `time_cont` asserts only
+    continuity; `materialDerivative` uses mathlib's convention
+    `deriv = 0` on non-differentiable points, so the vorticity
+    equation trivially holds where `u` is time-continuous but not
+    time-differentiable.  In practice `NS_time_analyticity` (the
+    classical axiom) supplies C^∞-in-time for smooth NS solutions,
+    so this is safe in every context where the chain is invoked.
+
+(b) **Decay at infinity on $\mathbb{R}^3$.**  The Biot–Savart
+    integral $u(x) = \frac{1}{4\pi}\int\frac{(x-y)\times\omega(y)}{|x-y|^3}dy$
+    requires decay of `ω` (Schwartz, compact support, or
+    $L^p$-integrable for appropriate `p`) for convergence.  The
+    `biot_savart_self_strain_bound` axiom implicitly takes decay
+    as part of its classical derivation.  On the torus this is
+    automatic; on $\mathbb{R}^3$ consumers are expected to supply
+    initial data in a Schwartz-type class.
+
+(c) **Pressure via Helmholtz decomposition.**  The momentum equation
+    is *not* part of this bundle (the vorticity equation eliminates
+    pressure by construction).  On $\mathbb{R}^3$ with decay, a
+    smooth divergence-free solution to the vorticity equation is
+    automatically a full NS solution with a definable pressure via
+    the Helmholtz projector; this is a theorem rather than a
+    hypothesis.
+
+(d) **Initial-data regularity.**  The bundle presumes an existing
+    smooth solution on `[0, T)`; initial-value regularity is
+    upstream (Kato local existence) and not re-asserted here.
 -/
 
 namespace NSBlwChain
