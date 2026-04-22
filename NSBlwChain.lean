@@ -19,4 +19,5 @@ import NSBlwChain.BLW.ChainWiring
 import NSBlwChain.BLW.VorticityAtArgmax
 import NSBlwChain.BLW.HessianAtArgmax
 import NSBlwChain.BLW.ArgmaxGradient
+import NSBlwChain.BLW.ArgmaxStepsCompose
 import NSBlwChain.Unconditional.Theorem1
