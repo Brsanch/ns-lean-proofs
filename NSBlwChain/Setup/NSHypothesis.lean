@@ -59,12 +59,14 @@ implicitly:
 
 (b) **Decay at infinity on $\mathbb{R}^3$.**  The Biot–Savart
     integral $u(x) = \frac{1}{4\pi}\int\frac{(x-y)\times\omega(y)}{|x-y|^3}dy$
-    requires decay of `ω` (Schwartz, compact support, or
-    $L^p$-integrable for appropriate `p`) for convergence.  The
-    `biot_savart_self_strain_bound` axiom implicitly takes decay
-    as part of its classical derivation.  On the torus this is
-    automatic; on $\mathbb{R}^3$ consumers are expected to supply
-    initial data in a Schwartz-type class.
+    requires decay of `ω` (Schwartz, compact support, or polynomial
+    faster than `|x|^{-3}`) for convergence.  This hypothesis is
+    now **explicit** at the classical-axioms layer via
+    `NSBlwChain.DecayAtInfinity` in `ClassicalAxioms.lean`, which
+    `biot_savart_self_strain_bound` takes as a second hypothesis
+    alongside `NSEvolutionAxioms`.  On the torus the witness is
+    trivially provided; on $\mathbb{R}^3$ consumers supply it from
+    the function space (Schwartz, weighted Sobolev, etc).
 
 (c) **Pressure via Helmholtz decomposition.**  The momentum equation
     is *not* part of this bundle (the vorticity equation eliminates
