@@ -48,4 +48,5 @@ import NSBlwChain.BLW.SanityExamples
 import NSBlwChain.BLW.AdvectionVanishes
 import NSBlwChain.BLW.SelfStrainNonneg
 import NSBlwChain.BLW.HessianExpansionIdentity
+import NSBlwChain.BLW.LipschitzMScalar
 import NSBlwChain.Analyticity.IdentityTheorem
