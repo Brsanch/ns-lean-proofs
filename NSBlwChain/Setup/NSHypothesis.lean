@@ -94,9 +94,14 @@ structure NSEvolutionAxioms
   nu_pos : 0 < ν
   /-- Positive blowup time. -/
   T_pos  : 0 < T
-  /-- Smoothness in space at every time in `[0, T)`. -/
+  /-- Smoothness in space at every time in `[0, T)`.
+
+      We require `C⁴` smoothness, which is enough to form the vector
+      Laplacian of the vorticity (third derivative of `u`) and is the
+      regularity actually consumed by §12.3.  Upgrading to `C∞` is
+      available but not needed here. -/
   smooth_in_space :
-    ∀ t : ℝ, 0 ≤ t → t < T → ContDiff ℝ ∞ (u t)
+    ∀ t : ℝ, 0 ≤ t → t < T → ContDiff ℝ 4 (u t)
   /-- Divergence-free. -/
   div_free :
     ∀ t : ℝ, 0 ≤ t → t < T → ∀ x : Vec3, divergence (u t) x = 0
