@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this formalization, please cite it as below."
+type: software
+title: "NS BLW-Gradient Chain: A Lean 4 Formalization of the Buaria–Lawson–Wilczek Gradient Chain for 3D Navier–Stokes Regularity"
+authors:
+  - family-names: Sanchez
+    given-names: Bryan
+    alias: Brsanch
+version: 0.1.0
+date-released: "2026-04-22"
+url: "https://github.com/Brsanch/ns-lean-proofs"
+repository-code: "https://github.com/Brsanch/ns-lean-proofs"
+license: MIT
+keywords:
+  - Lean 4
+  - mathlib
+  - formal verification
+  - interactive theorem proving
+  - Navier–Stokes equations
+  - fluid dynamics
+  - partial differential equations
+  - regularity theory
+  - Biot–Savart
+  - Buaria–Lawson–Wilczek
