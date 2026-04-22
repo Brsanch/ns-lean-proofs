@@ -24,8 +24,10 @@ numbers.
 ## Contents
 
 * `example_gradBoundHypotheses` — `ν = 1, M = 10, σ = 4, gradSqNorm = 40,
-  laplaceOmega3 = -4, growth = 0`.  Checks `gradient_bound`
-  conclusion `gradSqNorm ≤ 400`.
+  laplaceOmega3 = -4, growth = 36`.  Checks `gradient_bound`
+  conclusion `gradSqNorm ≤ 400`.  The value `growth = 36` is forced
+  by the time-derivative identity `ν · Δω₃ = Ṁ - M σ`:
+  `1·(-4) = 36 - 10·4 = -4`.
 
 * `example_argmaxGradientInputs` — trivial instance with
   `M = 10, ∂ω₃ = 0`.
@@ -38,14 +40,18 @@ namespace NSBlwChain.BLW
 open NSBlwChain
 
 /-- Concrete `GradBoundHypotheses` instance with ν=1, M=10, σ=4,
-    gradSqNorm=40, laplaceOmega3=-4, growth=0. -/
+    gradSqNorm=40, laplaceOmega3=-4, growth=36.  These scalars
+    satisfy the full constraint chain:
+    * `ν · Δω₃ = Ṁ - M·σ` → `1·(-4) = 36 - 10·4 = -4` ✓.
+    * `gradSqNorm ≤ M · |Δω₃|` → `40 ≤ 10·4 = 40` ✓.
+    * `Δω₃ ≤ 0` and `Ṁ ≥ 0` ✓. -/
 noncomputable def exampleGradBound : GradBoundHypotheses where
   ν                              := 1
   M                              := 10
   sigma                          := 4
   gradSqNorm                     := 40
   laplaceOmega3                  := -4
-  growth                         := 0
+  growth                         := 36
   nu_pos                         := by norm_num
   M_nonneg                       := by norm_num
   gradSqNorm_le_M_laplace        := by
@@ -55,7 +61,7 @@ noncomputable def exampleGradBound : GradBoundHypotheses where
     rw [h]; norm_num
   laplace_eq_growth_minus_strain := by norm_num
   laplace_nonpos                 := by norm_num
-  growth_nonneg                  := le_refl 0
+  growth_nonneg                  := by norm_num
 
 /-- Sanity check: the concrete bundle yields `gradSqNorm ≤ 400 = 10²·4/1`. -/
 example : exampleGradBound.gradSqNorm ≤ exampleGradBound.M ^ 2 *
