@@ -18,3 +18,4 @@ import NSBlwChain.BLW.ChainThread
 import NSBlwChain.BLW.ChainWiring
 import NSBlwChain.BLW.VorticityAtArgmax
 import NSBlwChain.BLW.HessianAtArgmax
+import NSBlwChain.BLW.ArgmaxGradient
