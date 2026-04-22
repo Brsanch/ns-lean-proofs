@@ -35,13 +35,16 @@ them by name.
    Sobolev embedding.  See the `/-! ## Axiom 2 ... -/` header
    below for the citation note.
 
-3. **NS time-analyticity (Masuda 1967 / Foias–Temam 1979).**
+3. **NS time-analyticity (Masuda 1967 + Foias–Temam 1979).**
    Named: `NS_time_analyticity`.  Smooth NS solutions extend to
    a holomorphic map on a complex strip around every interior
-   time in `(0, T)`.  The correct primary source is Masuda 1967
-   Proc. Japan Acad. 43; "Kato 1967" appearing in older drafts is
-   a mis-citation (that Kato paper is about 2D Euler, not NS
-   analyticity).  See the `/-! ## Axiom 3 ... -/` header below.
+   time in `(0, T)`.  The correct primary sources are Masuda 1967
+   Proc. Japan Acad. 43 (bounded domain / exterior with Dirichlet
+   BC) and **Foias–Temam 1979 J. Math. Pures Appl. 58** (whole-space /
+   torus, venue definitively resolved 2026-04-22); "Kato 1967"
+   appearing in older drafts is a mis-citation (that Kato paper
+   is about 2D Euler, not NS analyticity).  See the `/-! ## Axiom 3
+   ... -/` header below.
 
 ## Consumed forms
 
@@ -171,13 +174,26 @@ The axiom below is stated in the **vorticity-Type-I form** actually
 consumed by the BLW chain.  This is *not* Seregin 2012 verbatim — it
 is the composite theorem
 
-  *Seregin 2012 (L³ criterion)* + *Biot–Savart on ℝ³* + *Sobolev embedding*
+  *ESS 2003 + Seregin 2012 (L³ criterion)* + *Biot–Savart on ℝ³* + *Sobolev embedding*
   ⇒ vorticity-sub-Type-I rate excludes blow-up.
+
+Strictly speaking the originating L³ criterion is **Escauriaza–Seregin–
+Šverák 2003** ("L_{3,∞}-solutions of the Navier–Stokes equation and
+backward uniqueness", Russian Math. Surveys **58**, 211–250), which
+handled the endpoint `L^∞_t L^3_x` case.  Seregin 2012 refines this
+to a necessary condition where the full limit (not limsup) is used:
+if `lim_{t→T⁻} ‖u(·,t)‖_{L³} = ∞` fails, then no singularity at `T`.
 
 In the smooth regime on ℝ³, the vorticity bound `‖ω(t)‖_∞ ≤ ε/(T-t)`
 implies (via Biot–Savart + weighted estimates) `‖u(t)‖_{L³} = O(1)`
-as `t → T⁻`, which Seregin 2012 then excludes.  The bridging step is
-classical but should be noted in any external review.
+as `t → T⁻`, which ESS 2003 / Seregin 2012 then excludes.  The
+bridging step is classical but should be noted in any external
+review.
+
+Journal-hunt cross-check (2026-04-22,
+`noethersolve/docs/findings/ns_journal_theorem_statements_2026_04_22.md`)
+confirmed Seregin 2012 against arXiv:1104.3615 and flagged the
+`lim` vs `limsup` distinction.
 -/
 
 /-- Consumed form of Seregin (2012) composed with Biot–Savart +
@@ -214,23 +230,39 @@ axiom seregin_type_one_exclusion
                 ≤ ε / (T - t)) :
     SereginTypeOneExclusion u ν T
 
-/-! ## Axiom 3 — NS time-analyticity (Masuda 1967 / Foias–Temam 1979)
+/-! ## Axiom 3 — NS time-analyticity (Masuda 1967 + Foias–Temam 1979)
 
 **Citation correction.**  Earlier versions of this project cited
 "Kato 1967 ARMA 25" here, which is actually Kato's 2D Euler paper,
-not NS time analyticity.  The correct primary source for time
-analyticity of smooth 3D NS solutions is
+not NS time analyticity.  The correct primary sources — both needed
+jointly — are:
 
   *K. Masuda, On the analyticity and the unique continuation theorem
   for solutions of the Navier–Stokes equation*, Proc. Japan Acad.
-  **43** (1967), 827–832,
+  **43** (1967), 827–832.
 
-and the standard Banach-scale extension is Foias–Temam 1979
-(bibliographic venue should be verified by the reviewer; the paper's
-supplemental note cites *J. Math. Pures Appl.* 58).  The content
-below is the **real-analyticity window** consumed by the BLW chain,
-which is weaker than (and implied by) the full holomorphic-strip
-extension in either source.
+  *C. Foias, R. Temam, Some analytic and geometric properties of the
+  solutions of the evolution Navier–Stokes equations*, J. Math.
+  Pures Appl. **58** (1979), 339–368.
+
+Journal-hunt cross-check (2026-04-22,
+`noethersolve/docs/findings/ns_journal_theorem_statements_2026_04_22.md`)
+confirmed Masuda 1967 against the J-STAGE PDF and **definitively
+resolved the venue for Foias–Temam 1979 as J. Math. Pures Appl.
+58 (1979), 339–368** (not J. Funct. Anal. 33 as cited in some earlier
+drafts — that is a different 1989 Gevrey-regularity paper).
+
+**Why both sources.**  Masuda 1967 proves time-analyticity on
+**bounded domains or exterior of a C² hypersurface with Dirichlet
+BC**, not directly on ℝ³ or the torus.  Foias–Temam 1979 provides
+the **torus / ℝ³ whole-space** version via Galerkin + Banach-scale
+extension.  The Lean axiom below is stated domain-abstractly so it
+covers either source's setting, but for a full formalization the
+domain and BC would need to be fixed to match the source.
+
+The content below is the **real-analyticity window** consumed by the
+BLW chain, which is weaker than (and implied by) the full
+holomorphic-strip extension in either source.
 -/
 
 /-- Consumed form of Masuda (1967) / Foias–Temam (1979).  Provides,
