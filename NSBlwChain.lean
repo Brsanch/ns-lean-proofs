@@ -66,6 +66,7 @@ import NSBlwChain.BLW.VorticityFrameFromEnvelope
 import NSBlwChain.BLW.DerivFrameFromProductRule
 import NSBlwChain.BLW.DerivFrameFromNSEvolution
 import NSBlwChain.BLW.SliceSmoothness
+import NSBlwChain.BLW.ScalarMaxFromNSEvolution
 import NSBlwChain.BLW.HessianExpansionFromC2
 import NSBlwChain.BLW.FullDischargePipeline
 import NSBlwChain.BLW.FromNSEvolution
