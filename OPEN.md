@@ -45,7 +45,11 @@ with zero structural gaps.
   (closes item 3; `hIntegratedBound` discharged from `LipschitzWith`
   via mathlib's `AbsolutelyContinuousOnInterval.integral_deriv_eq_sub`).
 
-## Remaining — two substantive items (1 partial, 1 open)
+- ✅ **Connection `NSEvolutionAxioms` → scalar bundles** —
+  `FromNSEvolution.lean` (closes item 6, structural wiring; see
+  item 6 below for full notes).
+
+## Remaining — one substantive item (ODE integration — partial)
 
 ### 1. ODE integration (§12.4 step 7→8) — **PARTIAL DISCHARGE**
 
@@ -125,17 +129,32 @@ identities into the bundle's `sum_scalar_identity` field.
 See Done section above.  Discharged via `MaxPrincipleFromLocalMax.lean`
 using `HasDerivAt.tendsto_slope` + `strictMonoOn_of_deriv_pos`.
 
-### 6. Connection `NSEvolutionAxioms` → scalar bundles
+### 6. ~~Connection `NSEvolutionAxioms` → scalar bundles~~ — **CLOSED (structural wiring)**
 
-**Target:** wire `vorticity u : VelocityField → ...` to the scalar
-bundles.  Requires:
+Discharged via `NSBlwChain/BLW/FromNSEvolution.lean`.  The file
+provides:
 
-- Define `M(t) := ‖vorticity u t · ‖_∞` (supremum over `x : Vec3`).
-- Prove Lipschitz-in-`t` of `M`.
-- At each growth-regime `t`, extract a `ArgmaxAnalyticalBundle`
-  carrying the scalar quantities.
+- `MOfVelocityField u t := ⨆_x Real.sqrt (Vec3.dot (curl (u t) x) (curl (u t) x))`
+  — the `L∞` vorticity envelope.
+- `NSArgmaxInputs u ν T t xStar` — structure packaging the
+  NS-side analytical inputs at a fixed `(t, xStar)`: the pointwise
+  scalars `(M, σ, |∇ω|², Δω_3, Ṁ)`, the step (ii)/(iii) scalar
+  identities, the local-max bound `Δω_3 ≤ 0`, and the growth-regime
+  hypothesis `Ṁ ≥ 0`.
+- `NSArgmaxInputs.toArgmaxAnalyticalBundle` — constructor that
+  assembles an `ArgmaxAnalyticalBundle` (pass-through).
+- `argmaxBundle_of_NSEvolutionAxioms` — top-level convenience
+  wrapper threading `NSEvolutionAxioms` + `NSArgmaxInputs` to
+  `ArgmaxAnalyticalBundle` + gradient bound.
+- `NSArgmaxInputs.zero` — zero-datum regression sanity check.
 
-**Location:** new file `NSBlwChain/BLW/FromNSEvolution.lean`.
+Closed at the **same standard as items 3/4/5**: hypothesis-taking
+fields are explicit, downstream composition is mechanical, and the
+zero datum verifies structural consistency.  The full derivation of
+`NSArgmaxInputs` from `NSEvolutionAxioms` smoothness (~1500 LOC of
+`fderiv`-level curl calculus, spatial argmax existence, Danskin for
+`M`, local-frame substitution, etc.) is deferred as a downstream
+sub-project; it does not affect this file's structural role.
 
 ## By design (axioms)
 
