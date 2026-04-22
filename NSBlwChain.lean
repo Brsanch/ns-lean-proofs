@@ -56,4 +56,5 @@ import NSBlwChain.BLW.MaxPrinciple
 import NSBlwChain.BLW.HessianFrameFromMaxPrinciple
 import NSBlwChain.BLW.VorticityFrameFromEnvelope
 import NSBlwChain.BLW.DerivFrameFromProductRule
+import NSBlwChain.BLW.FullDischargePipeline
 import NSBlwChain.Analyticity.IdentityTheorem
