@@ -67,23 +67,34 @@ a **single** clean residual hypothesis:
 This is the substitution-level bound for `w := 1/(M·log M)`.  The
 algebraic step `w(t) ≥ 4(T-t) ⇒ (T-t)·M·logM ≤ 1/4` is unconditional.
 
-**Remaining:** derive `hW_lower_bound` from the a.e. ODE inequality
-`Ṁ ≤ 4 M² log M` via:
-1. quotient rule on `w = 1/(M·log M)` to get `ẇ ≥ -4 - 4/log M`;
-2. FTC integration from `t` to `T⁻`
-   (`intervalIntegral.integral_eq_sub_of_hasDerivAt`);
-3. boundary limit `w(T⁻) = 0` from `log M → ∞` and `M > 1`;
-4. tail absorption of `∫_t^T 4/log M ds = o(T-t)` as `t → T⁻`.
+**Progress (2026-04-22, commit `68bd0b1`):** pointwise half now
+machine-verified in `NSBlwChain/BLW/ODEIntegration_ResidualDischarge.lean`:
 
-**Derivation sketch (paper §12.4):** Given a.e. `Ṁ ≤ 4 M² log M`, the
-function `w := 1/(M · log M)` satisfies
-`ẇ = -Ṁ(log M + 1)/(M · log M)² ≥ -4 - 4/log M`.  Integrating from
-`t` to `T⁻` with `w(T⁻) = 0` (from `log M → ∞`) and absorbing the
-`4/log M` tail yields `w(t) ≥ 4(T-t)`, i.e., the clean residual
-above.
+1. ✅ **Quotient rule** — `deriv_w_quotient`:
+   `d/dt(1/(M·log M)) = -(Ṁ·(log M + 1))/(M·log M)²`, proved via
+   `HasDerivAt.mul`, `HasDerivAt.log`, `HasDerivAt.inv`.
+2. ✅ **ODE-inequality transfer** — `deriv_w_lower_bound`:
+   `Ṁ ≤ 4 M² log M ⇒ ẇ ≥ -4 - 4/log M` at each interior point.
+3. ✅ **Symmetric tight-equality variant** — `deriv_w_upper_bound_of_tight`.
+
+**Remaining** (single `sorry` in
+`hW_lower_bound_of_rate_equality`): FTC + limit composition —
+
+- On `[t, T-ε]`, apply `intervalIntegral.integral_eq_sub_of_hasDerivAt`
+  with `ẇ ≥ -4 - 4/log M` to get
+  `w(T-ε) - w(t) ≥ -4·(T-ε-t) - ∫_t^{T-ε} 4/log M ds`.
+- Drop `∫ 4/log M ≥ 0` (already hypothesized as `h_tail_nonneg`).
+- Take `ε → 0⁺` using `hW_boundary : w(T⁻) → 0`.
+
+All four mathematical pieces are isolated as hypothesis fields on
+`hW_lower_bound_of_rate_equality` (continuity, differentiability,
+pointwise bound, boundary limit, tail nonnegativity); only the
+*tactical packaging* of FTC + limit remains.
 
 **Location:** `NSBlwChain/BLW/ODEIntegration.lean` (bundle) +
-`NSBlwChain/BLW/ODEIntegration_Discharge.lean` (partial discharge).
+`NSBlwChain/BLW/ODEIntegration_Discharge.lean` (algebraic core) +
+`NSBlwChain/BLW/ODEIntegration_ResidualDischarge.lean` (pointwise
+calculus, FTC-limit composition remaining).
 
 ### 2. ~~Banach fixed-point for C4 largeness~~ — **CLOSED**
 
