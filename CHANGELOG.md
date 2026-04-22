@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.5 — 2026-04-22 (morning)
+
+**Pre-review pipeline executed.** Four review-preprocessing deliverables
+landed as `docs/findings/*.md` in the noethersolve repo:
+
+- `ns_obstruction_memo_2026_04_22.md` — survives-test against 6
+  literature obstructions (Tao 2014, CKN, BKM, PSL, ESS, Constantin-
+  Foias). Verdict: no blocking obstructions; Tao + Constantin-Foias
+  flagged as `plausibly survives` for closer look.
+- `ns_axiom_citation_audit_2026_04_22.md` — citation-fidelity audit
+  found three issues, all fixed in commits below.
+- `ns_model_correctness_memo_2026_04_22.md` — NSEvolutionAxioms
+  faithful encoding; four implicit-but-standard assumptions flagged.
+- `ns_journal_theorem_statements_2026_04_22.md` — journal-hunt
+  verified Masuda 1967 (J-STAGE) and Seregin 2012 (arXiv:1104.3615);
+  Foias-Temam 1979 venue definitively resolved as J. Math. Pures
+  Appl. 58 (not J. Funct. Anal. 33 as earlier draft had).
+
+**Lean-side fixes from the audits:**
+
+- Axiom 1 (`biot_savart_self_strain_bound`): added `Mdot` + `0 ≤ Mdot`
+  growth-regime hypothesis (previously implicit); corrected docstring
+  to identify as §12.4 log-absorption output, not Prop 12.1 alone.
+  Threaded through `buildImplicitBundleFromAxiom`,
+  `sigma_le_4M_log_M_from_axiom`, `sigma_le_4M_log_M_of_analytical`,
+  `FullScalarChain.sigma_bound_from_chain`.
+- Axiom 2 (`seregin_type_one_exclusion`): documented as composite
+  (Seregin 2012 L³ + Biot-Savart + Sobolev ⇒ vorticity-Type-I);
+  added ESS 2003 citation as the originating L³ criterion.
+- Axiom 3 (`NS_time_analyticity`): citation corrected from
+  "Kato 1967" (2D Euler) to Masuda 1967 Proc Japan Acad 43 +
+  Foias-Temam 1979 J. Math. Pures Appl. 58. Masuda covers bounded
+  domains / Dirichlet; Foias-Temam covers whole-space / torus.
+- New `DecayAtInfinity` structure in `ClassicalAxioms.lean` with
+  `has_polynomial_decay` field (C · |x|^{-p}, p > 3); added as
+  explicit hypothesis to `biot_savart_self_strain_bound`
+  (previously implicit).
+- New `NSBlwChain/Setup/DecayConstructors.lean` with two constructors:
+  `DecayAtInfinity.of_compactSupport_vorticity` (trivial, for
+  compactly-supported vorticity) and
+  `DecayAtInfinity.of_uniform_polynomial_bound` (direct pass-through).
+- `NSEvolutionAxioms` docstring: new section enumerating the four
+  implicit assumptions (time-differentiability via deriv-convention,
+  decay at infinity — now explicit in DecayAtInfinity, pressure via
+  Helmholtz, initial-data regularity).
+
+67 files, ~9900 LOC on main, all CI-green.
+
 ## v0.4 — 2026-04-22 (late-overnight)
 
 **All six originally-listed OPEN.md items fully closed.**  No
