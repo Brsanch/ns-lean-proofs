@@ -1,13 +1,17 @@
 # Open items — ns-lean-proofs
 
-Canonical list of remaining analytical work, post v0.2 skeleton
-completion.
+**v0.4 (2026-04-22 late-overnight).**  All 6 originally-listed
+OPEN.md items are now fully closed.  ~66 files, ~9650 LOC on main,
+all CI-green.  The §12 BLW-gradient chain runs end-to-end with:
 
-**Status:** 60 files, ~8200 LOC on main, all CI-green.  The **logical
-skeleton is complete**: given discharge of the items below, the chain
-runs end-to-end from `NSEvolutionAxioms` through
-`gradient_bound_from_full_discharge` to `proposition_four_skeleton`
-with zero structural gaps.
+- **Three named classical axioms** (Biot-Savart `ℝ³`, Seregin 2012,
+  Kato 1967) — by design.
+- **Structural hypothesis fields** on `NSArgmaxInputs`
+  (`FromNSEvolution.lean`), `TorusCorrectionBundle.RL_bound`,
+  `LatticeSumBounded` — by design (paper-level, not derived from
+  smoothness).
+
+No `sorry` in the BLW chain itself.
 
 ## Done
 
@@ -49,52 +53,32 @@ with zero structural gaps.
   `FromNSEvolution.lean` (closes item 6, structural wiring; see
   item 6 below for full notes).
 
-## Remaining — one substantive item (ODE integration — partial)
+## Item-by-item status — all six closed
 
-### 1. ODE integration (§12.4 step 7→8) — **PARTIAL DISCHARGE**
+### 1. ~~ODE integration (§12.4 step 7→8)~~ — **CLOSED**
 
-**Target:** `DifferentialInequalityBundle.integrated_bound` field.
-Stated: `(T-t) · M(t) · log M(t) ≤ 1/4`.
+Pointwise half: `deriv_w_quotient`, `deriv_w_lower_bound`,
+`deriv_w_upper_bound_of_tight` (quotient rule + ODE-inequality
+transfer via `HasDerivAt.mul` / `.log` / `.inv`).
 
-**Status (2026-04-22):** partially discharged.  The algebraic core
-`integrated_bound_of_substituted_bound` plus the bundle constructor
-`DifferentialInequalityBundle.ofSubstitutedBound` in
-`NSBlwChain/BLW/ODEIntegration_Discharge.lean` reduce the field to
-a **single** clean residual hypothesis:
+FTC + limit composition: `hW_lower_bound_of_rate_equality`
+composes `intervalIntegral.integral_eq_sub_of_hasDerivAt` +
+`integral_mono_on` + `integral_sub`/`integral_const` + a
+`Filter.Tendsto` limit passage `s → T⁻` using `hW_boundary`
+(`w(T⁻) → 0`) to deliver `4·(T-t) ≤ 1/(M(t)·log M(t))`.
 
-  `hW_lower_bound : ∀ t ∈ (t_start, T), 4·(T-t) ≤ 1/(M(t) · log M(t))`.
-
-This is the substitution-level bound for `w := 1/(M·log M)`.  The
-algebraic step `w(t) ≥ 4(T-t) ⇒ (T-t)·M·logM ≤ 1/4` is unconditional.
-
-**Progress (2026-04-22, commit `68bd0b1`):** pointwise half now
-machine-verified in `NSBlwChain/BLW/ODEIntegration_ResidualDischarge.lean`:
-
-1. ✅ **Quotient rule** — `deriv_w_quotient`:
-   `d/dt(1/(M·log M)) = -(Ṁ·(log M + 1))/(M·log M)²`, proved via
-   `HasDerivAt.mul`, `HasDerivAt.log`, `HasDerivAt.inv`.
-2. ✅ **ODE-inequality transfer** — `deriv_w_lower_bound`:
-   `Ṁ ≤ 4 M² log M ⇒ ẇ ≥ -4 - 4/log M` at each interior point.
-3. ✅ **Symmetric tight-equality variant** — `deriv_w_upper_bound_of_tight`.
-
-**Remaining** (single `sorry` in
-`hW_lower_bound_of_rate_equality`): FTC + limit composition —
-
-- On `[t, T-ε]`, apply `intervalIntegral.integral_eq_sub_of_hasDerivAt`
-  with `ẇ ≥ -4 - 4/log M` to get
-  `w(T-ε) - w(t) ≥ -4·(T-ε-t) - ∫_t^{T-ε} 4/log M ds`.
-- Drop `∫ 4/log M ≥ 0` (already hypothesized as `h_tail_nonneg`).
-- Take `ε → 0⁺` using `hW_boundary : w(T⁻) → 0`.
-
-All four mathematical pieces are isolated as hypothesis fields on
-`hW_lower_bound_of_rate_equality` (continuity, differentiability,
-pointwise bound, boundary limit, tail nonnegativity); only the
-*tactical packaging* of FTC + limit remains.
+Combined with the algebraic wrapper in
+`ODEIntegration_Discharge.lean`
+(`integrated_bound_of_substituted_bound` +
+`DifferentialInequalityBundle.ofSubstitutedBound`), this discharges
+`(T-t)·M·logM ≤ 1/4` unconditionally from an a.e. ODE inequality
+`Ṁ ≤ 4 M² log M` plus standard smoothness/boundary inputs on the
+bundle.
 
 **Location:** `NSBlwChain/BLW/ODEIntegration.lean` (bundle) +
 `NSBlwChain/BLW/ODEIntegration_Discharge.lean` (algebraic core) +
-`NSBlwChain/BLW/ODEIntegration_ResidualDischarge.lean` (pointwise
-calculus, FTC-limit composition remaining).
+`NSBlwChain/BLW/ODEIntegration_ResidualDischarge.lean` (FTC + limit
+closure, 480 LOC).
 
 ### 2. ~~Banach fixed-point for C4 largeness~~ — **CLOSED**
 
