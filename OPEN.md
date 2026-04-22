@@ -36,8 +36,12 @@ axioms. Budget: <25,000 LOC.
 
 - [ ] **`Caveats/C1_GrowthMoment.lean`** (~800 LOC). Jordan decomposition,
   Proposition C1, Corollary C1.1.
-- [ ] **`Caveats/C2_Envelope.lean`** (~1,200 LOC). Lemma C2.1 (Lipschitz
-  of $M$), Lemma C2.5 (Danskin envelope), Proposition C2.
+- [x] **`Caveats/C2_Envelope.lean`** — **Lemma C2.5 (Danskin envelope)
+  core landed in v0.1.1.** Includes `danskin_envelope`,
+  `danskin_envelope_consistent` (uniqueness across argmax points), and
+  `deriv_sup_eq_deriv_slice_of_argmax`. Still TODO in this file:
+  Lemma C2.1 (Lipschitz of $M$) and Proposition C2 (a.e. ODE packaging),
+  ~800–1,000 more LOC.
 - [ ] **`Caveats/C4_ImplicitBound.lean`** (~1,000 LOC). Convex analysis,
   Proposition C4 ($\sigma \leq 4M\log M$), Banach fixed-point.
 - [ ] **`Caveats/AngularIntegrals.lean`** (~500 LOC). D.3.1 ($\int = 2\delta/3$),
