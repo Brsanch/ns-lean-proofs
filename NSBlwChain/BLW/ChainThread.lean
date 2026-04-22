@@ -66,8 +66,10 @@ open NSBlwChain NSBlwChain.Caveats
     machinery in turn.
 
     The threaded conclusion returns a `SereginTypeOneExclusion`
-    package — existence of `T' > T` plus a smooth-extended `u'`. -/
-theorem extends_past_T_of_subTypeI
+    package — existence of `T' > T` plus a smooth-extended `u'`.
+    Since `SereginTypeOneExclusion` is a data-carrying structure
+    (not a `Prop`), this is a `def` rather than a `theorem`. -/
+def extends_past_T_of_subTypeI
     {u : VelocityField} {ν T : ℝ}
     (ax : NSEvolutionAxioms u ν T)
     (h_subTypeI :
