@@ -4,9 +4,6 @@
 import Mathlib
 import NSBlwChain.Setup.VectorFields
 import NSBlwChain.Setup.NSHypothesis
-import NSBlwChain.Setup.ClassicalAxioms
-import NSBlwChain.Caveats.C1_GrowthMoment
-import NSBlwChain.Caveats.C4_ImplicitBound
 import NSBlwChain.BLW.GradientBound
 import NSBlwChain.BLW.ArgmaxIdentities
 import NSBlwChain.BLW.LogAbsorption
