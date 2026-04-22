@@ -44,4 +44,5 @@ import NSBlwChain.BLW.LogInequalities
 import NSBlwChain.BLW.BootstrapDischarge
 import NSBlwChain.BLW.ChainRuleMSquared
 import NSBlwChain.BLW.SanityExamples
+import NSBlwChain.BLW.AdvectionVanishes
 import NSBlwChain.Analyticity.IdentityTheorem
