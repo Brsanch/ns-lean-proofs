@@ -111,7 +111,6 @@ theorem deriv_w_quotient {M : ℝ → ℝ} {t : ℝ}
       m * Real.log (M t) + M t * (m / M t) =
         m * (Real.log (M t) + 1) := by
     field_simp
-    ring
   have hU_hasDeriv' :
       HasDerivAt (fun s => M s * Real.log (M s))
         (m * (Real.log (M t) + 1)) t := by
@@ -120,9 +119,11 @@ theorem deriv_w_quotient {M : ℝ → ℝ} {t : ℝ}
   have hW_hasDeriv :
       HasDerivAt (fun s => (M s * Real.log (M s))⁻¹)
         (-(m * (Real.log (M t) + 1)) / (M t * Real.log (M t))^2) t := by
-    have := hU_hasDeriv'.inv hprod_ne
-    -- `HasDerivAt.inv` gives derivative `-u'/u²`.
-    simpa [neg_div, pow_two] using this
+    have h := hU_hasDeriv'.inv hprod_ne
+    -- `HasDerivAt.inv` gives derivative `-u'/(u x)^2`.
+    -- Shape `-c' / c x ^ 2` matches the target up to `neg_div`.
+    convert h using 1
+    ring
   -- Rewrite `1 / x = x⁻¹` to match the target form.
   have hW_hasDeriv' :
       HasDerivAt (fun s => 1 / (M s * Real.log (M s)))
