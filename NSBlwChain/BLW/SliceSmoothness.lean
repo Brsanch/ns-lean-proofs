@@ -5,6 +5,9 @@ import Mathlib
 import NSBlwChain.Setup.VorticityDifferentiable
 import NSBlwChain.BLW.MaxPrincipleFromLocalMax
 
+set_option diagnostics true
+set_option diagnostics.threshold 100
+
 /-!
 # Smoothness of scalar slices
 
@@ -104,12 +107,23 @@ theorem NSEvolutionAxioms.sqNormVort_slice_differentiableAt_nhds
   -- with the coercion between `ℕ∞` and `WithTop ℕ∞` implicit.
   exact h_slice.differentiable (by norm_num) s
 
-/- Note: the slice-derivative-differentiable-at-0 corollary requires
-   `ContDiff.deriv : ContDiff n f → ContDiff (n-1) (deriv f)` in
-   mathlib 4.29, which resolves `h_slice.deriv` to `Exists.deriv` in
-   this elaboration context (ContDiff unfolded to `∃ p, HasFTaylorSeriesUpTo`
-   before the dot-notation lookup succeeded).  Deferred until a
-   clean `ContDiff.deriv` invocation via explicit application is tested.
-   Consumers can currently derive it inline via `iteratedDeriv`. -/
+/-- Diagnostic retry: slice-derivative-differentiable-at-0 via iteratedDeriv. -/
+theorem NSEvolutionAxioms.sqNormVort_sliceDeriv_differentiableAt_zero
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
+    (xStar : Vec3) (i : Fin 3) :
+    DifferentiableAt ℝ
+      (deriv (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
+        xStar i))
+      0 := by
+  have h_slice := ax.sqNormVort_slice_contDiff ht htT xStar i
+  -- Use iteratedDeriv pathway: Differentiable (iteratedDeriv 1 f) from ContDiff 3.
+  have h_iter : Differentiable ℝ (iteratedDeriv 1
+      (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
+        xStar i)) :=
+    h_slice.differentiable_iteratedDeriv 1 (by norm_num)
+  -- iteratedDeriv 1 f = deriv f.
+  rw [iteratedDeriv_one] at h_iter
+  exact h_iter 0
 
 end NSBlwChain
