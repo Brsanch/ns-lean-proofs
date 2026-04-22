@@ -85,15 +85,39 @@ theorem NSEvolutionAxioms.sqNormVort_slice_contDiff
         xStar i) :=
   slice_contDiff_of_contDiff (ax.vorticitySqNorm_contDiff ht htT) xStar i
 
-/- Note: the two differentiability corollaries (slice DifferentiableAt
-   on a nbhd of 0, and deriv slice DifferentiableAt at 0) that would
-   directly match the hypothesis shape consumed by
-   `ScalarLocalMaxSecondDeriv.ofIsLocalMax` are **deferred** to a
-   follow-up commit.  They hit a `ℕ∞` vs `WithTop ℕ∞` elaboration
-   mismatch on `ContDiff.differentiable` / `ContDiff.deriv` in
-   mathlib 4.29 that needs more careful handling (probably by inlining
-   via `fun_prop` with the `h_slice` hypothesis in scope).  The
-   `sqNormVort_slice_contDiff` theorem above is sufficient to
-   derive both corollaries by the consumer on demand. -/
+/-- **Slice-differentiable-on-neighborhood from `NSEvolutionAxioms`.**
+
+    Every point is a neighborhood-of-differentiability for the
+    `|ω|²` slice.  Consumed by `ScalarLocalMaxSecondDeriv.ofIsLocalMax`'s
+    `hf_nhd` field. -/
+theorem NSEvolutionAxioms.sqNormVort_slice_differentiableAt_nhds
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
+    (xStar : Vec3) (i : Fin 3) :
+    ∀ᶠ s in 𝓝 (0 : ℝ),
+      DifferentiableAt ℝ
+        (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
+          xStar i) s := by
+  have h_slice := ax.sqNormVort_slice_contDiff ht htT xStar i
+  refine Filter.Eventually.of_forall (fun s => ?_)
+  -- `fun_prop` handles `ContDiff n f, n > 0 → DifferentiableAt f s`
+  -- with the coercion between `ℕ∞` and `WithTop ℕ∞` implicit.
+  exact h_slice.differentiable (by norm_num) s
+
+/-- **Slice-derivative-differentiable-at-0 from `NSEvolutionAxioms`.**
+
+    The derivative of the `|ω|²` slice is itself differentiable at `0`.
+    Consumed by `ScalarLocalMaxSecondDeriv.ofIsLocalMax`'s `hD` field. -/
+theorem NSEvolutionAxioms.sqNormVort_sliceDeriv_differentiableAt_zero
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
+    (xStar : Vec3) (i : Fin 3) :
+    DifferentiableAt ℝ
+      (deriv (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
+        xStar i))
+      0 := by
+  have h_slice := ax.sqNormVort_slice_contDiff ht htT xStar i
+  -- `deriv` of ContDiff 3 is ContDiff 2; then differentiable at 0.
+  exact (h_slice.deriv.differentiable (by norm_num)) 0
 
 end NSBlwChain
