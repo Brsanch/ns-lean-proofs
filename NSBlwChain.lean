@@ -37,6 +37,7 @@ import NSBlwChain.BLW.FullScalarChain
 import NSBlwChain.BLW.ODEToSeregin
 import NSBlwChain.BLW.ODEIntegration
 import NSBlwChain.BLW.ODEIntegration_Discharge
+import NSBlwChain.BLW.ODEIntegration_ResidualDischarge
 import NSBlwChain.BLW.ChainHypotheses
 import NSBlwChain.BLW.AnalyticalToImplicit
 import NSBlwChain.Unconditional.Theorem1
