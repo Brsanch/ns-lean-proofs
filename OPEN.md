@@ -59,17 +59,23 @@ the integrated bound.
 **Location:** `NSBlwChain/BLW/ODEIntegration.lean` (infrastructure
 landed, proof remaining).
 
-### 2. Banach fixed-point for C4 largeness
+### 2. ~~Banach fixed-point for C4 largeness~~ — **CLOSED**
 
-**Target:** `ImplicitBoundBundle.hLarge` field.
-Currently a hypothesis: `1 + log L + (1/2) log(σ/ν) ≤ 4 log M - K/M`.
+Discharged via `NSBlwChain/Caveats/C4_GrowthDominance.lean`
+(`hLarge_of_large_M_bootstrap`, `ImplicitBoundBundle.ofLargeM_hLarge`,
+`exists_M_crit_threshold`).  The paper's "Banach fixed-point" framing
+turns out to be structural scaffolding; the mathematical content is
+elementary growth dominance: for `M ≥ M_crit(L, ν, K)` with
+`M_crit := max 2 (max (K + 2) (exp(|A₀| + 1)))` and
+`A₀ := 1 + log L + (1/2) log 4 - (1/2) log ν`, the threshold
+inequality
 
-**Derivation:** Convex analysis on `σ ↦ M(1+logL+½log(σ/ν))` showing
-a unique fixed point exists and satisfies `σ* ≤ 4 M log M` for `M`
-large.  Paper §C4.
+  `1 + log L + (1/2)(log 4 + log M + log(log M) - log ν) ≤ 4 log M - K/M`
 
-**Location:** `NSBlwChain/Caveats/C4_ImplicitBound.lean` or a new
-`C4_BanachFixedPoint.lean`.
+holds, proved via `Real.log_le_self` (bounding `log(log M) ≤ log M`)
+and linear arithmetic on the leftover `3 log M ≥ A₀ + K/M`.
+Composing with `BootstrapDischarge.c4_largeness_from_bootstrap`
+delivers `hLarge` as a theorem rather than a hypothesis.
 
 ### 3. ~~FTC-for-Lipschitz identity~~ — **CLOSED**
 
