@@ -68,7 +68,7 @@ structure ArgmaxGradientDischarge where
   M : ℝ
   i : Fin 3
   /-- Local-frame alignment: `ω(xStar) = M · ê₃`. -/
-  align : ω xStar = fun j => M * Vec3.e 3 j
+  align : ω xStar = fun j => M * Vec3.e (2 : Fin 3) j
   /-- Product rule at `xStar`:
         `∂ᵢ(|ω|²)(xStar) = 2 · Σ_k (ω(xStar)_k · ∂ᵢ(ω_k)(xStar))`.
       This is the content of `HasFDerivAt.inner` for `Vec3.dot`. -/
@@ -85,38 +85,38 @@ variable (h : ArgmaxGradientDischarge)
 
 /-- Value of `ω(xStar)` at coordinate `k`, from the alignment hypothesis. -/
 lemma omega_apply (k : Fin 3) :
-    h.ω h.xStar k = h.M * Vec3.e 3 k := by
+    h.ω h.xStar k = h.M * Vec3.e (2 : Fin 3) k := by
   have := congrArg (fun f => f k) h.align
   simpa using this
 
-/-- At the basis coordinate `k = 3`, `ω(xStar)_3 = M`. -/
+/-- At the basis coordinate `k = (2 : Fin 3)` (the "third component" in
+    physics notation with 0-indexed `Fin 3`), `ω(xStar)_2 = M`. -/
 lemma omega_apply_three :
-    h.ω h.xStar 3 = h.M := by
-  have := h.omega_apply 3
-  -- `Vec3.e 3 3 = 1`
-  simp [Vec3.e_self] at this
-  exact this
+    h.ω h.xStar (2 : Fin 3) = h.M := by
+  have := h.omega_apply (2 : Fin 3)
+  rw [Vec3.e_self] at this
+  simpa using this
 
-/-- At basis coordinates `k ≠ 3`, `ω(xStar)_k = 0`. -/
-lemma omega_apply_of_ne {k : Fin 3} (hk : k ≠ 3) :
+/-- At basis coordinates `k ≠ (2 : Fin 3)`, `ω(xStar)_k = 0`. -/
+lemma omega_apply_of_ne {k : Fin 3} (hk : k ≠ (2 : Fin 3)) :
     h.ω h.xStar k = 0 := by
   have := h.omega_apply k
-  have h_e : Vec3.e 3 k = 0 := Vec3.e_of_ne hk
+  have h_e : Vec3.e (2 : Fin 3) k = 0 := Vec3.e_of_ne hk
   rw [h_e] at this
   simpa using this
 
-/-- **Key sum collapse.**  In the local frame, only `k = 3` contributes:
-    `Σ_k (ω(xStar)_k · ∂ᵢ(ω_k)(xStar)) = M · ∂ᵢ(ω_3)(xStar)`. -/
+/-- **Key sum collapse.**  In the local frame, only `k = 2` contributes:
+    `Σ_k (ω(xStar)_k · ∂ᵢ(ω_k)(xStar)) = M · ∂ᵢ(ω_2)(xStar)`. -/
 lemma sum_collapse :
     (∑ k : Fin 3, h.ω h.xStar k * partialDeriv (fun x => h.ω x k) h.i h.xStar)
-      = h.M * partialDeriv (fun x => h.ω x 3) h.i h.xStar := by
-  -- All terms with `k ≠ 3` vanish by `omega_apply_of_ne`; use `Finset.sum_eq_single`.
+      = h.M * partialDeriv (fun x => h.ω x (2 : Fin 3)) h.i h.xStar := by
   classical
   have h_single :
       (∑ k ∈ (Finset.univ : Finset (Fin 3)),
           h.ω h.xStar k * partialDeriv (fun x => h.ω x k) h.i h.xStar)
-        = h.ω h.xStar 3 * partialDeriv (fun x => h.ω x 3) h.i h.xStar := by
-    refine Finset.sum_eq_single (3 : Fin 3) ?_ ?_
+        = h.ω h.xStar (2 : Fin 3)
+            * partialDeriv (fun x => h.ω x (2 : Fin 3)) h.i h.xStar := by
+    refine Finset.sum_eq_single (2 : Fin 3) ?_ ?_
     · intro k _ hk_ne
       rw [h.omega_apply_of_ne hk_ne, zero_mul]
     · intro hmem
@@ -129,13 +129,13 @@ lemma sum_collapse :
     gives `∂ᵢ(|ω|²)(xStar) = 2 · M · ∂ᵢ(ω_3)(xStar)`. -/
 lemma partial_sqNorm_eq :
     partialDeriv (fun x => Vec3.dot (h.ω x) (h.ω x)) h.i h.xStar
-      = 2 * h.M * partialDeriv (fun x => h.ω x 3) h.i h.xStar := by
+      = 2 * h.M * partialDeriv (fun x => h.ω x (2 : Fin 3)) h.i h.xStar := by
   calc partialDeriv (fun x => Vec3.dot (h.ω x) (h.ω x)) h.i h.xStar
       = 2 * ∑ k : Fin 3, h.ω h.xStar k * partialDeriv (fun x => h.ω x k) h.i h.xStar :=
           h.product_rule
-    _ = 2 * (h.M * partialDeriv (fun x => h.ω x 3) h.i h.xStar) := by
+    _ = 2 * (h.M * partialDeriv (fun x => h.ω x (2 : Fin 3)) h.i h.xStar) := by
           rw [h.sum_collapse]
-    _ = 2 * h.M * partialDeriv (fun x => h.ω x 3) h.i h.xStar := by ring
+    _ = 2 * h.M * partialDeriv (fun x => h.ω x (2 : Fin 3)) h.i h.xStar := by ring
 
 /-- **Analytical discharge of step (i).**
 
@@ -144,7 +144,7 @@ lemma partial_sqNorm_eq :
     conclusion then gives `M · ∂ᵢ(ω_3)(xStar) = 0`. -/
 noncomputable def toInputs : ArgmaxGradientInputs where
   M := h.M
-  partial_omega_3 := partialDeriv (fun x => h.ω x 3) h.i h.xStar
+  partial_omega_3 := partialDeriv (fun x => h.ω x (2 : Fin 3)) h.i h.xStar
   partial_sqNorm := partialDeriv (fun x => Vec3.dot (h.ω x) (h.ω x)) h.i h.xStar
   sqNorm_form := h.partial_sqNorm_eq
   sqNorm_zero := h.sqNorm_zero
@@ -152,13 +152,13 @@ noncomputable def toInputs : ArgmaxGradientInputs where
 /-- **Step (i) conclusion, analytical form.**  Directly from
     `toInputs.step_i`. -/
 theorem step_i_analytical :
-    h.M * partialDeriv (fun x => h.ω x 3) h.i h.xStar = 0 :=
+    h.M * partialDeriv (fun x => h.ω x (2 : Fin 3)) h.i h.xStar = 0 :=
   h.toInputs.step_i
 
 /-- **Step (i) corollary, analytical form.**  If `M ≠ 0`, then
     `∂ᵢ(ω_3)(xStar) = 0`. -/
 theorem partial_omega_3_zero_of_M_ne_zero (hM : h.M ≠ 0) :
-    partialDeriv (fun x => h.ω x 3) h.i h.xStar = 0 :=
+    partialDeriv (fun x => h.ω x (2 : Fin 3)) h.i h.xStar = 0 :=
   h.toInputs.partial_omega_3_zero_of_M_ne_zero hM
 
 end ArgmaxGradientDischarge
