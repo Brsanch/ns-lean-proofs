@@ -42,4 +42,5 @@ import NSBlwChain.Torus.EpsteinZeta
 import NSBlwChain.BLW.TorusToC4
 import NSBlwChain.BLW.LogInequalities
 import NSBlwChain.BLW.BootstrapDischarge
+import NSBlwChain.BLW.ChainRuleMSquared
 import NSBlwChain.Analyticity.IdentityTheorem
