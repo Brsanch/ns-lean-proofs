@@ -242,7 +242,7 @@ theorem blowup_rate_algebraic
         = (Tstar - t) * (c_Z * M t ^ β) := by ring
     rw [heq]; exact hchain'
   have hbd : (Tstar - t) * M t ^ β ≤ (E₀ / ν) / c_Z :=
-    (div_le_iff₀ hcZ_pos).mpr hstep
+    (le_div_iff₀ hcZ_pos).mpr hstep
   have hdiv : (E₀ / ν) / c_Z = E₀ / (ν * c_Z) := by
     field_simp
   linarith
