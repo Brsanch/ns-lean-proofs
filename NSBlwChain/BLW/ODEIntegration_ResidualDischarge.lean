@@ -329,12 +329,18 @@ theorem hW_lower_bound_of_rate_equality
             (fun x => - (4 / Real.log (M x))) := by
           funext x; ring
         rw [hfun] at h_diff
-        -- IntervalIntegrable closed under negation.
-        simpa using h_diff.neg
-      rw [intervalIntegral.integral_sub h_const_int h_four_over_log_int]
+        -- `h_diff.neg` gives `IntervalIntegrable (-(fun x => -(4/log M)))`;
+        -- rewrite the pointwise double-negation to `4/log M` via funext.
+        have h_neg := h_diff.neg
+        have hneg_fun :
+            (-(fun x : ℝ => -(4 / Real.log (M x)))) =
+              (fun x : ℝ => 4 / Real.log (M x)) := by
+          funext x; simp
+        rwa [hneg_fun] at h_neg
+      exact intervalIntegral.integral_sub h_const_int h_four_over_log_int
     -- Constant integral.
     have h_const : (∫ _ in t..s, (-4 : ℝ)) = (s - t) * (-4) := by
-      rw [intervalIntegral.integral_const]; ring
+      rw [intervalIntegral.integral_const, smul_eq_mul]
     -- FTC for w on [t, s].
     have h_ftc_ts : w s - w t = ∫ x in t..s, deriv w x := h_FTC ht_low hts_le hsT
     -- Tail nonneg on [t, s].
@@ -382,9 +388,13 @@ theorem hW_lower_bound_of_rate_equality
         (𝓝 (4 * (T - t))) := by
       have h_id : Filter.Tendsto (fun s : ℝ => s) (𝓝[<] T) (𝓝 T) :=
         (continuous_id.tendsto T).mono_left nhdsWithin_le_nhds
-      have : Filter.Tendsto (fun s : ℝ => s - t) (𝓝[<] T) (𝓝 (T - t)) :=
-        h_id.sub_const t
-      simpa using this.const_mul 4
+      have h_const_t : Filter.Tendsto (fun _ : ℝ => t) (𝓝[<] T) (𝓝 t) :=
+        tendsto_const_nhds
+      have h_sub : Filter.Tendsto (fun s : ℝ => s - t) (𝓝[<] T) (𝓝 (T - t)) :=
+        h_id.sub h_const_t
+      have h_const_4 : Filter.Tendsto (fun _ : ℝ => (4 : ℝ)) (𝓝[<] T) (𝓝 4) :=
+        tendsto_const_nhds
+      exact h_const_4.mul h_sub
     exact h_w_tend.add h_lin_tend
   -- The constant tendsto for the RHS.
   have h_rhs_tendsto :
