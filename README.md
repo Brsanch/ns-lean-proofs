@@ -74,9 +74,38 @@ For everything else, push and let CI build.
 
 ## Status
 
-**v0.1.0 (2026-04-22)** — Initial scaffold. Build infrastructure, top-level
-module skeleton, and planning documents in place. Formalization content
-lands incrementally; see `OPEN.md` for the live roadmap.
+**v0.2 (2026-04-22 late-evening)** — 60 files, ~8200 LOC, all CI-green.
+
+**Machine-verified (zero `sorry`, classical axioms only where stated):**
+- Theorem 12.2 algebraic core `|∇ω|²(x*) ≤ M²σ/ν` + 12.2' sqrt form.
+- Step (i) analytical discharge: `∂_i|ω|² = 2·M·∂_i ω₃` in local frame via
+  mathlib's product rule (`ScalarProductRule.partialDeriv_dot_self_eq` →
+  `DerivFrameFromProductRule`).
+- Step (ii) partial discharge: Hessian-trace ≤ 0 at local max
+  (`MaxPrinciple`) + Hessian expansion structural form
+  (`HessianExpansionIdentity`).
+- Step (iii) partial discharge: Danskin envelope identity for `|ω|²/2`
+  (`EnvelopeIdentity`) composed with `d/dt(M²/2) = M·Ṁ`
+  (`ChainRuleMSquared`) → `VorticityFrameFromEnvelope`.
+- §12.4 step 5→6 log expansion (`LogAbsorption.log_L_over_sqrt_delta`).
+- Angular integrals D.3.1 and D.3.2 fully proved from mathlib FTC.
+- Epstein p-series framework for the torus correction.
+- Caveats C1/C4 algebraic bundles, C2.5 Danskin envelope.
+- End-to-end `FullDischargePipeline.gradient_bound_from_full_discharge`
+  with concrete sanity-check (40 ≤ 400).
+- Seregin threading `ChainThread.extends_past_T_of_subTypeI` +
+  umbrella `ChainHypotheses.proposition_four_of_hypotheses`.
+
+**Still open** (6 substantive analytical items):
+1. ODE integration `Ṁ ≤ 4M²logM → (T-t)·M·logM ≤ 1/4` (§12.4 step 7→8).
+2. Banach fixed-point for `ImplicitBoundBundle.hLarge` (§C4).
+3. FTC-for-Lipschitz identity (one mathlib lemma away; `C1_FTC` stub).
+4. Pointwise `Δ(f²) = 2|∇f|² + 2f·Δf` at fderiv-level.
+5. 1-D 2nd-derivative test at local max (`ScalarLocalMaxSecondDeriv`).
+6. Wire `NSEvolutionAxioms` → scalar bundles via `M(t) := ‖vorticity u t‖_∞`.
+
+See `OPEN.md` for the live roadmap and `DEVELOPMENT.md` for the
+build-safety protocol.
 
 ## Relationship to the SQG project
 
