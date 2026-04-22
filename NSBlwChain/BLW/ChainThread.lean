@@ -69,7 +69,7 @@ open NSBlwChain NSBlwChain.Caveats
     package — existence of `T' > T` plus a smooth-extended `u'`.
     Since `SereginTypeOneExclusion` is a data-carrying structure
     (not a `Prop`), this is a `def` rather than a `theorem`. -/
-def extends_past_T_of_subTypeI
+noncomputable def extends_past_T_of_subTypeI
     {u : VelocityField} {ν T : ℝ}
     (ax : NSEvolutionAxioms u ν T)
     (h_subTypeI :
