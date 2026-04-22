@@ -6,6 +6,7 @@ import NSBlwChain.Setup.LipschitzToAE
 import NSBlwChain.Setup.EnergyEnstrophy
 import NSBlwChain.Caveats.C1_GrowthMoment
 import NSBlwChain.Caveats.C2_Envelope
+import NSBlwChain.Caveats.C2_AeOde
 import NSBlwChain.Caveats.C4_ImplicitBound
 import NSBlwChain.BLW.GradientBound
 import NSBlwChain.BLW.ArgmaxIdentities
