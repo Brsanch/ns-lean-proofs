@@ -74,35 +74,54 @@ For everything else, push and let CI build.
 
 ## Status
 
-**v0.2 (2026-04-22 late-evening)** — 60 files, ~8200 LOC, all CI-green.
+**v0.3 (2026-04-22 overnight)** — 65 files, ~9500 LOC, all CI-green.
 
-**Machine-verified (zero `sorry`, classical axioms only where stated):**
-- Theorem 12.2 algebraic core `|∇ω|²(x*) ≤ M²σ/ν` + 12.2' sqrt form.
-- Step (i) analytical discharge: `∂_i|ω|² = 2·M·∂_i ω₃` in local frame via
-  mathlib's product rule (`ScalarProductRule.partialDeriv_dot_self_eq` →
-  `DerivFrameFromProductRule`).
-- Step (ii) partial discharge: Hessian-trace ≤ 0 at local max
-  (`MaxPrinciple`) + Hessian expansion structural form
-  (`HessianExpansionIdentity`).
-- Step (iii) partial discharge: Danskin envelope identity for `|ω|²/2`
-  (`EnvelopeIdentity`) composed with `d/dt(M²/2) = M·Ṁ`
-  (`ChainRuleMSquared`) → `VorticityFrameFromEnvelope`.
-- §12.4 step 5→6 log expansion (`LogAbsorption.log_L_over_sqrt_delta`).
-- Angular integrals D.3.1 and D.3.2 fully proved from mathlib FTC.
-- Epstein p-series framework for the torus correction.
-- Caveats C1/C4 algebraic bundles, C2.5 Danskin envelope.
-- End-to-end `FullDischargePipeline.gradient_bound_from_full_discharge`
+**Machine-verified analytical discharges (items 2-6 fully closed;
+item 1 reduced to single residual):**
+
+- **Theorem 12.2 algebraic core** `|∇ω|²(x*) ≤ M²σ/ν` + sqrt form 12.2'.
+- **Step (i)** `∂_i|ω|² = 2·M·∂_i ω₃` via mathlib `HasDerivAt.pow`
+  (`ScalarProductRule` → `DerivFrameFromProductRule`).
+- **Step (ii)** Hessian trace ≤ 0 at local max (`MaxPrinciple`)
+  — three `d_i_nonpos` discharged from `IsLocalMax` +
+  differentiability via `MaxPrincipleFromLocalMax`
+  (`HasDerivAt.tendsto_slope` + `strictMonoOn_of_deriv_pos`).
+- **Step (ii.b)** pointwise `(f²)'' = 2(f')² + 2 f · f''` via
+  `HasDerivAt.pow` + product rule (`HessianExpansionFromC2`).
+- **Step (iii)** Danskin envelope `|ω|²/2` (`EnvelopeIdentity`)
+  composed with `d/dt(M²/2) = M·Ṁ` (`ChainRuleMSquared`)
+  → `VorticityFrameFromEnvelope`.
+- **§12.4 step 5→6** log expansion (`LogAbsorption`).
+- **§C1 FTC-for-Lipschitz**
+  `GrowthMomentBundle.ofLipschitzAndPointwiseBound` — `hIntegratedBound`
+  discharged from `LipschitzWith` via
+  `AbsolutelyContinuousOnInterval.integral_deriv_eq_sub`
+  (`C1_FTC_Discharge`).
+- **§C4 largeness (Banach fixed-point)** closed by elementary
+  growth dominance: for `M ≥ M_crit(L, ν, K)`, `1 + log L +
+  ½ log(σ/ν) ≤ 4 log M − K/M` (`C4_GrowthDominance`).
+- **Angular integrals D.3.1 and D.3.2** from mathlib FTC.
+- **Epstein p-series framework** for torus correction.
+- **Caveat C2.5 (Danskin envelope)**.
+- **End-to-end** `FullDischargePipeline.gradient_bound_from_full_discharge`
   with concrete sanity-check (40 ≤ 400).
-- Seregin threading `ChainThread.extends_past_T_of_subTypeI` +
-  umbrella `ChainHypotheses.proposition_four_of_hypotheses`.
+- **Seregin threading** `ChainThread.extends_past_T_of_subTypeI`
+  + umbrella `ChainHypotheses.proposition_four_of_hypotheses`.
+- **NS connection layer** `FromNSEvolution.lean`:
+  `MOfVelocityField`, `NSArgmaxInputs`, and
+  `argmaxBundle_of_NSEvolutionAxioms` plumb velocity-field data
+  through the scalar bundles + gradient bound.
 
-**Still open** (6 substantive analytical items):
-1. ODE integration `Ṁ ≤ 4M²logM → (T-t)·M·logM ≤ 1/4` (§12.4 step 7→8).
-2. Banach fixed-point for `ImplicitBoundBundle.hLarge` (§C4).
-3. FTC-for-Lipschitz identity (one mathlib lemma away; `C1_FTC` stub).
-4. Pointwise `Δ(f²) = 2|∇f|² + 2f·Δf` at fderiv-level.
-5. 1-D 2nd-derivative test at local max (`ScalarLocalMaxSecondDeriv`).
-6. Wire `NSEvolutionAxioms` → scalar bundles via `M(t) := ‖vorticity u t‖_∞`.
+**Partial** (item 1 — ODE integration §12.4 step 7→8):
+The algebraic core `integrated_bound_of_substituted_bound` +
+constructor `DifferentialInequalityBundle.ofSubstitutedBound` in
+`ODEIntegration_Discharge` reduce `(T-t)·M·logM ≤ 1/4` to a single
+residual hypothesis
+
+  `hW_lower_bound : ∀ t ∈ (t_start, T), 4·(T-t) ≤ 1/(M(t)·log M(t))`
+
+which remains to be derived from `Ṁ ≤ 4 M² log M` via quotient rule
+on `w = 1/(M log M)` + FTC + boundary limit + tail absorption.
 
 See `OPEN.md` for the live roadmap and `DEVELOPMENT.md` for the
 build-safety protocol.
