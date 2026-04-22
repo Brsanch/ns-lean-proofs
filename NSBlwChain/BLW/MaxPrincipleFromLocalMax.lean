@@ -66,10 +66,13 @@ theorem isLocalMax_second_deriv_nonpos
   -- Slope characterization of the derivative at `x`.
   have hslope : Tendsto (fun y => (deriv f y - deriv f x) / (y - x))
       (𝓝[≠] x) (𝓝 L) := by
-    have := hD'.tendsto_slope
+    have hs := hD'.tendsto_slope
     -- `slope (deriv f) x y = (deriv f y - deriv f x) / (y - x)`
     -- by `slope_def_field`.
-    simpa [slope_def_field] using this
+    have hrw : slope (deriv f) x = fun y => (deriv f y - deriv f x) / (y - x) := by
+      funext y; exact slope_def_field (deriv f) x y
+    rw [hrw] at hs
+    exact hs
   -- Rewrite using `deriv f x = 0`.
   have hslope' : Tendsto (fun y => deriv f y / (y - x))
       (𝓝[≠] x) (𝓝 L) := by
@@ -92,7 +95,8 @@ theorem isLocalMax_second_deriv_nonpos
   have hev_right_pos : ∀ᶠ y in 𝓝[>] x, 0 < deriv f y := by
     have hpos_y_minus_x : ∀ᶠ y in 𝓝[>] x, 0 < y - x := by
       refine eventually_nhdsWithin_of_forall (fun y hy => ?_)
-      linarith [hy]
+      have : x < y := hy
+      linarith
     filter_upwards [hev_slope, hpos_y_minus_x] with y hy hypos
     have hquot_pos : 0 < deriv f y / (y - x) := by linarith
     -- From `0 < a/b` and `0 < b`, conclude `0 < a`.
