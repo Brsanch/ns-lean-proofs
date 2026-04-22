@@ -31,8 +31,12 @@ with zero structural gaps.
 - ✅ **Torus correction → C4 bridge** — `TorusToC4`.
 - ✅ **Bootstrap → C4 largeness** — `BootstrapDischarge`.
 - ✅ **Max principle** — scalar `ScalarLocalMaxSecondDeriv.trace_nonpos`.
+- ✅ **1-D 2nd-derivative test at local max** —
+  `MaxPrincipleFromLocalMax.isLocalMax_second_deriv_nonpos` +
+  `ScalarLocalMaxSecondDeriv.ofIsLocalMax` (closes item 5; all three
+  `d_i_nonpos` discharged from `IsLocalMax` + slice differentiability).
 
-## Remaining — six substantive analytical items
+## Remaining — five substantive analytical items
 
 ### 1. ODE integration (§12.4 step 7→8)
 
@@ -80,16 +84,10 @@ symmetry of mixed partials.
 **Location:** `NSBlwChain/BLW/HessianExpansionIdentity.lean` (structural
 form landed; identity still hypothesis).
 
-### 5. 1-D 2nd-derivative test at local max
+### 5. ~~1-D 2nd-derivative test at local max~~ — **CLOSED**
 
-**Target:** `ScalarLocalMaxSecondDeriv.d_i_nonpos` fields.
-Currently hypotheses.
-
-**Derivation:** `IsLocalMax.deriv_eq_zero` + sign of second derivative
-for scalar functions on ℝ.
-
-**Location:** `NSBlwChain/BLW/MaxPrinciple.lean` (bundle + trace
-conclusion landed; per-direction `d_i ≤ 0` still hypothesis).
+See Done section above.  Discharged via `MaxPrincipleFromLocalMax.lean`
+using `HasDerivAt.tendsto_slope` + `strictMonoOn_of_deriv_pos`.
 
 ### 6. Connection `NSEvolutionAxioms` → scalar bundles
 
