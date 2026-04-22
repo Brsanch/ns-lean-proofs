@@ -85,55 +85,15 @@ theorem NSEvolutionAxioms.sqNormVort_slice_contDiff
         xStar i) :=
   slice_contDiff_of_contDiff (ax.vorticitySqNorm_contDiff ht htT) xStar i
 
-/-- **Slice-differentiable-on-neighborhood from `NSEvolutionAxioms`.**
-
-    Every point is a neighborhood-of-differentiability for the
-    `|ω|²` slice: `∀ᶠ t in 𝓝 0, DifferentiableAt ℝ (slice |ω|² xStar i) t`.
-    Consumed by `ScalarLocalMaxSecondDeriv.ofIsLocalMax`'s
-    `hf_nhd` field.  Trivially true since the slice is
-    `ContDiff ℝ 3` (differentiable everywhere). -/
-theorem NSEvolutionAxioms.sqNormVort_slice_differentiableAt_nhds
-    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
-    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
-    (xStar : Vec3) (i : Fin 3) :
-    ∀ᶠ s in 𝓝 (0 : ℝ),
-      DifferentiableAt ℝ
-        (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
-          xStar i) s := by
-  have h_slice := ax.sqNormVort_slice_contDiff ht htT xStar i
-  -- ContDiff ℝ 3 → Differentiable (mathlib 4.29 signature: n ≠ 0).
-  have h3_ne_0 : (3 : ℕ∞) ≠ 0 := by decide
-  have h_diff := h_slice.differentiable h3_ne_0
-  refine Filter.Eventually.of_forall (fun s => ?_)
-  exact h_diff s
-
-/-- **Slice-derivative-differentiable-at-0 from `NSEvolutionAxioms`.**
-
-    The derivative of the `|ω|²` slice is itself differentiable at
-    `0`: `DifferentiableAt ℝ (deriv (slice |ω|² xStar i)) 0`.
-    Consumed by `ScalarLocalMaxSecondDeriv.ofIsLocalMax`'s `hD`
-    field.  Follows from the slice being `ContDiff ℝ 3`: taking one
-    derivative drops the smoothness by 1, giving `ContDiff ℝ 2`,
-    which still exceeds the differentiability threshold. -/
-theorem NSEvolutionAxioms.sqNormVort_sliceDeriv_differentiableAt_zero
-    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
-    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
-    (xStar : Vec3) (i : Fin 3) :
-    DifferentiableAt ℝ
-      (deriv (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
-        xStar i))
-      0 := by
-  have h_slice := ax.sqNormVort_slice_contDiff ht htT xStar i
-  -- `ContDiff.deriv`: ContDiff ℝ (n+1) f → ContDiff ℝ n (deriv f).
-  -- With f the slice and n = 2, we need ContDiff ℝ 3 f; we have it
-  -- (and `(3 : ℕ∞) = 2 + 1` holds definitionally for numeric literals).
-  have h_slice' : ContDiff ℝ (2 + 1 : ℕ∞)
-      (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
-        xStar i) := h_slice
-  have h_deriv : ContDiff ℝ 2
-      (deriv (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
-        xStar i)) := h_slice'.deriv
-  have h2_ne_0 : (2 : ℕ∞) ≠ 0 := by decide
-  exact (h_deriv.differentiable h2_ne_0) 0
+/- Note: the two differentiability corollaries (slice DifferentiableAt
+   on a nbhd of 0, and deriv slice DifferentiableAt at 0) that would
+   directly match the hypothesis shape consumed by
+   `ScalarLocalMaxSecondDeriv.ofIsLocalMax` are **deferred** to a
+   follow-up commit.  They hit a `ℕ∞` vs `WithTop ℕ∞` elaboration
+   mismatch on `ContDiff.differentiable` / `ContDiff.deriv` in
+   mathlib 4.29 that needs more careful handling (probably by inlining
+   via `fun_prop` with the `h_slice` hypothesis in scope).  The
+   `sqNormVort_slice_contDiff` theorem above is sufficient to
+   derive both corollaries by the consumer on demand. -/
 
 end NSBlwChain
