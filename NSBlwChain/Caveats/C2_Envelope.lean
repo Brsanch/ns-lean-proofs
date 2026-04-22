@@ -1,6 +1,8 @@
 -- Copyright (c) 2026 Bryan Sanchez. All rights reserved.
 -- Released under MIT License (see LICENSE in repo root).
 
+import Mathlib
+
 /-!
 # Lemma C2.5 — Danskin envelope theorem
 
@@ -44,8 +46,6 @@ approach.
 * Clarke, *Optimization and Nonsmooth Analysis*, §2.8.
 * Companion note §C2 (caveats_formal.md).
 -/
-
-import Mathlib
 
 namespace NSBlwChain.Caveats
 

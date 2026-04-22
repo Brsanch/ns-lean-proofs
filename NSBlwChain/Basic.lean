@@ -3,6 +3,8 @@
 -- Machine-verified formalization of the BLW-gradient chain for 3D
 -- Navier–Stokes regularity (see accompanying paper, to be added).
 
+import Mathlib
+
 /-!
 # NS BLW-Gradient Chain — Lean 4 Formalization
 
@@ -72,8 +74,6 @@ Initial scaffold — v0.1.0 (2026-04-22). Work in progress.
 The file below contains a placeholder theorem to exercise the build.
 It will be replaced as real content lands.
 -/
-
-import Mathlib
 
 namespace NSBlwChain
 
