@@ -84,7 +84,8 @@ theorem full_scalar_chain
           + (1 / 2) * Real.log (h₃.sigma / ν)
             ≤ 4 * Real.log h₃.M - 0 / h₃.M := by
       rw [h_rewrite]; exact hLarge
-    have := sigma_le_4M_log_M_from_axiom bs h₃.M h₃.sigma hM_ge_one hσ_pos hν_pos hLarge'
+    have := sigma_le_4M_log_M_from_axiom bs h₃.M h₃.sigma h₃.growth
+      hM_ge_one hσ_pos hν_pos hg hLarge'
     -- this : h₃.sigma ≤ 4 * h₃.M * Real.log h₃.M
     exact this
   -- Step 4: combine step (iii) with strain bound.

@@ -55,6 +55,7 @@ theorem sigma_le_4M_log_M_of_analytical
           ≤ 4 * Real.log a.M - 0 / a.M) :
     a.sigma ≤ 4 * a.M * Real.log a.M := by
   have hν_pos : 0 < ν := by rw [← hν_agree]; exact a.nu_pos
-  exact sigma_le_4M_log_M_from_axiom bs a.M a.sigma hM_ge_one hσ_pos hν_pos hLarge
+  exact sigma_le_4M_log_M_from_axiom bs a.M a.sigma a.growth
+    hM_ge_one hσ_pos hν_pos a.growth_nonneg hLarge
 
 end NSBlwChain.BLW

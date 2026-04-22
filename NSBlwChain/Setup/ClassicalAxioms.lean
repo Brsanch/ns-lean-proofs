@@ -17,22 +17,31 @@ them by name.
 
 ## The three axioms
 
-1. **Biot–Savart pointwise bound (Proposition 12.1).**  Named:
-   `biot_savart_self_strain_bound`.  Packages the output of the
-   cylindrical θ-averaging identity of paper §12.2: at any argmax
-   `x_star` of `|ω(·, t)|`, the aligned self-strain `σ(x_star, t)`
-   is bounded by `M · (1 + C_L + log(L / δ_ν))` for some `C_L ≥ 0`.
+1. **Biot–Savart self-strain bound (§12.4 log-absorption output).**
+   Named: `biot_savart_self_strain_bound`.  Packages the output of
+   the paper's §12.4 log-absorption step *in the growth regime*
+   `dM/dt(t) ≥ 0`: at any argmax `x_star` of `|ω(·, t)|`, the aligned
+   self-strain is bounded by `σ(x_star, t) ≤ M · (1 + C_L + log(L / δ_ν))`
+   for some `C_L ≥ 0`.  Note this is the *composite* of Prop 12.1 +
+   cylindrical θ-averaging (§12.2) + Lemma B far-field bound +
+   growth-regime log absorption — not Prop 12.1 alone.
 
-2. **Seregin type-one exclusion (Seregin, CMP 2012).**  Named:
+2. **Seregin type-one exclusion (vorticity form).**  Named:
    `seregin_type_one_exclusion`.  Given a smooth NS solution on
    `[0, T)` whose vorticity satisfies the sub-Type-I rate
    `(T - t) · ‖ω(·, t)‖_∞ → 0`, the solution extends smoothly
-   past `T`.
+   past `T`.  This is a *composite* of Seregin 2012 CMP (which
+   proves the L³-velocity criterion) with Biot–Savart on ℝ³ and
+   Sobolev embedding.  See the `/-! ## Axiom 2 ... -/` header
+   below for the citation note.
 
-3. **Kato time-analyticity (Kato 1967 / Foias–Temam 1979).**
+3. **NS time-analyticity (Masuda 1967 / Foias–Temam 1979).**
    Named: `NS_time_analyticity`.  Smooth NS solutions extend to
    a holomorphic map on a complex strip around every interior
-   time in `(0, T)`.
+   time in `(0, T)`.  The correct primary source is Masuda 1967
+   Proc. Japan Acad. 43; "Kato 1967" appearing in older drafts is
+   a mis-citation (that Kato paper is about 2D Euler, not NS
+   analyticity).  See the `/-! ## Axiom 3 ... -/` header below.
 
 ## Consumed forms
 
@@ -45,16 +54,35 @@ capstone takes on input, so that invoking the axiom is a one-line
 
 namespace NSBlwChain
 
-/-! ## Axiom 1 — Biot–Savart self-strain bound -/
+/-! ## Axiom 1 — Biot–Savart self-strain bound
 
-/-- Consumed form of the exact pointwise identity of §12.1.  Provides
-    a constant `C_L ≥ 0` and a universal bound `σ(x*, t) ≤ M(t) · (1
+This axiom encodes the **output** of the §12.4 log-absorption step of
+the paper — specifically the inequality `σ(x*) ≤ M · (1 + C_L + log(L/δ_ν))`
+at an argmax `x*` of `|ω(·, t)|` *in the growth regime* `dM/dt ≥ 0`.
+
+**Upstream structure.**  The derivation uses:
+- Proposition 12.1 (Biot–Savart pointwise identity on ℝ³) to recover
+  `σ(x*)` from the vorticity;
+- cylindrical θ-averaging of the Biot–Savart kernel (§12.2);
+- Lemma B (energy-enstrophy dissipation) to bound the far-field tail;
+- the growth-regime hypothesis `dM/dt(t) ≥ 0`, which lets one drop the
+  time-derivative term in the log-absorption ODE.
+
+**What this axiom is NOT.**  It is *not* Proposition 12.1 alone
+(Biot–Savart identity), which is a pointwise equality and does not
+produce a log-absorption bound by itself.  The axiom consumes the
+composite paper §12.4 theorem including the growth-regime restriction.
+-/
+
+/-- Consumed form of the §12.4 log-absorption output.  Provides a
+    constant `C_L ≥ 0` and a universal bound `σ(x*, t) ≤ M(t) · (1
     + C_L + log(L / δ_ν(t)))` at every argmax point `x_star` in the
-    growth-regime of `M`, with `δ_ν(t) := √(ν/σ(x_star, t))`.
+    growth regime `0 ≤ Ṁ(t)`, with `δ_ν(t) := √(ν/σ(x_star, t))`.
 
     The structure records only the *output* shape consumed by the
     chain; the derivation of the identity from cylindrical
-    θ-averaging is the content of the axiom below. -/
+    θ-averaging plus log-absorption is the content of the axiom
+    below. -/
 structure BiotSavartSelfStrainBound
     (u : VelocityField) (ν T : ℝ) where
   /-- Box size at which the torus correction is applied. -/
@@ -66,26 +94,51 @@ structure BiotSavartSelfStrainBound
   /-- Torus correction non-negative. -/
   C_L_nonneg : 0 ≤ C_L
   /-- The bound at every growth-regime argmax.  Stated with respect
-      to abstract scalars representing `M`, `σ`, and `δ_ν = √(ν/σ)`
-      at a fixed time.  Downstream consumers pick concrete values. -/
+      to abstract scalars representing `M`, `σ`, `δ_ν = √(ν/σ)`, and
+      `Mdot` at a fixed time, with the **growth-regime hypothesis
+      `0 ≤ Mdot`** matching paper §12.4.  Downstream consumers pick
+      concrete values. -/
   bound :
-    ∀ M σ : ℝ, 0 ≤ M → 0 < σ → 0 < ν →
+    ∀ M σ Mdot : ℝ, 0 ≤ M → 0 < σ → 0 < ν → 0 ≤ Mdot →
       σ ≤ M * (1 + C_L + Real.log (L / Real.sqrt (ν / σ)))
 
 /-- **Axiom 1 — `biot_savart_self_strain_bound`.**  The exact Biot–
-    Savart pointwise identity at every argmax of `|ω|` delivers a
+    Savart pointwise identity of Prop 12.1, combined with the §12.4
+    log-absorption step (cylindrical θ-averaging, far-field Lemma B
+    bound, growth-regime hypothesis `dM/dt ≥ 0`), delivers a
     growth-regime bound of the form recorded in
     `BiotSavartSelfStrainBound`. -/
 axiom biot_savart_self_strain_bound
     {u : VelocityField} {ν T : ℝ} (_ax : NSEvolutionAxioms u ν T) :
     BiotSavartSelfStrainBound u ν T
 
-/-! ## Axiom 2 — Seregin type-one exclusion -/
+/-! ## Axiom 2 — Seregin type-one exclusion (vorticity form)
 
-/-- Consumed form of Seregin (2012).  The conclusion is that the
-    sub-Type-I rate hypothesis is *inconsistent* with `T` being a
-    finite singularity time: there is always a strictly later time
-    `T' > T` to which the solution extends smoothly. -/
+**Citation note.**  The directly cited paper is Seregin 2012,
+*A certain necessary condition of potential blow up for
+Navier–Stokes equations*, Comm. Math. Phys. **312**, 833–845
+(DOI 10.1007/s00220-011-1391-x).  That paper proves the **L³ velocity
+criterion**: if `limsup_{t → T⁻} ‖u(·, t)‖_{L³(ℝ³)} < ∞`, then the
+solution extends past `T`.
+
+The axiom below is stated in the **vorticity-Type-I form** actually
+consumed by the BLW chain.  This is *not* Seregin 2012 verbatim — it
+is the composite theorem
+
+  *Seregin 2012 (L³ criterion)* + *Biot–Savart on ℝ³* + *Sobolev embedding*
+  ⇒ vorticity-sub-Type-I rate excludes blow-up.
+
+In the smooth regime on ℝ³, the vorticity bound `‖ω(t)‖_∞ ≤ ε/(T-t)`
+implies (via Biot–Savart + weighted estimates) `‖u(t)‖_{L³} = O(1)`
+as `t → T⁻`, which Seregin 2012 then excludes.  The bridging step is
+classical but should be noted in any external review.
+-/
+
+/-- Consumed form of Seregin (2012) composed with Biot–Savart +
+    Sobolev.  The conclusion is that the sub-Type-I rate hypothesis
+    on vorticity is *inconsistent* with `T` being a finite singularity
+    time: there is always a strictly later time `T' > T` to which the
+    solution extends smoothly. -/
 structure SereginTypeOneExclusion
     (u : VelocityField) (ν T : ℝ) where
   /-- The extended-smoothness time. -/
@@ -115,11 +168,28 @@ axiom seregin_type_one_exclusion
                 ≤ ε / (T - t)) :
     SereginTypeOneExclusion u ν T
 
-/-! ## Axiom 3 — Kato time-analyticity -/
+/-! ## Axiom 3 — NS time-analyticity (Masuda 1967 / Foias–Temam 1979)
 
-/-- Consumed form of Kato (1967) / Foias–Temam (1979).  Provides, for
-    every interior time `t₀ ∈ (0, T)`, a positive radius `r(t₀)` at
-    which the map `t ↦ u(t, x)` is real-analytic.
+**Citation correction.**  Earlier versions of this project cited
+"Kato 1967 ARMA 25" here, which is actually Kato's 2D Euler paper,
+not NS time analyticity.  The correct primary source for time
+analyticity of smooth 3D NS solutions is
+
+  *K. Masuda, On the analyticity and the unique continuation theorem
+  for solutions of the Navier–Stokes equation*, Proc. Japan Acad.
+  **43** (1967), 827–832,
+
+and the standard Banach-scale extension is Foias–Temam 1979
+(bibliographic venue should be verified by the reviewer; the paper's
+supplemental note cites *J. Math. Pures Appl.* 58).  The content
+below is the **real-analyticity window** consumed by the BLW chain,
+which is weaker than (and implied by) the full holomorphic-strip
+extension in either source.
+-/
+
+/-- Consumed form of Masuda (1967) / Foias–Temam (1979).  Provides,
+    for every interior time `t₀ ∈ (0, T)`, a positive radius `r(t₀)`
+    at which the map `t ↦ u(t, x)` is real-analytic.
 
     We encode the conclusion structurally (existence of `r`) so that
     downstream consumers can apply the identity theorem for

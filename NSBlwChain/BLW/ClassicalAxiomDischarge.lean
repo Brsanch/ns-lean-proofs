@@ -60,7 +60,8 @@ open NSBlwChain NSBlwChain.Caveats
 noncomputable def buildImplicitBundleFromAxiom
     {u : VelocityField} {ν T : ℝ}
     (bs : BiotSavartSelfStrainBound u ν T)
-    (M σ : ℝ) (hM : 1 ≤ M) (hσ : 0 < σ) (hν : 0 < ν) :
+    (M σ Mdot : ℝ) (hM : 1 ≤ M) (hσ : 0 < σ) (hν : 0 < ν)
+    (hMdot_nonneg : 0 ≤ Mdot) :
     ImplicitBoundBundle where
   ν := ν
   L := bs.L * Real.exp bs.C_L
@@ -75,8 +76,9 @@ noncomputable def buildImplicitBundleFromAxiom
   hσ_pos := hσ
   hK_nonneg := le_refl 0
   hImplicit := by
-    -- Step 1: invoke the axiom bound for this specific (M, σ).
-    have h_ax := bs.bound M σ (le_trans zero_le_one hM) hσ hν
+    -- Step 1: invoke the axiom bound for this specific (M, σ, Mdot),
+    -- passing through the growth-regime hypothesis `0 ≤ Mdot`.
+    have h_ax := bs.bound M σ Mdot (le_trans zero_le_one hM) hσ hν hMdot_nonneg
     -- h_ax : σ ≤ M · (1 + C_L + log(L/√(ν/σ)))
     -- Step 2: log-expand via log_L_over_sqrt_delta.
     have h_log : Real.log (bs.L / Real.sqrt (ν / σ))
@@ -96,15 +98,17 @@ noncomputable def buildImplicitBundleFromAxiom
 /-- **Axiom → σ ≤ 4 M log M.**
 
     End-to-end: from `BiotSavartSelfStrainBound` + positivity +
-    a largeness hypothesis, conclude `σ ≤ 4 M log M`. -/
+    the growth-regime hypothesis `0 ≤ Mdot` + a largeness hypothesis,
+    conclude `σ ≤ 4 M log M`. -/
 theorem sigma_le_4M_log_M_from_axiom
     {u : VelocityField} {ν T : ℝ}
     (bs : BiotSavartSelfStrainBound u ν T)
-    (M σ : ℝ) (hM : 1 ≤ M) (hσ : 0 < σ) (hν : 0 < ν)
+    (M σ Mdot : ℝ) (hM : 1 ≤ M) (hσ : 0 < σ) (hν : 0 < ν)
+    (hMdot_nonneg : 0 ≤ Mdot)
     (hLarge :
       1 + Real.log (bs.L * Real.exp bs.C_L) + (1 / 2) * Real.log (σ / ν)
         ≤ 4 * Real.log M - 0 / M) :
     σ ≤ 4 * M * Real.log M :=
-  (buildImplicitBundleFromAxiom bs M σ hM hσ hν).σ_le_of_largeness hLarge
+  (buildImplicitBundleFromAxiom bs M σ Mdot hM hσ hν hMdot_nonneg).σ_le_of_largeness hLarge
 
 end NSBlwChain.BLW
