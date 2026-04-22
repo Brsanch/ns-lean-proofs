@@ -49,10 +49,48 @@ Each axiom is wrapped in a `Prop`-valued structure so that consumers
 can destructure the analytical content cleanly.  The `Prop` shape
 matches the *exact* hypothesis signature that the BLW-gradient chain
 capstone takes on input, so that invoking the axiom is a one-line
-`exact biot_savart_self_strain_bound ax` call.
+`exact biot_savart_self_strain_bound ax hDecay` call (axiom 1 takes
+`NSEvolutionAxioms` plus a `DecayAtInfinity` witness).
 -/
 
 namespace NSBlwChain
+
+/-! ## Decay-at-infinity hypothesis (consumed by Axiom 1)
+
+The Biot–Savart integral on ℝ³,
+$u(x) = \frac{1}{4\pi}\int\frac{(x-y)\times\omega(y)}{|x-y|^3}\,dy$,
+requires `ω` to decay sufficiently fast at infinity for convergence.
+This is a genuine hypothesis on the velocity field, not implied by
+`NSEvolutionAxioms` alone (smooth + div-free does **not** force decay).
+
+We record the decay as an **explicit structural hypothesis** consumed
+by `biot_savart_self_strain_bound`.  The model-correctness audit
+(`noethersolve/docs/findings/ns_model_correctness_memo_2026_04_22.md`)
+flagged that earlier versions had this hypothesis implicit; making it
+visible here answers the reviewer's first question
+("what decay do you assume on u?") at the interface level.
+
+The concrete form we require is polynomial decay of `ω` faster than
+`|x|^{-3}` (which is the minimum needed for the Biot–Savart kernel's
+`|x - y|^{-2}`-type singularity to yield a convergent integral).
+On the torus this is automatic; `DecayAtInfinity.of_torus_periodic`
+provides a trivial constructor downstream.
+-/
+
+/-- Decay-at-infinity hypothesis on a velocity field `u` on `[0, T) × ℝ³`.
+    Asserts polynomial decay of the vorticity `ω = ∇ × u` faster than
+    `|x|^{-3}` outside a ball of radius `R`, sufficient for Biot–Savart
+    convergence. -/
+structure DecayAtInfinity (u : VelocityField) (T : ℝ) : Prop where
+  /-- Polynomial decay witness: there exist `R > 0`, `C ≥ 0`, and a
+      decay exponent `p > 3` such that on `[0, T) × {|x| ≥ R}`,
+      `|ω(t, x)| ≤ C · |x|^{-p}`. -/
+  has_polynomial_decay :
+    ∃ R C p : ℝ, 0 < R ∧ 0 ≤ C ∧ 3 < p ∧
+      ∀ t : ℝ, 0 ≤ t → t < T → ∀ x : Vec3,
+        R ≤ Real.sqrt (Vec3.dot x x) →
+          Real.sqrt (Vec3.dot (vorticity u t x) (vorticity u t x)) ≤
+            C / (Real.sqrt (Vec3.dot x x)) ^ p
 
 /-! ## Axiom 1 — Biot–Savart self-strain bound
 
@@ -107,9 +145,17 @@ structure BiotSavartSelfStrainBound
     log-absorption step (cylindrical θ-averaging, far-field Lemma B
     bound, growth-regime hypothesis `dM/dt ≥ 0`), delivers a
     growth-regime bound of the form recorded in
-    `BiotSavartSelfStrainBound`. -/
+    `BiotSavartSelfStrainBound`.
+
+    **Decay hypothesis (explicit).**  The Biot–Savart integral
+    requires `ω` to decay faster than `|x|^{-3}` at infinity; this
+    is consumed as `_hDecay : DecayAtInfinity u T`.  Previously this
+    hypothesis was implicit in the axiom's statement; the present
+    form makes it visible at every call site. -/
 axiom biot_savart_self_strain_bound
-    {u : VelocityField} {ν T : ℝ} (_ax : NSEvolutionAxioms u ν T) :
+    {u : VelocityField} {ν T : ℝ}
+    (_ax : NSEvolutionAxioms u ν T)
+    (_hDecay : DecayAtInfinity u T) :
     BiotSavartSelfStrainBound u ν T
 
 /-! ## Axiom 2 — Seregin type-one exclusion (vorticity form)
