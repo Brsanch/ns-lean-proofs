@@ -48,7 +48,11 @@ noncomputable def exampleGradBound : GradBoundHypotheses where
   growth                         := 0
   nu_pos                         := by norm_num
   M_nonneg                       := by norm_num
-  gradSqNorm_le_M_laplace        := by norm_num [abs_of_nonpos]
+  gradSqNorm_le_M_laplace        := by
+    have h : |(-4 : ℝ)| = 4 := by
+      rw [abs_of_nonpos (by norm_num : (-4 : ℝ) ≤ 0)]
+      norm_num
+    rw [h]; norm_num
   laplace_eq_growth_minus_strain := by norm_num
   laplace_nonpos                 := by norm_num
   growth_nonneg                  := le_refl 0
