@@ -4,25 +4,22 @@
 import Mathlib
 
 /-!
-# Lipschitz → differentiable a.e.
+# Lipschitz → differentiable a.e. (stub)
 
-This file packages Rademacher's theorem as a thin wrapper adapted to
-the `LipschitzWith` / `LipschitzOnWith` interface of mathlib, and the
-specific one-variable form consumed by the BLW-gradient ODE argument
-in `Caveats/C2_Envelope.lean` and `BLW/LogAbsorption.lean`.
+This file will package Rademacher's theorem (Lipschitz functions on
+$\mathbb{R}$ are Fréchet differentiable a.e.) in a form convenient
+for the BLW-gradient ODE argument in `Caveats/C2_Envelope.lean` and
+`BLW/LogAbsorption.lean`.
 
-## Scope
+Currently this is a *stub*: the Rademacher-form lemma
+`ae_hasDerivAt_of_lipschitz` hit a typeclass-resolution issue under
+mathlib 4.29.0 when stated with an unqualified `LipschitzWith` over
+`ℝ → ℝ`.  The downstream consumer (`Caveats/C2_AeOde.lean`, planned)
+can state the Rademacher conclusion as a *hypothesis* on `M` and
+defer the discharge to a later pass.
 
-The full Rademacher theorem (Lipschitz functions on `ℝⁿ` are Fréchet
-differentiable a.e.) is in mathlib as
-`LipschitzWith.ae_differentiableAt` for the Euclidean case.  For the
-BLW-gradient chain we need only the one-dimensional specialization:
-
-* A Lipschitz function `M : ℝ → ℝ` is differentiable at a.e. `t`.
-* At every differentiability point, `HasDerivAt M (deriv M t) t` holds.
-
-The wrappers below re-export these facts in forms convenient for
-downstream use without introducing new notation.
+The single lemma below is a trivial finiteness sanity-check, useful
+only to confirm the file compiles against the current mathlib.
 
 ## Reference
 
@@ -32,27 +29,11 @@ downstream use without introducing new notation.
 
 namespace NSBlwChain.Setup
 
-open Filter MeasureTheory
-open scoped Topology
-
-/-- **Rademacher (one-dimensional form).**
-
-    A Lipschitz function `M : ℝ → ℝ` is differentiable at almost every
-    point `t ∈ ℝ` (with respect to Lebesgue measure).  In particular,
-    `HasDerivAt M (deriv M t) t` holds for a.e. `t`. -/
-lemma ae_hasDerivAt_of_lipschitz
-    {K : NNReal} {M : ℝ → ℝ} (hM : LipschitzWith K M) :
-    ∀ᵐ t : ℝ, HasDerivAt M (deriv M t) t := by
-  -- mathlib: `LipschitzWith.ae_differentiableAt` gives `DifferentiableAt ℝ M t`
-  -- a.e., which packages into `HasDerivAt M (deriv M t) t`.
-  have h := hM.ae_differentiableAt
-  filter_upwards [h] with t ht
-  exact ht.hasDerivAt
-
 /-- Boilerplate: a Lipschitz constant is finite, so `K < ∞` as an
-    `ℝ≥0∞`.  This is trivial but recurs enough that we name it. -/
+    `ℝ≥0∞`.  Trivial, but recurs enough to be named. -/
 lemma lipschitzWith_edist_lt_top
-    {K : NNReal} {M : ℝ → ℝ} (_ : LipschitzWith K M) :
+    {α β : Type*} [PseudoEMetricSpace α] [PseudoEMetricSpace β]
+    {K : NNReal} {f : α → β} (_ : LipschitzWith K f) :
     (K : ℝ≥0∞) < ⊤ := ENNReal.coe_lt_top
 
 end NSBlwChain.Setup
