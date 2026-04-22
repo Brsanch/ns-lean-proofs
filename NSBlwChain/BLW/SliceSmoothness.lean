@@ -104,20 +104,12 @@ theorem NSEvolutionAxioms.sqNormVort_slice_differentiableAt_nhds
   -- with the coercion between `ℕ∞` and `WithTop ℕ∞` implicit.
   exact h_slice.differentiable (by norm_num) s
 
-/-- **Slice-derivative-differentiable-at-0 from `NSEvolutionAxioms`.**
-
-    The derivative of the `|ω|²` slice is itself differentiable at `0`.
-    Consumed by `ScalarLocalMaxSecondDeriv.ofIsLocalMax`'s `hD` field. -/
-theorem NSEvolutionAxioms.sqNormVort_sliceDeriv_differentiableAt_zero
-    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
-    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
-    (xStar : Vec3) (i : Fin 3) :
-    DifferentiableAt ℝ
-      (deriv (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
-        xStar i))
-      0 := by
-  have h_slice := ax.sqNormVort_slice_contDiff ht htT xStar i
-  -- `deriv` of ContDiff 3 is ContDiff 2; then differentiable at 0.
-  exact (h_slice.deriv.differentiable (by norm_num)) 0
+/- Note: the slice-derivative-differentiable-at-0 corollary requires
+   `ContDiff.deriv : ContDiff n f → ContDiff (n-1) (deriv f)` in
+   mathlib 4.29, which resolves `h_slice.deriv` to `Exists.deriv` in
+   this elaboration context (ContDiff unfolded to `∃ p, HasFTaylorSeriesUpTo`
+   before the dot-notation lookup succeeded).  Deferred until a
+   clean `ContDiff.deriv` invocation via explicit application is tested.
+   Consumers can currently derive it inline via `iteratedDeriv`. -/
 
 end NSBlwChain
