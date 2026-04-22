@@ -50,4 +50,5 @@ import NSBlwChain.BLW.AdvectionVanishes
 import NSBlwChain.BLW.SelfStrainNonneg
 import NSBlwChain.BLW.HessianExpansionIdentity
 import NSBlwChain.BLW.LipschitzMScalar
+import NSBlwChain.BLW.GradientBoundSqrt
 import NSBlwChain.Analyticity.IdentityTheorem
