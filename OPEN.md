@@ -40,8 +40,12 @@ with zero structural gaps.
   `HasDerivAt.pow` + second product rule, plus
   `HessianExpansionData.ofScalarIdentities` constructor
   (closes item 4).
+- ✅ **FTC-for-Lipschitz identity** —
+  `C1_FTC_Discharge.GrowthMomentBundle.ofLipschitzAndPointwiseBound`
+  (closes item 3; `hIntegratedBound` discharged from `LipschitzWith`
+  via mathlib's `AbsolutelyContinuousOnInterval.integral_deriv_eq_sub`).
 
-## Remaining — four substantive analytical items
+## Remaining — three substantive analytical items
 
 ### 1. ODE integration (§12.4 step 7→8)
 
@@ -67,16 +71,19 @@ large.  Paper §C4.
 **Location:** `NSBlwChain/Caveats/C4_ImplicitBound.lean` or a new
 `C4_BanachFixedPoint.lean`.
 
-### 3. FTC-for-Lipschitz identity
+### 3. ~~FTC-for-Lipschitz identity~~ — **CLOSED**
 
-**Target:** `GrowthMomentBundle.hIntegratedBound` field.
-Currently a hypothesis: `M(t)-M(s) ≤ ∫_s^t Φ(M(τ)) dτ`.
+Discharged via `NSBlwChain/Caveats/C1_FTC_Discharge.lean`
+(`GrowthMomentBundle.ofLipschitzAndPointwiseBound`).  The mathlib
+chain `LipschitzWith` → `LipschitzOnWith.absolutelyContinuousOnInterval`
+→ `AbsolutelyContinuousOnInterval.integral_deriv_eq_sub` discharges
+both the FTC identity and interval-integrability of `deriv M` from
+a single `LipschitzWith K M` hypothesis.  The integrated bound
 
-**Derivation:** One mathlib lemma — `LipschitzWith` → absolutely
-continuous → FTC `∫ deriv M dτ = M(t)-M(s)`.
+  `M t - M s ≤ ∫ τ in s..t, Φ (M τ)`
 
-**Location:** `NSBlwChain/Caveats/C1_FTC.lean` (scaffolding landed,
-identity taken as hypothesis; needs mathlib bridge).
+now follows unconditionally from `hM_lip`, an a.e. pointwise bound
+`deriv M τ ≤ Φ (M τ)`, and interval-integrability of `Φ ∘ M`.
 
 ### 4. ~~Pointwise `Δ(f²) = 2|∇f|² + 2f·Δf`~~ — **CLOSED**
 
