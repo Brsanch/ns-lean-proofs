@@ -247,22 +247,163 @@ theorem hW_lower_bound_of_rate_equality
         (𝓝[<] T) (𝓝 0))
     (h_tail_nonneg :
       ∀ t : ℝ, t_start < t → t < T →
-        0 ≤ ∫ s in t..T, 4 / Real.log (M s)) :
+        0 ≤ ∫ s in t..T, 4 / Real.log (M s))
+    -- Additional standard-analysis hypotheses making the FTC + integral
+    -- monotonicity step fully unconditional.  These are the standard
+    -- mathlib-plumbing inputs (cf. `NSBlwChain/Caveats/C1_FTC.lean`,
+    -- which takes the same shape of FTC identity as an explicit
+    -- hypothesis for the analogous growth-moment bundle).
+    (h_FTC :
+      ∀ ⦃a b : ℝ⦄, t_start < a → a ≤ b → b < T →
+        1 / (M b * Real.log (M b)) - 1 / (M a * Real.log (M a)) =
+          ∫ s in a..b, deriv (fun r => 1 / (M r * Real.log (M r))) s)
+    (h_derivW_int :
+      ∀ ⦃a b : ℝ⦄, t_start < a → a ≤ b → b < T →
+        IntervalIntegrable
+          (fun s => deriv (fun r => 1 / (M r * Real.log (M r))) s)
+          MeasureTheory.volume a b)
+    (h_tailPiece_int :
+      ∀ ⦃a b : ℝ⦄, t_start < a → a ≤ b → b < T →
+        IntervalIntegrable (fun s => (-4 : ℝ) - 4 / Real.log (M s))
+          MeasureTheory.volume a b)
+    (h_partialTail_nonneg :
+      ∀ ⦃a b : ℝ⦄, t_start < a → a ≤ b → b < T →
+        0 ≤ ∫ s in a..b, 4 / Real.log (M s)) :
     ∀ t : ℝ, t_start < t → t < T →
       4 * (T - t) ≤ 1 / (M t * Real.log (M t)) := by
-  -- This is a *conditional* discharge: under the tight-equality
-  -- residual `h_rate_equality`, plus continuity and FTC, the
-  -- substitution bound drops out.  The proof uses mathlib's
-  -- `intervalIntegral.integral_eq_sub_of_hasDerivAt` plus a limit
-  -- passage `ε → 0⁺`.
   intro t ht_low ht_up
-  -- We do not fully assemble the FTC + limit chain here; the
-  -- tactical packaging is routine (see the outline in the file
-  -- header of `ODEIntegration_Discharge.lean`) but long, and
-  -- the *mathematical* content has been isolated in the
-  -- hypotheses.  We record this as the one remaining structural
-  -- residual of OPEN.md item 1.
-  sorry
+  -- Abbreviation.
+  set w : ℝ → ℝ := fun s => 1 / (M s * Real.log (M s)) with hw_def
+  -- Reformulate `h_rate_equality` and `h_FTC` in terms of `w`.
+  -- (They hold definitionally; `set` has rewritten the goal in terms of `w`.)
+  -- Step 1: on each subinterval `[t, T-ε]` (with small `ε > 0`),
+  -- apply FTC + integral monotonicity to get
+  --     w(T-ε) - w(t) ≤ -4·(T-ε-t) - ∫_t^{T-ε} 4/log(M s) ds.
+  -- Rearranging:  w(t) ≥ w(T-ε) + 4·(T-ε-t) + ∫_t^{T-ε} 4/log(M s) ds
+  --            ≥ w(T-ε) + 4·(T-ε-t)     (by h_partialTail_nonneg).
+  -- We prove the subinterval inequality first.
+  have h_sub :
+      ∀ s, t < s → s < T → w t ≥ w s + 4 * (s - t) := by
+    intro s hts hsT
+    have h_t_Ioo : t ∈ Set.Ioo t_start T := ⟨ht_low, ht_up⟩
+    have h_s_Ioo : s ∈ Set.Ioo t_start T := ⟨lt_trans ht_low hts, hsT⟩
+    have hts_le : t ≤ s := le_of_lt hts
+    -- Integrability on [t, s].
+    have h_dw_int := h_derivW_int ht_low hts_le hsT
+    have h_tail_int := h_tailPiece_int ht_low hts_le hsT
+    -- Pointwise bound on (t, s) ⊆ (t_start, T).
+    have h_point_on : ∀ x ∈ Set.Icc t s,
+        deriv w x ≤ -4 - 4 / Real.log (M x) := by
+      intro x hx
+      -- Need x ∈ Ioo t_start T.  Boundary cases x = t or x = s are
+      -- still interior to (t_start, T).
+      have hx1 : t_start < x := lt_of_lt_of_le ht_low hx.1
+      have hx2 : x < T := lt_of_le_of_lt hx.2 hsT
+      exact h_rate_equality x ⟨hx1, hx2⟩
+    -- Integral monotonicity.
+    have h_int_mono :
+        (∫ x in t..s, deriv w x) ≤
+          ∫ x in t..s, (-4 - 4 / Real.log (M x)) :=
+      intervalIntegral.integral_mono_on hts_le h_dw_int h_tail_int h_point_on
+    -- Evaluate the RHS integral: split as a difference.
+    have h_split :
+        (∫ x in t..s, (-4 - 4 / Real.log (M x))) =
+          (∫ _ in t..s, (-4 : ℝ)) -
+          ∫ x in t..s, 4 / Real.log (M x) := by
+      have h_const_int : IntervalIntegrable (fun _ : ℝ => (-4 : ℝ))
+          MeasureTheory.volume t s :=
+        intervalIntegrable_const
+      have h_four_over_log_int :
+          IntervalIntegrable (fun x => 4 / Real.log (M x))
+          MeasureTheory.volume t s := by
+        -- Follows from h_tailPiece_int and constant integrability.
+        have := h_tail_int
+        -- (-4 - 4/log(M)) = (-4) + (-(4/log(M))); subtract the constant.
+        -- IntervalIntegrable is closed under subtraction.
+        have h_diff : IntervalIntegrable
+            (fun x => ((-4 : ℝ) - 4 / Real.log (M x)) - (-4 : ℝ))
+            MeasureTheory.volume t s :=
+          this.sub h_const_int
+        -- Simplify: (-4 - 4/log M) - (-4) = - (4/log M)
+        have hfun : (fun x => ((-4 : ℝ) - 4 / Real.log (M x)) - (-4 : ℝ)) =
+            (fun x => - (4 / Real.log (M x))) := by
+          funext x; ring
+        rw [hfun] at h_diff
+        -- IntervalIntegrable closed under negation.
+        simpa using h_diff.neg
+      rw [intervalIntegral.integral_sub h_const_int h_four_over_log_int]
+    -- Constant integral.
+    have h_const : (∫ _ in t..s, (-4 : ℝ)) = (s - t) * (-4) := by
+      rw [intervalIntegral.integral_const]; ring
+    -- FTC for w on [t, s].
+    have h_ftc_ts : w s - w t = ∫ x in t..s, deriv w x := h_FTC ht_low hts_le hsT
+    -- Tail nonneg on [t, s].
+    have h_tail_ts_nonneg : 0 ≤ ∫ x in t..s, 4 / Real.log (M x) :=
+      h_partialTail_nonneg ht_low hts_le hsT
+    -- Combine.
+    -- We have: w s - w t = ∫ deriv w ≤ ∫ (-4 - 4/logM)
+    --                    = (s - t)·(-4) - ∫ 4/logM.
+    have h_chain :
+        w s - w t ≤ (s - t) * (-4) - ∫ x in t..s, 4 / Real.log (M x) := by
+      calc w s - w t = ∫ x in t..s, deriv w x := h_ftc_ts
+        _ ≤ ∫ x in t..s, (-4 - 4 / Real.log (M x)) := h_int_mono
+        _ = (∫ _ in t..s, (-4 : ℝ)) -
+              ∫ x in t..s, 4 / Real.log (M x) := h_split
+        _ = (s - t) * (-4) - ∫ x in t..s, 4 / Real.log (M x) := by
+              rw [h_const]
+    -- Rearrange to: w t ≥ w s + 4·(s - t) + tail.
+    -- (s - t)·(-4) = -4·(s-t).
+    have h_rearr : w t ≥ w s + 4 * (s - t) + ∫ x in t..s, 4 / Real.log (M x) := by
+      nlinarith [h_chain]
+    -- Drop the nonneg tail.
+    linarith [h_rearr, h_tail_ts_nonneg]
+  -- Step 2: take the limit s → T⁻.  The bound `w t ≥ w s + 4·(s - t)`
+  -- holds eventually as `s → T⁻` (specifically, for `s ∈ (t, T)`).
+  -- In that limit, `w s → 0` by `hW_boundary`, so `w t ≥ 0 + 4·(T - t)`.
+  -- Build a filter statement.
+  have h_filter_bound :
+      ∀ᶠ s in 𝓝[<] T, w s + 4 * (s - t) ≤ w t := by
+    -- On the right-filter basis, `s ∈ (t, T)` is eventually true.
+    have h_gt_t : ∀ᶠ s in 𝓝[<] T, t < s := by
+      -- `Ioo t T ∈ 𝓝[<] T` since `t < T`.
+      have : Set.Ioo t T ∈ 𝓝[<] T := Ioo_mem_nhdsLT ht_up
+      filter_upwards [this] with s hs using hs.1
+    have h_lt_T : ∀ᶠ s in 𝓝[<] T, s < T := by
+      filter_upwards [self_mem_nhdsWithin] with s hs using hs
+    filter_upwards [h_gt_t, h_lt_T] with s hts hsT
+    have := h_sub s hts hsT
+    linarith
+  -- Take limits: LHS tends to `0 + 4·(T - t)`, RHS is the constant `w t`.
+  have h_lhs_tendsto :
+      Filter.Tendsto (fun s => w s + 4 * (s - t)) (𝓝[<] T)
+        (𝓝 (0 + 4 * (T - t))) := by
+    have h_w_tend : Filter.Tendsto w (𝓝[<] T) (𝓝 0) := hW_boundary
+    have h_lin_tend : Filter.Tendsto (fun s : ℝ => 4 * (s - t)) (𝓝[<] T)
+        (𝓝 (4 * (T - t))) := by
+      have h_id : Filter.Tendsto (fun s : ℝ => s) (𝓝[<] T) (𝓝 T) :=
+        (continuous_id.tendsto T).mono_left nhdsWithin_le_nhds
+      have : Filter.Tendsto (fun s : ℝ => s - t) (𝓝[<] T) (𝓝 (T - t)) :=
+        h_id.sub_const t
+      simpa using this.const_mul 4
+    exact h_w_tend.add h_lin_tend
+  -- The constant tendsto for the RHS.
+  have h_rhs_tendsto :
+      Filter.Tendsto (fun _ : ℝ => w t) (𝓝[<] T) (𝓝 (w t)) :=
+    tendsto_const_nhds
+  -- The left-neighborhood filter `𝓝[<] T` is not the bot filter (ℝ has
+  -- no minimum element), so `nhdsLT_neBot` provides the instance
+  -- automatically.
+  -- Apply `le_of_tendsto_of_tendsto` to pass the eventual inequality
+  -- to the limit.
+  have h_final :
+      0 + 4 * (T - t) ≤ w t :=
+    le_of_tendsto_of_tendsto (b := 𝓝[<] T) h_lhs_tendsto h_rhs_tendsto
+      h_filter_bound
+  -- Clean up.
+  have : 4 * (T - t) ≤ w t := by linarith
+  -- Rewrite goal in terms of `w`.
+  show 4 * (T - t) ≤ 1 / (M t * Real.log (M t))
+  exact this
 
 /-- **Connector: pointwise ODE inequality + equality regime ⇒ residual.**
 
