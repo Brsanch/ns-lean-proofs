@@ -88,18 +88,18 @@ theorem integratedBound_of_ftc_identity
       M t - M s ≤ ∫ τ in s..t, Φ (M τ) := by
   intro s t h0s hst htT
   -- Step 1: integral monotonicity from the a.e. bound on [s, t].
-  have h_ae_Ioc :
-      ∀ᵐ τ ∂(MeasureTheory.volume.restrict (Ioc s t)),
+  have h_ae_Icc :
+      ∀ᵐ τ ∂(MeasureTheory.volume.restrict (Icc s t)),
         deriv M τ ≤ Φ (M τ) := by
-    refine (ae_restrict_iff' measurableSet_Ioc).mpr ?_
-    filter_upwards [hAeBound] with τ hτ hτIoc
-    have h0τ : 0 ≤ τ := le_trans h0s hτIoc.1.le
-    have hτT : τ < T := lt_of_le_of_lt hτIoc.2 htT
+    refine (ae_restrict_iff' measurableSet_Icc).mpr ?_
+    filter_upwards [hAeBound] with τ hτ hτIcc
+    have h0τ : 0 ≤ τ := le_trans h0s hτIcc.1
+    have hτT : τ < T := lt_of_le_of_lt hτIcc.2 htT
     exact hτ ⟨h0τ, hτT⟩
   have h_mono :
       ∫ τ in s..t, deriv M τ ≤ ∫ τ in s..t, Φ (M τ) :=
     intervalIntegral.integral_mono_ae_restrict hst
-      (hDerivInt h0s hst htT) (hPhiInt h0s hst htT) h_ae_Ioc
+      (hDerivInt h0s hst htT) (hPhiInt h0s hst htT) h_ae_Icc
   -- Step 2: chain with the FTC identity.
   have hEq : M t - M s = ∫ τ in s..t, deriv M τ := hFTC h0s hst htT
   linarith
@@ -188,7 +188,7 @@ Constant `M ≡ c` with `Φ ≡ 0`: `deriv M ≡ 0`, a.e. bound is trivial,
 FTC identity reduces to `c - c = 0`, and the integrated bound is
 `0 ≤ 0`.  Exercises the wiring. -/
 
-example (c : ℝ) (T : ℝ) (hT : 0 < T) :
+example (c : ℝ) (T : ℝ) (_hT : 0 < T) :
     let M : ℝ → ℝ := fun _ => c
     let Φ : ℝ → ℝ := fun _ => 0
     ∀ ⦃s t : ℝ⦄, 0 ≤ s → s ≤ t → t < T →
