@@ -60,12 +60,9 @@ def dot (a b : Vec3) : ℝ := ∑ i : Fin 3, a i * b i
 
 /-- Symmetry of the dot product. -/
 lemma dot_comm (a b : Vec3) : dot a b = dot b a := by
-  simp [dot, mul_comm]
-
-/-- Dot product is bilinear (left-scalar form). -/
-lemma dot_smul_left (c : ℝ) (a b : Vec3) :
-    dot (fun i => c * a i) b = c * dot a b := by
-  simp [dot, Finset.mul_sum, mul_assoc]
+  unfold dot
+  refine Finset.sum_congr rfl fun i _ => ?_
+  ring
 
 end Vec3
 
