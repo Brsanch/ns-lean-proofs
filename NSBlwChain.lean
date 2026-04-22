@@ -13,6 +13,7 @@ import NSBlwChain.Caveats.C2_Envelope
 import NSBlwChain.Caveats.C2_AeOde
 import NSBlwChain.Caveats.C4_ImplicitBound
 import NSBlwChain.Caveats.C4_Monotonicity
+import NSBlwChain.Caveats.C4_GrowthDominance
 import NSBlwChain.BLW.BiotSavartCylindrical
 import NSBlwChain.BLW.GradientBound
 import NSBlwChain.BLW.ArgmaxIdentities
