@@ -62,4 +62,5 @@ import NSBlwChain.BLW.VorticityFrameFromEnvelope
 import NSBlwChain.BLW.DerivFrameFromProductRule
 import NSBlwChain.BLW.HessianExpansionFromC2
 import NSBlwChain.BLW.FullDischargePipeline
+import NSBlwChain.BLW.FromNSEvolution
 import NSBlwChain.Analyticity.IdentityTheorem
