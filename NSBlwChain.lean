@@ -22,6 +22,7 @@ import NSBlwChain.BLW.ArgmaxGradient
 import NSBlwChain.BLW.ArgmaxGradientFromFrame
 import NSBlwChain.BLW.HessianAtArgmaxFromFrame
 import NSBlwChain.BLW.VorticityAtArgmaxFromFrame
+import NSBlwChain.BLW.StepsFromFrameCompose
 import NSBlwChain.BLW.ArgmaxStepsCompose
 import NSBlwChain.BLW.SubTypeOneRate
 import NSBlwChain.BLW.ClassicalAxiomDischarge
