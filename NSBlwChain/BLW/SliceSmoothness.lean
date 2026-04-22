@@ -64,6 +64,12 @@ theorem slice_contDiff_of_contDiff
   show ContDiff ℝ n (g ∘ sliceMap xStar i)
   exact hg.comp h_map
 
+end NSBlwChain.BLW
+
+namespace NSBlwChain
+
+open NSBlwChain.BLW
+
 /-- **`|ω|² slice smoothness from `NSEvolutionAxioms`.**
 
     The slice of `|ω(t, ·)|²` at `xStar` in direction `e_i` is
@@ -122,9 +128,9 @@ theorem NSEvolutionAxioms.sqNormVort_sliceDeriv_differentiableAt_zero
   have h_deriv : ContDiff ℝ 2
       (deriv (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
         xStar i)) := by
-    have : (2 : ℕ∞) + 1 = 3 := by norm_num
-    rw [← this] at h_slice
+    have h3eq : (3 : ℕ∞) = 2 + 1 := by norm_num
+    rw [h3eq] at h_slice
     exact h_slice.deriv_right
   exact (h_deriv.differentiable (by norm_num : (1 : ℕ∞) ≤ 2)) 0
 
-end NSBlwChain.BLW
+end NSBlwChain
