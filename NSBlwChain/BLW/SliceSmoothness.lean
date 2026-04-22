@@ -5,9 +5,6 @@ import Mathlib
 import NSBlwChain.Setup.VorticityDifferentiable
 import NSBlwChain.BLW.MaxPrincipleFromLocalMax
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # Smoothness of scalar slices
 
@@ -71,7 +68,7 @@ end NSBlwChain.BLW
 
 namespace NSBlwChain
 
-open NSBlwChain.BLW
+open NSBlwChain.BLW Topology Filter
 
 /-- **`|ω|² slice smoothness from `NSEvolutionAxioms`.**
 
@@ -104,9 +101,9 @@ theorem NSEvolutionAxioms.sqNormVort_slice_differentiableAt_nhds
         (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
           xStar i) s := by
   have h_slice := ax.sqNormVort_slice_contDiff ht htT xStar i
-  -- ContDiff ℝ 3 → Differentiable (since 1 ≤ 3).  Apply at each point s.
-  have h1_le_3 : (1 : ℕ∞) ≤ 3 := by decide
-  have h_diff := h_slice.differentiable h1_le_3
+  -- ContDiff ℝ 3 → Differentiable (mathlib 4.29 signature: n ≠ 0).
+  have h3_ne_0 : (3 : ℕ∞) ≠ 0 := by decide
+  have h_diff := h_slice.differentiable h3_ne_0
   refine Filter.Eventually.of_forall (fun s => ?_)
   exact h_diff s
 
@@ -136,7 +133,7 @@ theorem NSEvolutionAxioms.sqNormVort_sliceDeriv_differentiableAt_zero
   have h_deriv : ContDiff ℝ 2
       (deriv (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
         xStar i)) := h_slice'.deriv
-  have h1_le_2 : (1 : ℕ∞) ≤ 2 := by decide
-  exact (h_deriv.differentiable h1_le_2) 0
+  have h2_ne_0 : (2 : ℕ∞) ≠ 0 := by decide
+  exact (h_deriv.differentiable h2_ne_0) 0
 
 end NSBlwChain
