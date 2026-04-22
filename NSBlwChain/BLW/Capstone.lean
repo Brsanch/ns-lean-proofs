@@ -49,7 +49,7 @@ classical inputs.
 
 namespace NSBlwChain.BLW
 
-open NSBlwChain NSBlwChain.Caveats
+open NSBlwChain
 
 /-- **Composition witness.**  Packages the hypotheses one needs to
     apply the chain at a *single* time `t` in the growth regime: an
