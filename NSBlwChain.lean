@@ -5,6 +5,7 @@ import NSBlwChain.Setup.ArgmaxFrame
 import NSBlwChain.Setup.LipschitzToAE
 import NSBlwChain.Setup.EnergyEnstrophy
 import NSBlwChain.Setup.ClassicalAxioms
+import NSBlwChain.Caveats.AngularIntegrals
 import NSBlwChain.Caveats.C1_GrowthMoment
 import NSBlwChain.Caveats.C2_Envelope
 import NSBlwChain.Caveats.C2_AeOde
