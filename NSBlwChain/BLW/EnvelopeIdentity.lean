@@ -150,8 +150,8 @@ theorem envelope_identity_via_chainRule_deriv
     slice_deriv = M t * deriv M t := by
   have h := envelope_identity_via_chainRule phi M x_star t Mdot slice_deriv
     h_env h_hit h_M h_slice
-  -- `HasDerivAt.deriv` rewrites `Mdot = deriv M t`.
-  rw [← h_M.deriv]
+  -- `h_M.deriv : deriv M t = Mdot`; rewrite it in `h`.
+  rw [← h_M.deriv] at h
   exact h
 
 /-! ## Sanity-check example
@@ -164,11 +164,8 @@ section Examples
 /-- Constant envelope: `phi x t = c^2 / 2`, `M ≡ c`.  Identity reduces
     to `0 = c * 0`. -/
 example (c : ℝ) (t : ℝ) :
-    let M : ℝ → ℝ := fun _ => c
-    (0 : ℝ) = M t * deriv M t := by
-  intro M
-  show (0 : ℝ) = c * deriv (fun _ : ℝ => c) t
-  simp [deriv_const]
+    (0 : ℝ) = c * deriv (fun _ : ℝ => c) t := by
+  simp
 
 end Examples
 
