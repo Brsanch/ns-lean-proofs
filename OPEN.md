@@ -35,8 +35,13 @@ with zero structural gaps.
   `MaxPrincipleFromLocalMax.isLocalMax_second_deriv_nonpos` +
   `ScalarLocalMaxSecondDeriv.ofIsLocalMax` (closes item 5; all three
   `d_i_nonpos` discharged from `IsLocalMax` + slice differentiability).
+- ✅ **Pointwise `(f²)'' = 2(f')² + 2 f · f''`** —
+  `HessianExpansionFromC2.scalar_sq_second_deriv_eq` via
+  `HasDerivAt.pow` + second product rule, plus
+  `HessianExpansionData.ofScalarIdentities` constructor
+  (closes item 4).
 
-## Remaining — five substantive analytical items
+## Remaining — four substantive analytical items
 
 ### 1. ODE integration (§12.4 step 7→8)
 
@@ -73,16 +78,12 @@ continuous → FTC `∫ deriv M dτ = M(t)-M(s)`.
 **Location:** `NSBlwChain/Caveats/C1_FTC.lean` (scaffolding landed,
 identity taken as hypothesis; needs mathlib bridge).
 
-### 4. Pointwise `Δ(f²) = 2|∇f|² + 2f·Δf`
+### 4. ~~Pointwise `Δ(f²) = 2|∇f|² + 2f·Δf`~~ — **CLOSED**
 
-**Target:** `HessianExpansionData.scalar_Δsq_f_identity_k` field.
-Currently a hypothesis.
-
-**Derivation:** fderiv-level product rule applied twice, plus
-symmetry of mixed partials.
-
-**Location:** `NSBlwChain/BLW/HessianExpansionIdentity.lean` (structural
-form landed; identity still hypothesis).
+See Done section above.  Scalar 1-D form `(f²)'' = 2(f')² + 2 f · f''`
+discharged in `NSBlwChain/BLW/HessianExpansionFromC2.lean`; constructor
+`HessianExpansionData.ofScalarIdentities` assembles per-component
+identities into the bundle's `sum_scalar_identity` field.
 
 ### 5. ~~1-D 2nd-derivative test at local max~~ — **CLOSED**
 
