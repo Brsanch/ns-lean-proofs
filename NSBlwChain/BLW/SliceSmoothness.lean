@@ -101,11 +101,11 @@ theorem NSEvolutionAxioms.sqNormVort_slice_differentiableAt_nhds
         (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
           xStar i) s := by
   have h_slice := ax.sqNormVort_slice_contDiff ht htT xStar i
-  have h_diff : Differentiable ℝ
-      (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
-        xStar i) :=
-    h_slice.differentiable (by norm_num : (1 : ℕ∞) ≤ 3)
-  exact Filter.eventually_of_forall (fun s => h_diff s)
+  -- h_slice : ContDiff ℝ 3 (slice |ω|² xStar i).  Differentiable follows.
+  have h1_le_3 : (1 : ℕ∞) ≤ 3 := by decide
+  have h_diff := h_slice.differentiable h1_le_3
+  -- h_diff : Differentiable ℝ (slice |ω|² xStar i), i.e., ∀ x, DifferentiableAt.
+  exact Filter.Eventually.of_forall (fun s => h_diff.differentiableAt)
 
 /-- **Slice-derivative-differentiable-at-0 from `NSEvolutionAxioms`.**
 
@@ -128,9 +128,10 @@ theorem NSEvolutionAxioms.sqNormVort_sliceDeriv_differentiableAt_zero
   have h_deriv : ContDiff ℝ 2
       (deriv (slice (fun y : Vec3 => Vec3.dot (vorticity u t y) (vorticity u t y))
         xStar i)) := by
-    have h3eq : (3 : ℕ∞) = 2 + 1 := by norm_num
-    rw [h3eq] at h_slice
+    -- ContDiff.deriv_right requires `ContDiff ℝ (n+1) f` and yields `ContDiff ℝ n (deriv f)`.
+    -- With n = 2, we need ContDiff ℝ 3 f; we have it.
     exact h_slice.deriv_right
-  exact (h_deriv.differentiable (by norm_num : (1 : ℕ∞) ≤ 2)) 0
+  have h1_le_2 : (1 : ℕ∞) ≤ 2 := by decide
+  exact (h_deriv.differentiable h1_le_2).differentiableAt
 
 end NSBlwChain
