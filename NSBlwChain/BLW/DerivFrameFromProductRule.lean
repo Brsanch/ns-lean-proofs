@@ -54,9 +54,7 @@ noncomputable def LocalFrameDerivativeData.ofDifferentiableVectorField
     (hω : ∀ k : Fin 3, DifferentiableAt ℝ (fun y => ω y k) x_star)
     (h_ω_0 : ω x_star 0 = 0)
     (h_ω_1 : ω x_star 1 = 0)
-    (h_ω_2 : ω x_star 2 = M)
-    (h_argmax :
-      partialDeriv (fun y => Vec3.dot (ω y) (ω y)) i x_star = 0) :
+    (h_ω_2 : ω x_star 2 = M) :
     LocalFrameDerivativeData where
   M                  := M
   omega_0_at_xstar   := ω x_star 0
@@ -77,6 +75,5 @@ noncomputable def LocalFrameDerivativeData.ofDifferentiableVectorField
     have h := partialDeriv_dot_self_eq hω i
     rw [h, Fin.sum_univ_three]
     ring
-  sqNorm_zero := h_argmax
 
 end NSBlwChain.BLW
