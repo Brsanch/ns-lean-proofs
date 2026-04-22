@@ -57,20 +57,20 @@ All other content is expected to be machine-verified with **zero `sorry`**.
 
 ## Build
 
-```
-lake exe cache get       # fetch mathlib cache (WARNING: apfsd-heavy on macOS)
-lake build
-```
+**Policy:** CI (`.github/workflows/lean_action_ci.yml`) is the default
+verifier. Do **not** run `lake build` or `lake exe cache get` on Apple
+Silicon — they trigger apfsd saturation and kernel panics. See
+[`DEVELOPMENT.md`](./DEVELOPMENT.md) for the full safe-workflow
+protocol, diagnostic tricks, and lessons learned from the sister
+project `sqg-lean-proofs`.
 
-On macOS M-series hardware, `lake exe cache get` can trigger SoC watchdog
-kernel panics due to leantar decompression saturating apfsd. Prefer CI
-builds (`.github/workflows/lean_action_ci.yml`) over local `lake build`.
-
-For local single-file checking:
+For safe local single-file type-checking only (no artifact writes):
 
 ```
-LEAN_NUM_THREADS=1 lake env lean NSBlwChain/Basic.lean
+LEAN_NUM_THREADS=1 lake env lean NSBlwChain/YOUR_FILE.lean
 ```
+
+For everything else, push and let CI build.
 
 ## Status
 
