@@ -202,8 +202,7 @@ theorem blowup_rate_algebraic
   -- ∫_t^{Tstar} A ds = (Tstar − t) · A.
   have hA_const_int :
       (∫ _ in t..Tstar, A) = (Tstar - t) * A := by
-    rw [intervalIntegral.integral_const]
-    ring
+    rw [intervalIntegral.integral_const, smul_eq_mul]
   -- ∫_t^{Tstar} A ≤ ∫_t^{Tstar} Z.
   have hZ_int_full : IntervalIntegrable Z MeasureTheory.volume 0 Tstar :=
     B.Z_integrable
@@ -238,13 +237,12 @@ theorem blowup_rate_algebraic
   have hcZ_ne : (c_Z : ℝ) ≠ 0 := ne_of_gt hcZ_pos
   have hν_ne : (ν : ℝ) ≠ 0 := ne_of_gt hν_pos
   have hstep :
-      c_Z * ((Tstar - t) * M t ^ β) ≤ E₀ / ν := by
-    have : (Tstar - t) * (c_Z * M t ^ β) = c_Z * ((Tstar - t) * M t ^ β) := by
-      ring
-    rw [this] at hchain'
-    exact hchain'
-  have : (Tstar - t) * M t ^ β ≤ (E₀ / ν) / c_Z :=
-    (div_le_iff₀ hcZ_pos).mpr (by linarith [hstep])
+      (Tstar - t) * M t ^ β * c_Z ≤ E₀ / ν := by
+    have heq : (Tstar - t) * M t ^ β * c_Z
+        = (Tstar - t) * (c_Z * M t ^ β) := by ring
+    rw [heq]; exact hchain'
+  have hbd : (Tstar - t) * M t ^ β ≤ (E₀ / ν) / c_Z :=
+    (div_le_iff₀ hcZ_pos).mpr hstep
   have hdiv : (E₀ / ν) / c_Z = E₀ / (ν * c_Z) := by
     field_simp
   linarith
@@ -266,7 +264,7 @@ theorem blowup_rate_algebraic
 theorem blowup_rate_alpha_of_bundle
     {ν E₀ Tstar : ℝ} {M Z : ℝ → ℝ} {β c_Z α : ℝ}
     (B : EnstrophyCrossoverBundle ν E₀ Tstar M Z β c_Z)
-    (hα_pos : 0 < α) (hα_le_β : α ≤ β)
+    (_hα_pos : 0 < α) (hα_le_β : α ≤ β)
     {t : ℝ} (ht_nn : 0 ≤ t) (htT : t ≤ Tstar) (hMt : 1 ≤ M t) :
     (Tstar - t) * M t ^ α ≤ E₀ / (ν * c_Z) := by
   -- From `1 ≤ M t` and `α ≤ β`, `M t ^ α ≤ M t ^ β`.
