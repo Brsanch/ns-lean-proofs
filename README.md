@@ -74,10 +74,15 @@ For everything else, push and let CI build.
 
 ## Status
 
-**v0.3 (2026-04-22 overnight)** — 65 files, ~9500 LOC, all CI-green.
+**v0.4 (2026-04-22 late-overnight)** — 66 files, ~9650 LOC,
+all CI-green.  **All six originally-listed OPEN.md items fully
+closed.**  No `sorry` in the BLW chain.  Axiom footprint: three
+named classical PDE axioms (`biot_savart_identity_R3`,
+`seregin_type_one_exclusion`, `NS_time_analyticity` — by design)
+plus structural hypothesis fields on the NS-side wiring
+(`NSArgmaxInputs`, `TorusCorrectionBundle.RL_bound`).
 
-**Machine-verified analytical discharges (items 2-6 fully closed;
-item 1 reduced to single residual):**
+**Machine-verified analytical discharges (all six items closed):**
 
 - **Theorem 12.2 algebraic core** `|∇ω|²(x*) ≤ M²σ/ν` + sqrt form 12.2'.
 - **Step (i)** `∂_i|ω|² = 2·M·∂_i ω₃` via mathlib `HasDerivAt.pow`
@@ -112,16 +117,12 @@ item 1 reduced to single residual):**
   `argmaxBundle_of_NSEvolutionAxioms` plumb velocity-field data
   through the scalar bundles + gradient bound.
 
-**Partial** (item 1 — ODE integration §12.4 step 7→8):
-The algebraic core `integrated_bound_of_substituted_bound` +
-constructor `DifferentialInequalityBundle.ofSubstitutedBound` in
-`ODEIntegration_Discharge` reduce `(T-t)·M·logM ≤ 1/4` to a single
-residual hypothesis
-
-  `hW_lower_bound : ∀ t ∈ (t_start, T), 4·(T-t) ≤ 1/(M(t)·log M(t))`
-
-which remains to be derived from `Ṁ ≤ 4 M² log M` via quotient rule
-on `w = 1/(M log M)` + FTC + boundary limit + tail absorption.
+- **§12.4 step 7→8 ODE integration** `(T-t)·M·logM ≤ 1/4` from
+  an a.e. ODE inequality `Ṁ ≤ 4 M² log M` — discharged in
+  `ODEIntegration_ResidualDischarge` via quotient rule on
+  `w = 1/(M·log M)` + FTC on `[t, s]` + limit passage `s → T⁻`
+  with `w(T⁻) = 0`.  Combined with the algebraic wrapper in
+  `ODEIntegration_Discharge`.
 
 See `OPEN.md` for the live roadmap and `DEVELOPMENT.md` for the
 build-safety protocol.

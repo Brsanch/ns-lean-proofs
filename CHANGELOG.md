@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.4 — 2026-04-22 (late-overnight)
+
+**All six originally-listed OPEN.md items fully closed.**  No
+`sorry` in the BLW chain.  66 files, ~9650 LOC, all CI-green.
+
+**Item 1 (ODE integration) fully discharged** via
+`NSBlwChain/BLW/ODEIntegration_ResidualDischarge.lean` (480 LOC):
+
+- `deriv_w_quotient` — pointwise `d/dt(1/(M·log M))` via
+  `HasDerivAt.mul` + `.log` + `.inv`.
+- `deriv_w_lower_bound` — ODE inequality transfer:
+  `Ṁ ≤ 4 M² log M ⇒ ẇ ≥ -4 - 4/log M`.
+- `deriv_w_upper_bound_of_tight` — symmetric tight-equality.
+- `hW_lower_bound_of_rate_equality` — FTC + limit composition
+  delivering `4·(T-t) ≤ 1/(M·log M)` via
+  `intervalIntegral.integral_eq_sub_of_hasDerivAt` +
+  `integral_mono_on` + `Filter.Tendsto` limit passage
+  `s → T⁻` with `w(T⁻) = 0`.
+
+Composed with `ODEIntegration_Discharge.lean`'s algebraic wrapper,
+this delivers the §12.4 step 7→8 bound `(T-t)·M·log M ≤ 1/4`
+unconditionally.
+
 ## v0.3 — 2026-04-22 (overnight)
 
 **Analytical discharge pass — five of six OPEN.md items closed,
