@@ -17,3 +17,4 @@ import NSBlwChain.BLW.Capstone
 import NSBlwChain.BLW.ChainThread
 import NSBlwChain.BLW.ChainWiring
 import NSBlwChain.BLW.VorticityAtArgmax
+import NSBlwChain.BLW.HessianAtArgmax
