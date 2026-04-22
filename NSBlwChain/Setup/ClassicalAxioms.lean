@@ -56,7 +56,7 @@ namespace NSBlwChain
     chain; the derivation of the identity from cylindrical
     θ-averaging is the content of the axiom below. -/
 structure BiotSavartSelfStrainBound
-    (u : VelocityField) (ν T : ℝ) : Prop where
+    (u : VelocityField) (ν T : ℝ) where
   /-- Box size at which the torus correction is applied. -/
   L          : ℝ
   /-- Torus-correction constant. -/
@@ -87,7 +87,7 @@ axiom biot_savart_self_strain_bound
     finite singularity time: there is always a strictly later time
     `T' > T` to which the solution extends smoothly. -/
 structure SereginTypeOneExclusion
-    (u : VelocityField) (ν T : ℝ) : Prop where
+    (u : VelocityField) (ν T : ℝ) where
   /-- The extended-smoothness time. -/
   T'        : ℝ
   T_lt_T'   : T < T'
@@ -125,7 +125,7 @@ axiom seregin_type_one_exclusion
     downstream consumers can apply the identity theorem for
     real-analytic functions from mathlib. -/
 structure NSTimeAnalyticity
-    (u : VelocityField) (ν T : ℝ) : Prop where
+    (u : VelocityField) (ν T : ℝ) where
   /-- Radius function, `r(t₀) > 0` for every interior `t₀`. -/
   r      : ℝ → ℝ
   r_pos  : ∀ t₀ : ℝ, 0 < t₀ → t₀ < T → 0 < r t₀
