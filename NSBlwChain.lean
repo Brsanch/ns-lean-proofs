@@ -37,4 +37,5 @@ import NSBlwChain.BLW.AnalyticalToImplicit
 import NSBlwChain.Unconditional.Theorem1
 import NSBlwChain.Unconditional.Theorem2
 import NSBlwChain.Torus.EpsteinZeta
+import NSBlwChain.BLW.TorusToC4
 import NSBlwChain.Analyticity.IdentityTheorem
