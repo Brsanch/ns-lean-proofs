@@ -211,6 +211,13 @@ def exampleFrameCompatibility :
   M_eq       := rfl
   laplace_eq := rfl
 
+/-- Growth non-negativity for the example bundle.  Factored out
+    because `norm_num` on a raw `exampleVorticityFrameData.growth`
+    projection doesn't delta-unfold without help. -/
+theorem exampleGrowthNonneg : 0 ≤ exampleVorticityFrameData.growth := by
+  show (0 : ℝ) ≤ (36 : ℝ)
+  norm_num
+
 /-- **Sanity check — gradient bound on concrete numerics.**
     `exampleHessianFrameData.gradSqNorm = 40`; the right-hand side
     `M² · σ / ν = 10² · 4 / 1 = 400`; so the conclusion is
@@ -221,13 +228,13 @@ example :
           / exampleVorticityFrameData.ν :=
   gradient_bound_from_full_discharge
     exampleHessianFrameData exampleVorticityFrameData
-    exampleFrameCompatibility (by norm_num)
+    exampleFrameCompatibility exampleGrowthNonneg
 
 /-- The numerical RHS evaluates to `400`. -/
 example :
     exampleVorticityFrameData.M ^ 2 * exampleVorticityFrameData.sigma
         / exampleVorticityFrameData.ν = 400 := by
-  unfold exampleVorticityFrameData
+  show (10 : ℝ) ^ 2 * (4 : ℝ) / (1 : ℝ) = 400
   norm_num
 
 /-- The numerical LHS is `40`. -/
