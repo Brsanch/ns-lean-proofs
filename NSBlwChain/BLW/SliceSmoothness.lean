@@ -123,4 +123,72 @@ theorem NSEvolutionAxioms.sqNormVort_sliceDeriv_differentiableAt_zero
   rw [iteratedDeriv_one] at h_iter
   exact h_iter 0
 
+/-! ### ω₃ slice smoothness from `NSEvolutionAxioms`
+
+The fully-discharged BLW capstone also requires slice-smoothness of
+the single component `ω₃ = fun y => vorticity u t y 2` (used in the
+step-(ii) sign argument `Δω₃ ≤ 0` at an argmax of `|ω|²` under
+alignment `ω(x*) = (0, 0, M)`).  The lemmas below discharge those
+witnesses the same way the `|ω|²` ones are discharged. -/
+
+/-- **`ω_k` component smoothness from `NSEvolutionAxioms`.**
+
+    Each component `fun y => vorticity u t y k` is `ContDiff ℝ 3`
+    for every `t ∈ [0, T)`.  Extracted from
+    `NSEvolutionAxioms.vorticity_contDiff` via `contDiff_pi`. -/
+theorem NSEvolutionAxioms.vorticity_component_contDiff
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
+    (k : Fin 3) :
+    ContDiff ℝ 3 (fun y : Vec3 => vorticity u t y k) := by
+  have h_vort : ContDiff ℝ 3 (fun y => vorticity u t y) :=
+    ax.vorticity_contDiff ht htT
+  rw [contDiff_pi] at h_vort
+  exact h_vort k
+
+/-- **`ω₃ = fun y => vorticity u t y 2` slice smoothness.**
+
+    The slice of `ω₃ = ω(t, ·) 2` at `xStar` in direction `e_i` is
+    `ContDiff ℝ 3` for every `t ∈ [0, T)` and every `i : Fin 3`. -/
+theorem NSEvolutionAxioms.omega3_slice_contDiff
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
+    (xStar : Vec3) (i : Fin 3) :
+    ContDiff ℝ 3
+      (slice (fun y : Vec3 => vorticity u t y 2) xStar i) :=
+  slice_contDiff_of_contDiff (ax.vorticity_component_contDiff ht htT 2) xStar i
+
+/-- **ω₃ slice differentiable on a neighborhood of 0.**
+
+    Consumed by the fully-discharged BLW capstone's `hf_nhd_ω3`
+    hypothesis. -/
+theorem NSEvolutionAxioms.omega3_slice_differentiableAt_nhds
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
+    (xStar : Vec3) (i : Fin 3) :
+    ∀ᶠ s in 𝓝 (0 : ℝ),
+      DifferentiableAt ℝ
+        (slice (fun y : Vec3 => vorticity u t y 2) xStar i) s := by
+  have h_slice := ax.omega3_slice_contDiff ht htT xStar i
+  refine Filter.Eventually.of_forall (fun s => ?_)
+  exact h_slice.differentiable (by norm_num) s
+
+/-- **ω₃ slice-derivative differentiable at 0.**
+
+    Consumed by the fully-discharged BLW capstone's `hD_ω3`
+    hypothesis. -/
+theorem NSEvolutionAxioms.omega3_sliceDeriv_differentiableAt_zero
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
+    (xStar : Vec3) (i : Fin 3) :
+    DifferentiableAt ℝ
+      (deriv (slice (fun y : Vec3 => vorticity u t y 2) xStar i))
+      0 := by
+  have h_slice := ax.omega3_slice_contDiff ht htT xStar i
+  have h_iter : Differentiable ℝ (iteratedDeriv 1
+      (slice (fun y : Vec3 => vorticity u t y 2) xStar i)) :=
+    h_slice.differentiable_iteratedDeriv 1 (by norm_num)
+  rw [iteratedDeriv_one] at h_iter
+  exact h_iter 0
+
 end NSBlwChain
