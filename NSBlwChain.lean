@@ -76,6 +76,7 @@ import NSBlwChain.BLW.AdvectionAtArgmaxFromNSEvolution
 import NSBlwChain.BLW.AlignmentContraction
 import NSBlwChain.BLW.StrainContractionAligned
 import NSBlwChain.BLW.EnvelopeFormFromNSEvolution
+import NSBlwChain.BLW.StepIIIFromNSEvolution
 import NSBlwChain.BLW.HessianExpansionFromC2
 import NSBlwChain.BLW.FullDischargePipeline
 import NSBlwChain.BLW.FromNSEvolution
