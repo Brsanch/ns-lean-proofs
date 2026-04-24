@@ -32,10 +32,14 @@ be discharged at the wiring layer where the physical vectors
 7. `h_laplace_vec`: `ω · Δω(xStar) = M · laplaceOmega3` (vector form).
 
 **Next pickup target** (ranked by ROI):
-- **Hessian expansion of `|ω|²`** (#1 above) — cleanest, uses existing
-  `HessianExpansionFromC2.scalar_sq_second_deriv_eq` componentwise +
-  sum over Fin 3 × Fin 3.  Estimated ~60-100 LOC.  New file:
-  `BLW/HessianExpansionScalar.lean`.
+- ~~**Hessian expansion of `|ω|²`** (#1 above)~~ — **CLOSED (v0.14)**
+  via `BLW/HessianExpansionScalar.lean`
+  (`laplace_sq_eq_of_slice_identities` / `_fin3` / `_of_C2_slices`,
+  ~150 LOC).  Per-component `(★)` identity now derivable from three
+  1-D `scalar_sq_second_deriv_eq` slice applications + Fin 3
+  algebraic assembly.  Three compositions over `k ∈ {0,1,2}` feed
+  the `h_star_k` slots of `HessianExpansionData.ofScalarIdentities`
+  to deliver the vector-level `Δ|ω|² = 2|∇ω|² + 2 ω·Δω`.
 - **Hessian trace ≤ 0 at max** (#2) — compose
   `MaxPrincipleFromLocalMax.ScalarLocalMaxSecondDeriv.ofIsLocalMax` +
   `ScalarLocalMaxSecondDeriv.trace_nonpos` + the scalar Hessian
