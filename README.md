@@ -9,7 +9,10 @@ $\mathbb{T}^3$ and on $\mathbb{R}^3$.  Companion paper:
 `paper/ns_regularity.md` in the `noethersolve` project, with supplements
 `ns_regularity_caveats_formal.md` and `ns_regularity_blw_derivations.md`.
 
-**Status: v0.10 (2026-04-24).** ~90 files, ~12,700 LOC, all CI-green.
+**Status: v0.11 (2026-04-24).** ~90 files, ~12,700 LOC, all CI-green.
+`step_iii_identity_from_NSEvolution` now takes 5 hypotheses; two
+formerly-taken hypotheses (h_contracted, h_material_split) are now
+derived internally.
 Zero `sorry` in the BLW chain.  Three named classical PDE axioms
 (by design); no other axioms.  **The step-(iii) identity
 `ν · Δω_3 = Ṁ - M·σ` is now derived from NSEv + IsLocalMax + Danskin
