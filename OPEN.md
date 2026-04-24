@@ -68,9 +68,19 @@ be discharged at the wiring layer where the physical vectors
   `Vec3.dot ω (vortexStretching u ω)(x*) = M² · σ` where
   `σ := ∂₃ u₃(x*)`.  Closes the fifth of the 7 taken vector-field-
   layer identities.
-- **Time chain rule + envelope** (#4, #5) — require
-  time-differentiability of ω at xStar (from `NS_time_analyticity`
-  axiom).  More involved.
+- ~~**Time chain rule + envelope** (#4, #5)~~ — **CLOSED (v0.18)**
+  via `BLW/TimeChainRuleDot.lean` (`hasDerivAt_Vec3_sqNorm_half`,
+  `time_chain_rule_Vec3_dot`, `envelope_identity_sqNorm_half_at_argmax`,
+  ~130 LOC).  Identity #4 via per-component `HasDerivAt.pow 2` +
+  `HasDerivAt.sum` over Fin 3 + `div_const 2`.  Identity #5 direct
+  specialization of the existing
+  `EnvelopeIdentity.envelope_identity_via_chainRule_deriv`
+  (Danskin envelope).  **All 7 vector-field-layer identities now
+  discharged** — `h_time_chain_rule`, `h_envelope`, and the
+  five alignment-algebra identities all derivable from the
+  `NSEvolutionAxioms` + `IsLocalMax |ω|²` + alignment + positivity
+  hypotheses plus per-component time-differentiability (from
+  `NS_time_analyticity` axiom).
 
 ## Non-BLW-scalar open items
 
