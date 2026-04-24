@@ -6,9 +6,6 @@ import NSBlwChain.Setup.NSHypothesis
 import NSBlwChain.BLW.VorticityAtArgmaxFromFrame
 import NSBlwChain.BLW.VorticityEquationAtPoint
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # `VorticityLocalFrameData` from `NSEvolutionAxioms`
 
