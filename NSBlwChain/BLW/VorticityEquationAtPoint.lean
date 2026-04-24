@@ -33,7 +33,12 @@ where `ω = vorticity u`.  This is simply the j-th component of the
 bundle's vector-valued `vorticity_equation`.
 -/
 
+set_option diagnostics true
+set_option diagnostics.threshold 100
+
 namespace NSBlwChain
+
+open scoped BigOperators
 
 /-- **Scalar j-component of the vorticity equation.**  The bundle's
     `vorticity_equation` field asserts a pointwise equality between
@@ -53,5 +58,40 @@ theorem NSEvolutionAxioms.vorticity_equation_scalar
   -- scalar.  Right side is `fun j => vortexStretching ... j + ν *
   -- vectorLaplacian ... j`; applied at `j` gives exactly the RHS.
   exact hj
+
+/-- **Contracted vorticity equation.**  Dot-product the vector
+    vorticity equation with the vorticity `ω` itself at the point
+    `x`, and sum over components:
+
+      `ω · D_t ω = ω · ((ω·∇) u) + ν · ω · Δω`.
+
+    This is the scalar-valued form consumed by the BLW chain's step
+    (iii) `vorticity_eq_contracted` field (after rearrangement using
+    `ω · ∂_t ω = ∂_t (|ω|²/2)` and the advection-vanishes-at-argmax
+    identity).  Proof: sum the scalar j-component equations weighted
+    by `ω_j(x)`. -/
+theorem NSEvolutionAxioms.vorticity_equation_contracted_with_omega
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T) (x : Vec3) :
+    Vec3.dot (vorticity u t x)
+             (materialDerivative u (vorticity u) t x) =
+      Vec3.dot (vorticity u t x)
+               (vortexStretching u (vorticity u) t x)
+        + ν * Vec3.dot (vorticity u t x)
+                       (fun j => vectorLaplacian (vorticity u t) x j) := by
+  -- Unfold Vec3.dot to expose the Fin 3 sums on both sides.
+  unfold Vec3.dot
+  -- Goal:
+  --   ∑ j, ω_j · MD_j = ∑ j, ω_j · VS_j + ν · ∑ j, ω_j · VL_j
+  -- Rewrite RHS as a single sum.
+  rw [← Finset.mul_sum, ← Finset.sum_add_distrib]
+  -- Goal: ∑ j, ω_j · MD_j = ∑ j, (ω_j · VS_j + ν · (ω_j · VL_j))
+  apply Finset.sum_congr rfl
+  intro j _
+  -- Goal: ω_j · MD_j = ω_j · VS_j + ν · (ω_j · VL_j)
+  have hj := ax.vorticity_equation_scalar ht htT x j
+  -- hj: MD_j = VS_j + ν · VL_j
+  rw [hj]
+  ring
 
 end NSBlwChain
