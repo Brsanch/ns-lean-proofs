@@ -112,6 +112,46 @@ theorem isLocalMax_omega3_of_isLocalMax_sqNorm
     Produces `(∑ i : Fin 3, deriv (deriv (slice (fun y => ω y 2) xStar i)) 0) ≤ 0`,
     which is the scalar `Δω₃(x*) ≤ 0` in the `ArgmaxAnalyticalBundle`
     formulation downstream. -/
+/-- **`Δ|ω|²(x*) ≤ 0` from `IsLocalMax |ω|²` directly.**
+
+    The *Hessian-trace* sign `h_trace_nonpos` is the immediate
+    consequence of `IsLocalMax` applied to the scalar `|ω|²`: the
+    2nd-derivative test per direction gives
+    `∂²_i |ω|²(x*) ≤ 0`, summed over `Fin 3` gives `Δ|ω|²(x*) ≤ 0`.
+
+    Consumes the argmax hypothesis and per-slice differentiability
+    of `|ω|²` (not of `ω₃` separately). -/
+theorem hessian_trace_sqNorm_nonpos_from_IsLocalMax
+    (ω : Vec3 → Fin 3 → ℝ) (xStar : Vec3)
+    (hmax : IsLocalMax (fun y => Vec3.dot (ω y) (ω y)) xStar)
+    (hf_nhd : ∀ i : Fin 3,
+      ∀ᶠ t in 𝓝 (0 : ℝ),
+        DifferentiableAt ℝ
+          (slice (fun y => Vec3.dot (ω y) (ω y)) xStar i) t)
+    (hD : ∀ i : Fin 3,
+      DifferentiableAt ℝ
+        (deriv (slice (fun y => Vec3.dot (ω y) (ω y)) xStar i)) 0) :
+    (∑ i : Fin 3,
+        deriv (deriv
+          (slice (fun y => Vec3.dot (ω y) (ω y)) xStar i)) 0) ≤ 0 := by
+  have d0_nonpos :
+      deriv (deriv
+        (slice (fun y => Vec3.dot (ω y) (ω y)) xStar 0)) 0 ≤ 0 :=
+    isLocalMax_second_deriv_nonpos
+      (isLocalMax_slice hmax 0) (hf_nhd 0) (hD 0)
+  have d1_nonpos :
+      deriv (deriv
+        (slice (fun y => Vec3.dot (ω y) (ω y)) xStar 1)) 0 ≤ 0 :=
+    isLocalMax_second_deriv_nonpos
+      (isLocalMax_slice hmax 1) (hf_nhd 1) (hD 1)
+  have d2_nonpos :
+      deriv (deriv
+        (slice (fun y => Vec3.dot (ω y) (ω y)) xStar 2)) 0 ≤ 0 :=
+    isLocalMax_second_deriv_nonpos
+      (isLocalMax_slice hmax 2) (hf_nhd 2) (hD 2)
+  simp only [Fin.sum_univ_three]
+  linarith
+
 theorem laplaceOmega3_nonpos_from_IsLocalMax
     (ω : Vec3 → Fin 3 → ℝ) (xStar : Vec3) (M : ℝ)
     (hM_nonneg : 0 ≤ M)
