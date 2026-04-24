@@ -64,22 +64,27 @@ theorem hasDerivAt_Vec3_sqNorm_half
       hfmul.div_const 2
     convert hhalf using 1
     ring
-  -- Sum over k ∈ Fin 3.
-  have h_sum :
-      HasDerivAt (fun τ => ∑ k : Fin 3, (ω τ k) * (ω τ k) / 2)
-        (∑ k : Fin 3, ω t k * ω_dot k) t :=
-    HasDerivAt.sum (fun k _ => h_half_sq k)
-  -- Identify with Vec3.dot form.
+  -- Sum the three components via HasDerivAt.add.
+  have h_sum3 :
+      HasDerivAt
+        (fun τ => ω τ 0 * ω τ 0 / 2 + ω τ 1 * ω τ 1 / 2
+                  + ω τ 2 * ω τ 2 / 2)
+        (ω t 0 * ω_dot 0 + ω t 1 * ω_dot 1 + ω t 2 * ω_dot 2) t :=
+    ((h_half_sq 0).add (h_half_sq 1)).add (h_half_sq 2)
+  -- Identify with Vec3.dot form via Fin.sum_univ_three and Vec3.dot def.
   have h_fun_eq :
-      (fun τ => ∑ k : Fin 3, (ω τ k) * (ω τ k) / 2)
+      (fun τ => ω τ 0 * ω τ 0 / 2 + ω τ 1 * ω τ 1 / 2
+                + ω τ 2 * ω τ 2 / 2)
         = (fun τ => Vec3.dot (ω τ) (ω τ) / 2) := by
     funext τ
-    rw [Finset.sum_div]
-    rfl
+    simp only [Vec3.dot, Fin.sum_univ_three]
+    ring
   have h_val_eq :
-      ∑ k : Fin 3, ω t k * ω_dot k = Vec3.dot (ω t) ω_dot := rfl
-  rw [h_fun_eq, h_val_eq] at h_sum
-  exact h_sum
+      ω t 0 * ω_dot 0 + ω t 1 * ω_dot 1 + ω t 2 * ω_dot 2
+        = Vec3.dot (ω t) ω_dot := by
+    simp only [Vec3.dot, Fin.sum_univ_three]
+  rw [h_fun_eq, h_val_eq] at h_sum3
+  exact h_sum3
 
 /-- **Time chain rule (identity #4, `deriv` form).**  With per-
     component differentiability, `Vec3.dot (ω t) ω_dot` equals
