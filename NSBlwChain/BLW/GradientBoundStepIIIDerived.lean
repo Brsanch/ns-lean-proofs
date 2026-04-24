@@ -5,9 +5,6 @@ import Mathlib
 import NSBlwChain.BLW.ArgmaxBundleFromNSEvolution
 import NSBlwChain.BLW.StepIIIFromNSEvolution
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # Gradient bound with step (iii) identity derived from `NSEvolutionAxioms`
 
