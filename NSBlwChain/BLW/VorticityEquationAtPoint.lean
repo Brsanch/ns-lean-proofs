@@ -33,9 +33,6 @@ where `ω = vorticity u`.  This is simply the j-th component of the
 bundle's vector-valued `vorticity_equation`.
 -/
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 namespace NSBlwChain
 
 open scoped BigOperators
