@@ -58,8 +58,7 @@ theorem vec3_component_sq_le_normSq (v : Fin 3 → ℝ) (k : Fin 3) :
     _ ≤ ∑ i : Fin 3, v i * v i         :=
         Finset.single_le_sum
           (f := fun i : Fin 3 => v i * v i)
-          (s := Finset.univ)
-          (h := fun i _ => mul_self_nonneg (v i))
+          (fun i _ => mul_self_nonneg (v i))
           (Finset.mem_univ k)
     _ = Vec3.dot v v                   := rfl
 
