@@ -7,9 +7,6 @@ import NSBlwChain.BLW.DerivFrameFromNSEvolution
 import NSBlwChain.BLW.ScalarMaxFromNSEvolution
 import NSBlwChain.BLW.VorticityFrameFromNSEvolution
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # `ArgmaxAnalyticalBundle` directly from `NSEvolutionAxioms`
 

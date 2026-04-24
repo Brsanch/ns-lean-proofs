@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.7 — 2026-04-24 (overnight)
+
+**All three BLW-chain steps + grand-compose now producible from
+`NSEvolutionAxioms`.**  Uniform thin-wrapper pattern:
+
+- `BLW/VorticityEquationAtPoint.lean` — (i) scalar j-component of
+  `vorticity_equation` via `congrFun`; (ii) dot-contracted form with
+  `ω` via `Finset.mul_sum` forward + `Finset.sum_add_distrib` +
+  pointwise `vorticity_equation_scalar` + `ring`.
+- `BLW/VorticityFrameFromNSEvolution.lean` —
+  `VorticityLocalFrameData.ofNSEvolutionAxioms`: step (iii) bundle
+  from NS bundle + scalar inputs `(M, σ, growth, Δω₃)` + step-(iii)
+  identity `ν·Δω₃ = growth - M·σ`.  4/5 Prop fields `rfl` given
+  canonical data; 5th via `nlinarith`.
+- `BLW/ArgmaxBundleFromNSEvolution.lean` — grand-compose
+  `ArgmaxAnalyticalBundle.ofNSEvolutionAxioms` producing the unified
+  scalar bundle + `gradient_bound_of_NSEvolutionAxioms_via_scalars`
+  one-line corollary.
+
+Now uniform L3/L6/L8/L9 pattern:
+
+| Layer | Bundle | File |
+|---|---|---|
+| L3 | `LocalFrameDerivativeData.ofNSEvolutionAxioms` (step i) | `DerivFrameFromNSEvolution.lean` |
+| L6 | `ScalarLocalMaxSecondDeriv.ofNSEvolutionAxioms` (step ii) | `ScalarMaxFromNSEvolution.lean` |
+| L8 | `VorticityLocalFrameData.ofNSEvolutionAxioms` (step iii) | `VorticityFrameFromNSEvolution.lean` |
+| L9 | `ArgmaxAnalyticalBundle.ofNSEvolutionAxioms` (compose) | `ArgmaxBundleFromNSEvolution.lean` |
+
+**Public repo switch.**  `github.com/Brsanch/ns-lean-proofs` made
+public mid-session (previously private; hit the Free plan's 2000-min
+Actions quota).  Public repos have unlimited CI minutes on Free,
+unblocking further iteration.
+
+**CI polling workflow codified.**  `gh api
+repos/.../actions/runs/<id>/jobs | jq '.jobs[].steps[] | name,
+status, conclusion'` catches `lean-action: completed:success` about
+7 min post-push, well before the ~16 min full-run completion
+(docgen-action runs after).  Documented in the updated README build
+section.
+
+~80 files, ~11,500 LOC on main, all CI-green.
+
 ## v0.6 — 2026-04-22 (late morning)
 
 **NSEvolutionAxioms → steps (i) and (ii) of the BLW chain, fully
