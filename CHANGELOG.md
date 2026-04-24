@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.9 — 2026-04-24 (afternoon)
+
+**Step (iii) identity now derived from NSEv + IsLocalMax.**
+Previously taken as a hypothesis in the L8 thin wrapper; now a
+theorem at the scalar level with the remaining taken hypotheses
+isolated to vector-field-layer algebra.
+
+New files:
+
+- `BLW/StrainContractionAligned.lean` — `laplace_contraction_of_aligned`
+  (specialization of `dot_of_aligned` to the Laplacian vector).
+- `BLW/EnvelopeFormFromNSEvolution.lean` — specializes
+  `envelope_identity_for_sqNorm_half` (Danskin) to the vorticity
+  field from NSEv.
+- `BLW/StepIIIFromNSEvolution.lean` — **capstone**: given NSEv +
+  IsLocalMax + 5 Danskin/alignment/time-chain hypotheses, derives
+  `ν · Δω_3 = Ṁ - M · σ` via the vorticity equation contracted
+  with ω, advection-vanishes (from AdvectionAtArgmaxFromNSEvolution),
+  time-chain-rule, Danskin envelope, and alignment contractions.
+
+Combined with tonight's earlier additions (advection-vanishes
+capstone, alignment contractions, envelope form), the step-(iii)
+scalar identity is no longer a hypothesis.  All that remains taken
+at the scalar level are the 5 vector-field algebra steps that unfold
+to pointwise derivatives of `∂_t ω`, `(ω·∇)u`, `Δω`.
+
 ## v0.8 — 2026-04-24 (late morning)
 
 **Thin-wrapper hypotheses being upgraded to real derivations.**
