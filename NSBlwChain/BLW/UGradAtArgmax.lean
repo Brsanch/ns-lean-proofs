@@ -4,9 +4,6 @@
 import Mathlib
 import NSBlwChain.Setup.VectorFields
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # Directional derivative at a local maximum vanishes
 

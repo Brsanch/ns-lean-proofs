@@ -5,9 +5,6 @@ import Mathlib
 import NSBlwChain.BLW.ScalarProductRule
 import NSBlwChain.BLW.UGradAtArgmax
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # Product rule: `ω · (u · ∇ω) = (1/2) u · ∇|ω|²`
 

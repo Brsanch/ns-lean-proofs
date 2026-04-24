@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.8 — 2026-04-24 (late morning)
+
+**Thin-wrapper hypotheses being upgraded to real derivations.**
+Advection vanishing at argmax is now a theorem, not a taken
+hypothesis.  Four new files:
+
+- `BLW/UGradAtArgmax.lean` — `u·∇g(xStar) = 0` for any direction
+  `u` at a local max of `g`, via `IsLocalMax.fderiv_eq_zero`.
+- `BLW/OmegaAdvectionProductRule.lean` — product-rule identity
+  `ω·(u·∇ω) = (1/2)·u·∇|ω|²`, via
+  `ScalarProductRule.partialDeriv_dot_self_eq` +
+  `Fin.sum_univ_three` + `ring`.
+- `BLW/AdvectionAtArgmaxFromNSEvolution.lean` — **capstone**:
+  combines the above with `NSEvolutionAxioms.vorticity_components_differentiableAt`
+  to derive `ω · (u·∇ω)(xStar, t) = 0` from NS smoothness +
+  `IsLocalMax |ω|² xStar` alone, no further hypotheses.
+- `BLW/AlignmentContraction.lean` — `dot_of_aligned`
+  (`ω(x) = M·ê₂ ⇒ ω(x)·v = M·v₂`) and `sqNorm_of_aligned`
+  (`|ω(x)|² = M²`).  Closes `strain_form` and `laplace_form`
+  fields with real derivations.
+
 ## v0.7 — 2026-04-24 (overnight)
 
 **All three BLW-chain steps + grand-compose now producible from

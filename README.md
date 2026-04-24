@@ -9,10 +9,12 @@ $\mathbb{T}^3$ and on $\mathbb{R}^3$.  Companion paper:
 `paper/ns_regularity.md` in the `noethersolve` project, with supplements
 `ns_regularity_caveats_formal.md` and `ns_regularity_blw_derivations.md`.
 
-**Status: v0.7 (2026-04-24).** ~80 files, ~11,500 LOC, all CI-green.
+**Status: v0.8 (2026-04-24).** ~84 files, ~11,900 LOC, all CI-green.
 Zero `sorry` in the BLW chain.  Three named classical PDE axioms
-(by design); no other axioms.  Pre-review audit pipeline executed
-(four `docs/findings/*.md` memos in `noethersolve/`).
+(by design); no other axioms.  Step (iii)'s advection-vanishes
+identity is now a theorem (from `NSEvolutionAxioms` + `IsLocalMax`
+only), not a taken hypothesis.  Alignment contractions `ω·v = M·v₂`
+and `|ω|² = M²` also derivable.
 
 **Repository is now public** (github.com/Brsanch/ns-lean-proofs).  Free
 Actions minutes unlimited — no billing-wall iteration blocks.

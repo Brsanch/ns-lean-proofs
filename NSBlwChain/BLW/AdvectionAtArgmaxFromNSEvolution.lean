@@ -6,9 +6,6 @@ import NSBlwChain.Setup.VorticityDifferentiable
 import NSBlwChain.BLW.UGradAtArgmax
 import NSBlwChain.BLW.OmegaAdvectionProductRule
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # Advection vanishes at argmax of `|ω|²` — from `NSEvolutionAxioms`
 
