@@ -1,35 +1,46 @@
 # Open items — ns-lean-proofs
 
-**v0.13 (2026-04-25 early-morning).**  88 files, 12,465 LOC on main,
-all CI-green, zero `sorry` in the BLW chain.  **All scalar-level
-Props are now derived.**  The gradient bound `|∇ω|² ≤ M²·σ/ν` is
-producible via `gradient_bound_of_NSEvolutionAxioms_all_scalar_derived`
+**v0.19 (2026-04-25 evening).**  Zero `sorry` in the BLW chain; all
+8 scalar-capstone hypotheses now **derivable** from structural
+inputs alone.  The gradient bound `|∇ω|² ≤ M²·σ/ν` producible via
+`gradient_bound_of_NSEvolutionAxioms_all_scalar_derived`
 (`BLW/GradientBoundAllScalarDerived.lean`) from:
 
 - `NSEvolutionAxioms u ν T` (3 classical PDE axioms hidden inside —
   `biot_savart_self_strain_bound`, `seregin_type_one_exclusion`,
   `NS_time_analyticity`).
-- `IsLocalMax |ω|² xStar` (argmax existence hypothesis).
-- 7 **vector-field-layer physical identities** (the current
-  remaining taken hypotheses).
-- Positivity/sign/growth-regime (`0 < M`, `Δω_3 ≤ 0`, `0 ≤ Ṁ`).
+- `IsLocalMax (fun y => Vec3.dot (ω y) (ω y)) xStar` (argmax
+  existence hypothesis).
+- Alignment (`ω(x*) 0 = 0`, `ω(x*) 1 = 0`, `ω(x*) 2 = M`).
+- Positivity / sign / growth-regime (`0 < M`, `0 ≤ Ṁ`).
+- Per-component slice differentiability (from `NS_time_analyticity`
+  axiom).
+- Definitional matchings of abstract scalars to physical quantities.
 
-## Remaining taken hypotheses (all vector-field-layer)
+## Capstone hypotheses — all 8 discharged as of v0.19
 
-Each unfolds to ~30-100 LOC of pointwise tensor calculus and can
-be discharged at the wiring layer where the physical vectors
-(`∂_tω`, `(ω·∇)u`, `Δω`, `∇²|ω|²`) are in scope.
+The scalar capstone
+`gradient_bound_of_NSEvolutionAxioms_all_scalar_derived` takes
+8 named hypotheses besides `NSEvolutionAxioms`, `IsLocalMax`,
+positivity, and growth regime.  **All 8 are now derivable** from
+structural inputs:
 
-**For step (ii):**
-1. `h_hessian_expansion`: `Δ(|ω|²) = 2·|∇ω|² + 2·(ω·Δω)`.
-2. `h_trace_nonpos`: `Δ(|ω|²)(xStar) ≤ 0` at the local max.
-3. `h_laplace_align_scalar`: `ω·Δω(xStar) = M · Δω_3` (scalar form).
+| # | Hypothesis | Discharge file | Version |
+|---|---|---|---|
+| 1 | `h_hessian_expansion` | `BLW/HessianExpansionScalar.lean` | v0.14 |
+| 2 | `h_trace_nonpos` | `BLW/LaplaceOmega3Nonpos.lean` (sibling) | v0.19 |
+| 3 | `h_laplace_align_scalar` | `BLW/LaplaceAlignScalar.lean` | v0.16 |
+| 4 | `h_time_chain_rule` | `BLW/TimeChainRuleDot.lean` | v0.19 |
+| 5 | `h_envelope` | `BLW/TimeChainRuleDot.lean` | v0.19 |
+| 6 | `h_strain` | `BLW/StrainAlignScalar.lean` | v0.17 |
+| 7 | `h_laplace_vec` | `BLW/LaplaceAlignScalar.lean` | v0.16 |
+| 8 | `h_laplace_nonpos` | `BLW/LaplaceOmega3Nonpos.lean` | v0.15 |
 
-**For step (iii):**
-4. `h_time_chain_rule`: `ω · ∂_tω = ∂_t(|ω|²/2)`.
-5. `h_envelope`: `∂_t(|ω|²/2)(xStar, t) = M · Ṁ` (Danskin).
-6. `h_strain`: `ω · (ω·∇)u = M² · σ` (under alignment).
-7. `h_laplace_vec`: `ω · Δω(xStar) = M · laplaceOmega3` (vector form).
+The three classical axioms remain the only load-bearing external
+inputs.  A full-discharge capstone wiring all 8 into a single
+theorem that takes only `NSEvolutionAxioms` + `IsLocalMax` +
+alignment + positivity + per-component slice differentiability
+is the natural next deliverable.
 
 **Next pickup target** (ranked by ROI):
 - ~~**Hessian expansion of `|ω|²`** (#1 above)~~ — **CLOSED (v0.14)**

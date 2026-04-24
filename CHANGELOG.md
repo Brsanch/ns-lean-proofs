@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.19 — 2026-04-25
+
+**All 8 scalar-capstone hypotheses discharged.**
+
+v0.18's `TimeChainRuleDot.lean` build failed on a `HasDerivAt.sum`
+implicit-`s` elaboration issue (the shape `(∑ i, fun τ ↦ f i τ)`
+did not unify with `(fun τ ↦ ∑ i, f i τ)` even after rewriting).
+v0.19 rewrites the sum via three explicit `.add` operations on the
+per-component `HasDerivAt`, then identifies the result with the
+`Vec3.dot` form via `Fin.sum_univ_three`.
+
+Also discovered during review: my 8th capstone hypothesis
+`h_trace_nonpos` (the `Δ|ω|²(x*) ≤ 0` sign) was previously
+miscounted as part of `h_laplace_nonpos`.  v0.19 adds the missing
+sibling lemma `hessian_trace_sqNorm_nonpos_from_IsLocalMax` in
+`BLW/LaplaceOmega3Nonpos.lean` — same pattern as the existing
+`laplaceOmega3_nonpos_from_IsLocalMax` but applied to `|ω|²`
+directly rather than `ω_3`.
+
+After v0.19, the scalar capstone's 8 named hypotheses are all
+discharged; only the 3 classical axioms
+(`biot_savart_self_strain_bound`, `seregin_type_one_exclusion`,
+`NS_time_analyticity`) remain as load-bearing external inputs.
+
 ## v0.18 — 2026-04-25
 
 **Sixth and seventh vector-field-layer physical identities discharged —
