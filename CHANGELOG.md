@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.10 — 2026-04-24 (evening)
+
+**Further tightenings of the step-iii derivation.**
+
+- `BLW/MaterialDerivativeSplit.lean` — `omega_dot_materialDeriv_split`:
+  `ω · materialDeriv = ω · ∂_tω + ω · (u·∇)ω` via `Finset.sum_add_distrib`.
+- `step_iii_identity_from_NSEvolution` simplified: `h_contracted`
+  hypothesis dropped (derived internally from `ax` via
+  `vorticity_equation_contracted_with_omega`).  Reduces the theorem
+  from 7 to 6 hypotheses.
+
 ## v0.9 — 2026-04-24 (afternoon)
 
 **Step (iii) identity now derived from NSEv + IsLocalMax.**
