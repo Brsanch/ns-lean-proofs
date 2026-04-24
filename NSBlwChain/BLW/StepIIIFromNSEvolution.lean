@@ -6,6 +6,7 @@ import NSBlwChain.BLW.VorticityEquationAtPoint
 import NSBlwChain.BLW.AdvectionAtArgmaxFromNSEvolution
 import NSBlwChain.BLW.AlignmentContraction
 import NSBlwChain.BLW.StrainContractionAligned
+import NSBlwChain.BLW.MaterialDerivativeSplit
 
 /-!
 # Step (iii) identity derived from the NS vorticity equation
@@ -85,15 +86,6 @@ theorem step_iii_identity_from_NSEvolution
       xStar)
     -- Scalar fields:
     (M σ Mdot laplaceOmega3 : ℝ) (hM_pos : 0 < M)
-    -- Hypothesis: material derivative splits as time + advection.
-    (h_material_split :
-      Vec3.dot (vorticity u t xStar)
-               (materialDerivative u (vorticity u) t xStar)
-        = Vec3.dot (vorticity u t xStar)
-                   (fun j => deriv (fun τ => vorticity u τ xStar j) t)
-          + (∑ j : Fin 3, vorticity u t xStar j *
-              (∑ i : Fin 3, u t xStar i *
-                partialDeriv (fun y => vorticity u t y j) i xStar)))
     -- Hypothesis: time-chain-rule (ω · ∂_t ω = ∂_t(|ω|²/2)).
     (h_time_chain_rule :
       Vec3.dot (vorticity u t xStar)
@@ -132,9 +124,22 @@ theorem step_iii_identity_from_NSEvolution
   -- RHS of (2) = ω·(ω·∇u) + ν · ω·Δω = M²·σ + ν·M·laplaceOmega3.
   -- So M·Mdot = M²·σ + ν·M·laplaceOmega3, then divide by M > 0.
   have h_combined : M * Mdot = M ^ 2 * σ + ν * (M * laplaceOmega3) := by
-    -- Derive h_contracted from ax via vorticity_equation_contracted_with_omega
-    -- (rather than taking it as a hypothesis).
+    -- Derive h_contracted from ax via vorticity_equation_contracted_with_omega.
     have h_contracted := ax.vorticity_equation_contracted_with_omega ht htT xStar
+    -- Derive h_material_split from omega_dot_materialDeriv_split.  Unfold
+    -- Vec3.dot on the LHS and on the time-derivative term of the RHS so that
+    -- the algebraic form matches what's needed for subsequent rewrites.
+    have h_material_split :
+        Vec3.dot (vorticity u t xStar)
+                 (materialDerivative u (vorticity u) t xStar)
+          = Vec3.dot (vorticity u t xStar)
+                     (fun j => deriv (fun τ => vorticity u τ xStar j) t)
+            + (∑ j : Fin 3, vorticity u t xStar j *
+                (∑ i : Fin 3, u t xStar i *
+                  partialDeriv (fun y => vorticity u t y j) i xStar)) := by
+      unfold Vec3.dot
+      exact omega_dot_materialDeriv_split u (vorticity u) t xStar
+        (vorticity u t xStar)
     rw [h_material_split, h_time_chain_rule, h_envelope, h_advection,
         h_strain, h_laplace] at h_contracted
     linarith [h_contracted]
