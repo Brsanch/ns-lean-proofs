@@ -4,9 +4,6 @@
 import Mathlib
 import NSBlwChain.Setup.VectorFields
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # Step (ii) inequality from Hessian trace + Hessian expansion + alignment
 
