@@ -44,11 +44,12 @@ open scoped BigOperators
 theorem u_dot_grad_eq_zero_at_localMax
     {g : Vec3 → ℝ} {xStar : Vec3}
     (hmax : IsLocalMax g xStar)
-    (hg : DifferentiableAt ℝ g xStar)
     (u : Vec3) :
     (∑ i : Fin 3, u i * partialDeriv g i xStar) = 0 := by
-  -- Step 1: fderiv g xStar = 0 at the local max.
-  have h_fderiv_zero : fderiv ℝ g xStar = 0 := hmax.fderiv_eq_zero hg
+  -- Step 1: fderiv g xStar = 0 at the local max (mathlib's
+  -- `IsLocalMax.fderiv_eq_zero` — no differentiability hypothesis
+  -- needed; returns 0 by `deriv = 0` convention if non-differentiable).
+  have h_fderiv_zero : fderiv ℝ g xStar = 0 := hmax.fderiv_eq_zero
   -- Step 2: partialDeriv g i xStar = (fderiv g xStar) (Vec3.e i).
   -- When fderiv g xStar = 0 as a continuous-linear map, evaluating
   -- at any vector gives 0.
