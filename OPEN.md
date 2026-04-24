@@ -1,17 +1,66 @@
 # Open items — ns-lean-proofs
 
-**v0.4 (2026-04-22 late-overnight).**  All 6 originally-listed
-OPEN.md items are now fully closed.  ~66 files, ~9650 LOC on main,
-all CI-green.  The §12 BLW-gradient chain runs end-to-end with:
+**v0.13 (2026-04-25 early-morning).**  88 files, 12,465 LOC on main,
+all CI-green, zero `sorry` in the BLW chain.  **All scalar-level
+Props are now derived.**  The gradient bound `|∇ω|² ≤ M²·σ/ν` is
+producible via `gradient_bound_of_NSEvolutionAxioms_all_scalar_derived`
+(`BLW/GradientBoundAllScalarDerived.lean`) from:
 
-- **Three named classical axioms** (Biot-Savart `ℝ³`, Seregin 2012,
-  Kato 1967) — by design.
-- **Structural hypothesis fields** on `NSArgmaxInputs`
-  (`FromNSEvolution.lean`), `TorusCorrectionBundle.RL_bound`,
-  `LatticeSumBounded` — by design (paper-level, not derived from
-  smoothness).
+- `NSEvolutionAxioms u ν T` (3 classical PDE axioms hidden inside —
+  `biot_savart_self_strain_bound`, `seregin_type_one_exclusion`,
+  `NS_time_analyticity`).
+- `IsLocalMax |ω|² xStar` (argmax existence hypothesis).
+- 7 **vector-field-layer physical identities** (the current
+  remaining taken hypotheses).
+- Positivity/sign/growth-regime (`0 < M`, `Δω_3 ≤ 0`, `0 ≤ Ṁ`).
 
-No `sorry` in the BLW chain itself.
+## Remaining taken hypotheses (all vector-field-layer)
+
+Each unfolds to ~30-100 LOC of pointwise tensor calculus and can
+be discharged at the wiring layer where the physical vectors
+(`∂_tω`, `(ω·∇)u`, `Δω`, `∇²|ω|²`) are in scope.
+
+**For step (ii):**
+1. `h_hessian_expansion`: `Δ(|ω|²) = 2·|∇ω|² + 2·(ω·Δω)`.
+2. `h_trace_nonpos`: `Δ(|ω|²)(xStar) ≤ 0` at the local max.
+3. `h_laplace_align_scalar`: `ω·Δω(xStar) = M · Δω_3` (scalar form).
+
+**For step (iii):**
+4. `h_time_chain_rule`: `ω · ∂_tω = ∂_t(|ω|²/2)`.
+5. `h_envelope`: `∂_t(|ω|²/2)(xStar, t) = M · Ṁ` (Danskin).
+6. `h_strain`: `ω · (ω·∇)u = M² · σ` (under alignment).
+7. `h_laplace_vec`: `ω · Δω(xStar) = M · laplaceOmega3` (vector form).
+
+**Next pickup target** (ranked by ROI):
+- **Hessian expansion of `|ω|²`** (#1 above) — cleanest, uses existing
+  `HessianExpansionFromC2.scalar_sq_second_deriv_eq` componentwise +
+  sum over Fin 3 × Fin 3.  Estimated ~60-100 LOC.  New file:
+  `BLW/HessianExpansionScalar.lean`.
+- **Hessian trace ≤ 0 at max** (#2) — compose
+  `MaxPrincipleFromLocalMax.ScalarLocalMaxSecondDeriv.ofIsLocalMax` +
+  `ScalarLocalMaxSecondDeriv.trace_nonpos` + the scalar Hessian
+  expansion form.  Follow naturally from #1.
+- **Alignment contractions** (#3, #6, #7) — pure alignment algebra;
+  specializations of `AlignmentContraction.dot_of_aligned` and
+  `StrainContractionAligned.laplace_contraction_of_aligned`.
+- **Time chain rule + envelope** (#4, #5) — require
+  time-differentiability of ω at xStar (from `NS_time_analyticity`
+  axiom).  More involved.
+
+## Non-BLW-scalar open items
+
+- **Theorem 1** (blowup rate α ∈ (1,2)) — skeleton in
+  `Unconditional/Theorem1.lean`; Leray energy identity + enstrophy
+  crossover bundle discharge would close it unconditionally.
+- **Theorem 2** (far-field control) — skeleton + algebraic core in
+  `Unconditional/Theorem2.lean`; Cauchy-Schwarz + energy bundle
+  discharge.
+- **Torus overlay** — periodic `NSEvolutionAxioms` + wire
+  `Torus/*.lean` framework.
+- **Anti-twist BLW §13** — possibly-novel math from paper §13; not
+  yet formalized.
+- **Classical axiom formalization** — any of the 3 (Biot-Savart,
+  Masuda, Seregin).  Multi-session scale each.
 
 ## Done
 
