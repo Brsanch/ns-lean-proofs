@@ -3,6 +3,8 @@
 
 import Mathlib
 import NSBlwChain.Setup.NSHypothesis
+import NSBlwChain.BLW.HessianExpansionFromC2
+import NSBlwChain.BLW.MaxPrincipleFromLocalMax
 
 /-!
 # Hessian-expansion scalar bundle
@@ -187,5 +189,153 @@ theorem HessianInputs.h_star_2_live
     H.laplace_sq_2
       = 2 * H.gradSqNorm_2 + 2 * vorticity u t xStar 2 * H.laplace_2 := by
   rw [H.h_star_2, H.h_ω2_match]
+
+/-! ### Smoothness-side constructor from C²-slice derivatives
+
+Constructs `HessianInputs` from per-component slice-derivative
+witnesses.  Input: for each `(k, i) : Fin 3 × Fin 3`, `HasDerivAt`
+data for the 1-D slice `s ↦ vorticity u t (xStar + s · e_i) k` at
+every `s`, plus the second derivative at `s = 0`.  These witnesses
+are supplied as abstract functions in this constructor; they are
+discharged automatically in the NS-axioms-side constructor
+`ofNSEvolutionAxioms`.
+
+The three concrete sums computed inside the constructor are:
+
+* `gradSqNorm_k   := Σ_i (deriv(slice ω_k xStar i) 0)²`  —
+  squared slice gradient of `ω_k` at `xStar`;
+* `laplace_k      := Σ_i deriv(deriv(slice ω_k xStar i)) 0`  —
+  scalar Laplacian of `ω_k` at `xStar`;
+* `laplace_sq_k   := Σ_i deriv(deriv(fun s => (slice ω_k xStar i s)²)) 0`
+                  = `Σ_i ∂²_i (ω_k²)(xStar)`  —
+  scalar Laplacian of `ω_k²` at `xStar`.
+
+The per-component `(★)_k` identities follow from
+`scalar_sq_second_deriv_eq` summed over `i ∈ Fin 3`.
+-/
+
+open scoped BigOperators
+
+/-- **Smoothness-side constructor: `HessianInputs` from C²-slice data.**
+
+    Consumes:
+
+    * `g_first k i s` — value of the first derivative of the slice
+      `s ↦ vorticity u t (xStar + s · e_i) k` at `s`.
+    * `g_second k i` — value of the second derivative at `s = 0`.
+    * `hasDerivAt_slice k i s` — pointwise `HasDerivAt` witness.
+    * `hasDerivAt_deriv_slice k i` — `HasDerivAt` of the first
+      derivative at `s = 0`.
+    * Three definitional matchings tying the abstract totals
+      `gradSqNorm`, `omega_laplace_omega`, `hessian_trace_sqNorm` to
+      concrete Fin 3 × Fin 3 sums over slice data.
+
+    Produces a `HessianInputs` bundle with the per-component scalars
+    set to the concrete slice-sum formulas and the 6 consistency
+    equations + 3 `(★)_k` identities discharged by
+    `scalar_sq_second_deriv_eq` plus pure algebra. -/
+noncomputable def HessianInputs.ofSliceDerivatives
+    (u : VelocityField) (t : ℝ) (xStar : Vec3)
+    (gradSqNorm omega_laplace_omega hessian_trace_sqNorm : ℝ)
+    (g_first : Fin 3 → Fin 3 → ℝ → ℝ)
+    (g_second : Fin 3 → Fin 3 → ℝ)
+    (hasDerivAt_slice : ∀ k i : Fin 3, ∀ s : ℝ,
+      HasDerivAt (slice (fun y => vorticity u t y k) xStar i)
+        (g_first k i s) s)
+    (hasDerivAt_deriv_slice : ∀ k i : Fin 3,
+      HasDerivAt (deriv (slice (fun y => vorticity u t y k) xStar i))
+        (g_second k i) 0)
+    (h_gradSq_match :
+      gradSqNorm = ∑ k : Fin 3, ∑ i : Fin 3, (g_first k i 0) ^ 2)
+    (h_omega_lap_match :
+      omega_laplace_omega
+        = ∑ k : Fin 3,
+            vorticity u t xStar k * (∑ i : Fin 3, g_second k i))
+    (h_trace_match :
+      hessian_trace_sqNorm
+        = ∑ k : Fin 3, ∑ i : Fin 3,
+            deriv (deriv (fun s =>
+              (slice (fun y => vorticity u t y k) xStar i s) ^ 2)) 0) :
+    HessianInputs u t xStar
+      gradSqNorm omega_laplace_omega hessian_trace_sqNorm := by
+  -- Slice-at-0 evaluates to ω_k(xStar).
+  have hslice0 : ∀ k i : Fin 3,
+      slice (fun y => vorticity u t y k) xStar i 0
+        = vorticity u t xStar k := by
+    intro k i
+    unfold slice
+    simp
+  -- Per-direction scalar (★★): (ω_k²)''(0) = 2·(g_first k i 0)² + 2·ω_k·(g_second k i)
+  have hstar_dir : ∀ k i : Fin 3,
+      deriv (deriv (fun s =>
+          (slice (fun y => vorticity u t y k) xStar i s) ^ 2)) 0
+        = 2 * (g_first k i 0) ^ 2
+          + 2 * vorticity u t xStar k * g_second k i := by
+    intro k i
+    have h :=
+      scalar_sq_second_deriv_eq (hasDerivAt_slice k i)
+        (hasDerivAt_deriv_slice k i)
+    -- `h : deriv² (slice²) 0 = 2 (g_first k i 0)² + 2·(slice 0)·(g_second k i)`.
+    rw [hslice0 k i] at h
+    exact h
+  -- Per-component (★)_k: summed over i.
+  have hstar_k : ∀ k : Fin 3,
+      (∑ i : Fin 3,
+         deriv (deriv (fun s =>
+           (slice (fun y => vorticity u t y k) xStar i s) ^ 2)) 0)
+        = 2 * (∑ i : Fin 3, (g_first k i 0) ^ 2)
+          + 2 * vorticity u t xStar k
+            * (∑ i : Fin 3, g_second k i) := by
+    intro k
+    calc (∑ i : Fin 3,
+            deriv (deriv (fun s =>
+              (slice (fun y => vorticity u t y k) xStar i s) ^ 2)) 0)
+        = ∑ i : Fin 3,
+            (2 * (g_first k i 0) ^ 2
+              + 2 * vorticity u t xStar k * g_second k i) := by
+              apply Finset.sum_congr rfl
+              intro i _; exact hstar_dir k i
+      _ = (∑ i : Fin 3, 2 * (g_first k i 0) ^ 2)
+          + ∑ i : Fin 3, 2 * vorticity u t xStar k * g_second k i := by
+              rw [← Finset.sum_add_distrib]
+      _ = 2 * (∑ i : Fin 3, (g_first k i 0) ^ 2)
+          + 2 * vorticity u t xStar k
+              * (∑ i : Fin 3, g_second k i) := by
+              rw [← Finset.mul_sum, ← Finset.mul_sum]
+              ring
+  refine
+    { ω0_val := vorticity u t xStar 0
+    , ω1_val := vorticity u t xStar 1
+    , ω2_val := vorticity u t xStar 2
+    , gradSqNorm_0 := ∑ i : Fin 3, (g_first 0 i 0) ^ 2
+    , gradSqNorm_1 := ∑ i : Fin 3, (g_first 1 i 0) ^ 2
+    , gradSqNorm_2 := ∑ i : Fin 3, (g_first 2 i 0) ^ 2
+    , laplace_0 := ∑ i : Fin 3, g_second 0 i
+    , laplace_1 := ∑ i : Fin 3, g_second 1 i
+    , laplace_2 := ∑ i : Fin 3, g_second 2 i
+    , laplace_sq_0 := ∑ i : Fin 3,
+        deriv (deriv (fun s =>
+          (slice (fun y => vorticity u t y 0) xStar i s) ^ 2)) 0
+    , laplace_sq_1 := ∑ i : Fin 3,
+        deriv (deriv (fun s =>
+          (slice (fun y => vorticity u t y 1) xStar i s) ^ 2)) 0
+    , laplace_sq_2 := ∑ i : Fin 3,
+        deriv (deriv (fun s =>
+          (slice (fun y => vorticity u t y 2) xStar i s) ^ 2)) 0
+    , h_ω0_match := rfl
+    , h_ω1_match := rfl
+    , h_ω2_match := rfl
+    , h_gradSq_decomp := ?_
+    , h_omega_lap_decomp := ?_
+    , h_trace_decomp := ?_
+    , h_star_0 := hstar_k 0
+    , h_star_1 := hstar_k 1
+    , h_star_2 := hstar_k 2 }
+  · -- h_gradSq_decomp: gradSqNorm = Σ_k (Σ_i (g_first k i 0)²)
+    rw [h_gradSq_match, Fin.sum_univ_three]
+  · -- h_omega_lap_decomp: omega_laplace_omega = Σ_k ω_k · (Σ_i g_second k i)
+    rw [h_omega_lap_match, Fin.sum_univ_three]
+  · -- h_trace_decomp: hessian_trace_sqNorm = Σ_k (Σ_i deriv²(slice²) 0)
+    rw [h_trace_match, Fin.sum_univ_three]
 
 end NSBlwChain.BLW
