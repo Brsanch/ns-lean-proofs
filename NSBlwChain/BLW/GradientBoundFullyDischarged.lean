@@ -4,6 +4,7 @@
 import Mathlib
 import NSBlwChain.BLW.GradientBoundTimeEnvelopeDischarged
 import NSBlwChain.BLW.HessianExpansionIdentity
+import NSBlwChain.BLW.HessianExpansionFromC2
 
 /-!
 # Fully-discharged capstone — all 8 scalar hypotheses derived internally
