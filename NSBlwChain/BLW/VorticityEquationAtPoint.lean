@@ -83,8 +83,12 @@ theorem NSEvolutionAxioms.vorticity_equation_contracted_with_omega
   unfold Vec3.dot
   -- Goal:
   --   ∑ j, ω_j · MD_j = ∑ j, ω_j · VS_j + ν · ∑ j, ω_j · VL_j
-  -- Rewrite RHS as a single sum.
-  rw [← Finset.mul_sum, ← Finset.sum_add_distrib]
+  -- Distribute ν inside the second sum (Finset.mul_sum forward).
+  rw [Finset.mul_sum]
+  -- Goal:
+  --   ∑ j, ω_j · MD_j = ∑ j, ω_j · VS_j + ∑ j, ν · (ω_j · VL_j)
+  -- Combine the two sums on RHS.
+  rw [← Finset.sum_add_distrib]
   -- Goal: ∑ j, ω_j · MD_j = ∑ j, (ω_j · VS_j + ν · (ω_j · VL_j))
   apply Finset.sum_congr rfl
   intro j _
