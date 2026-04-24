@@ -4,9 +4,6 @@
 import Mathlib
 import NSBlwChain.Setup.NSHypothesis
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # Component-wise extraction of the vorticity equation at a point
 
