@@ -51,9 +51,17 @@ be discharged at the wiring layer where the physical vectors
   from `IsLocalMax (fun y => Vec3.dot (ω y) (ω y)) xStar` +
   alignment + slice differentiability.  Closes the second of the 7
   taken vector-field-layer identities.
-- **Alignment contractions** (#3, #6, #7) — pure alignment algebra;
-  specializations of `AlignmentContraction.dot_of_aligned` and
-  `StrainContractionAligned.laplace_contraction_of_aligned`.
+- ~~**Alignment contractions** (#3, #7 — scalar and vector Laplace forms)~~ — **CLOSED (v0.16)**
+  via `BLW/LaplaceAlignScalar.lean` (`dot_of_aligned_direct`,
+  `laplace_align_scalar_of_aligned`, `laplace_vec_of_aligned`,
+  ~70 LOC).  Under alignment `ω(x*) = (0, 0, M)`, both the scalar
+  `omega_laplace_omega = M · laplaceOmega3` (#3) and the vector
+  `Vec3.dot ω(x*) Δω(x*) = M · laplaceOmega3` (#7) follow from a
+  single application of the `Vec3`-direct alignment contraction
+  plus substitution of the scalar definitions.  Closes the third
+  and fourth of the 7 taken vector-field-layer identities.
+- **Alignment strain contraction** (#6) — pure alignment algebra;
+  specialization of `StrainContractionAligned.laplace_contraction_of_aligned`.
 - **Time chain rule + envelope** (#4, #5) — require
   time-differentiability of ω at xStar (from `NS_time_analyticity`
   axiom).  More involved.

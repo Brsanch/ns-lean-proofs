@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.16 — 2026-04-25
+
+**Third and fourth vector-field-layer physical identities discharged.**
+Under alignment `ω(x*) = (0, 0, M)`, both the scalar identity
+`omega_laplace_omega = M · laplaceOmega3` (#3) and the vector
+identity `Vec3.dot ω(x*) Δω(x*) = M · laplaceOmega3` (#7) now
+derivable from `AlignmentContraction.dot_of_aligned` + substitution.
+
+- `BLW/LaplaceAlignScalar.lean` — new file (~70 LOC).
+  * `dot_of_aligned_direct` — Vec3-direct alignment-contraction
+    lemma (variant of `AlignmentContraction.dot_of_aligned` taking
+    `a b : Vec3` directly rather than a vector field + point).
+  * `laplace_align_scalar_of_aligned` — scalar identity #3 closure.
+  * `laplace_vec_of_aligned` — vector identity #7 closure.
+
+Pure alignment algebra; no analytical content.  Two more taken
+hypotheses converted to derived facts; total progress: 4 of 7
+vector-field-layer identities now discharged.
+
 ## v0.15 — 2026-04-25
 
 **Second of 7 vector-field-layer physical identities discharged.**
