@@ -80,6 +80,7 @@ import NSBlwChain.BLW.StepIIIFromNSEvolution
 import NSBlwChain.BLW.MaterialDerivativeSplit
 import NSBlwChain.BLW.VorticityFrameFullFromNSEvolution
 import NSBlwChain.BLW.GradientBoundStepIIIDerived
+import NSBlwChain.BLW.StepIIInequalityDerivation
 import NSBlwChain.BLW.HessianExpansionFromC2
 import NSBlwChain.BLW.FullDischargePipeline
 import NSBlwChain.BLW.FromNSEvolution
