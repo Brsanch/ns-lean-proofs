@@ -70,20 +70,10 @@ theorem omega_dot_u_grad_omega_eq_half_u_grad_sqNorm
       partialDeriv (fun y => Vec3.dot (ω y) (ω y)) i x
         = 2 * ∑ k : Fin 3, ω x k * partialDeriv (fun y => ω y k) i x :=
     fun i => partialDeriv_dot_self_eq hω i
-  -- Rewrite the RHS sum term-by-term.
-  simp only [hpd]
-  -- Goal:
-  --  Σⱼ ωⱼ · Σᵢ (uᵢ · ∂ᵢωⱼ) = (1/2) · Σᵢ uᵢ · (2 · Σₖ ωₖ · ∂ᵢωₖ)
-  -- Simplify the 1/2 · 2 and swap sums.
-  rw [Finset.mul_sum]
-  -- Factor out (1/2) * 2 = 1 and combine.
-  congr 1
-  apply Finset.sum_comm.trans
-  apply Finset.sum_congr rfl
-  intro j _
-  rw [Finset.mul_sum]
-  apply Finset.sum_congr rfl
-  intro i _
+  -- Expand all Fin 3 sums explicitly via Fin.sum_univ_three,
+  -- rewrite each ∂ᵢ(|ω|²) via hpd (also expanded), then ring-close
+  -- on concrete polynomial arithmetic.
+  simp only [Fin.sum_univ_three, hpd]
   ring
 
 end NSBlwChain.BLW
