@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.11 — 2026-04-24 (evening)
+
+**step_iii_identity_from_NSEvolution tightened to 5 hypotheses.**
+h_material_split is now derived internally via
+`omega_dot_materialDeriv_split` (same pattern as h_contracted in v0.10).
+
+Remaining taken hypotheses in `step_iii_identity_from_NSEvolution`:
+1. `h_time_chain_rule` — `ω · ∂_tω = ∂_t(|ω|²/2)`.  Requires
+   time-differentiability of each component of `ω` at the argmax.
+   Classical chain rule for the squared norm; not further tightened
+   tonight.
+2. `h_envelope` — `∂_t(|ω|²/2)(xStar, t) = M · Ṁ`.  Danskin envelope;
+   derivable via `envelope_form_of_NSEvolutionAxioms` at the wiring
+   layer.
+3. `h_strain` — `ω · (ω·∇u) = M² · σ` under alignment.  Requires the
+   physical `(ω·∇u)` vector; derivable by two applications of
+   `dot_of_aligned`.
+4. `h_laplace` — `ω · Δω = M · laplaceOmega3`.  Derivable via
+   `laplace_contraction_of_aligned` (already in tonight's additions)
+   when `laplaceOmega3 := vectorLaplacian (vorticity u t) xStar 2`.
+
 ## v0.10 — 2026-04-24 (evening)
 
 **Further tightenings of the step-iii derivation.**
