@@ -85,6 +85,7 @@ import NSBlwChain.BLW.GradientBoundAllScalarDerived
 import NSBlwChain.BLW.HessianExpansionFromC2
 import NSBlwChain.BLW.HessianExpansionScalar
 import NSBlwChain.BLW.LaplaceOmega3Nonpos
+import NSBlwChain.BLW.LaplaceAlignScalar
 import NSBlwChain.BLW.FullDischargePipeline
 import NSBlwChain.BLW.FromNSEvolution
 import NSBlwChain.Analyticity.IdentityTheorem
