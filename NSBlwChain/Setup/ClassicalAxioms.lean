@@ -297,7 +297,22 @@ holomorphic-strip extension in either source.
 
     We encode the conclusion structurally (existence of `r`) so that
     downstream consumers can apply the identity theorem for
-    real-analytic functions from mathlib. -/
+    real-analytic functions from mathlib.
+
+    **Joint analyticity content.**  Masuda 1967 and Foias–Temam 1979
+    in fact establish *joint* real-analyticity of `(t, x) ↦ u(t, x)`
+    in a complex strip about every interior time (respectively on
+    bounded domains with Dirichlet BC and on torus / whole-space).
+    Joint analyticity transports to spatial derivatives: for every
+    multi-index `α`, `(t, x) ↦ ∂_x^α u(t, x)` is also jointly
+    real-analytic on the same strip.  In particular the vorticity
+    components `(t, x) ↦ curl (u(t, ·))(x) k` inherit time
+    real-analyticity at every interior `(t₀, x)`.
+
+    We record the vorticity-time-differentiability consequence as a
+    separate field so downstream BLW-chain consumers can apply it
+    without re-deriving spatial-derivative / time-derivative
+    commutation from the raw analyticity window. -/
 structure NSTimeAnalyticity
     (u : VelocityField) (ν T : ℝ) where
   /-- Radius function, `r(t₀) > 0` for every interior `t₀`. -/
@@ -311,6 +326,20 @@ structure NSTimeAnalyticity
       ∃ δ : ℝ, 0 < δ ∧ δ ≤ r t₀ ∧
         AnalyticOn ℝ (fun t : ℝ => u t x)
           (Set.Ioo (t₀ - δ) (t₀ + δ))
+  /-- **Per-component vorticity time-differentiability.**  For every
+      interior time `t₀ ∈ (0, T)`, every spatial point `xStar`, and
+      every component `k : Fin 3`, the map
+      `τ ↦ vorticity u τ xStar k` is differentiable at `t₀` with
+      derivative given by mathlib's `deriv`.  This is a direct
+      consequence of joint real-analyticity of `(t, x) ↦ u(t, x)`
+      (Masuda 1967 / Foias–Temam 1979), which implies joint
+      analyticity of all spatial derivatives of `u` (hence of
+      `curl u`) on the same strip. -/
+  vorticity_component_hasDerivAt :
+    ∀ t₀ : ℝ, 0 < t₀ → t₀ < T →
+      ∀ xStar : Vec3, ∀ k : Fin 3,
+        HasDerivAt (fun τ : ℝ => vorticity u τ xStar k)
+          (deriv (fun τ : ℝ => vorticity u τ xStar k) t₀) t₀
 
 /-- **Axiom 3 — `NS_time_analyticity`.**  Smooth NS solutions on
     `[0, T)` extend holomorphically to a complex strip about every
