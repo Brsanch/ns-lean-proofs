@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.18 — 2026-04-25
+
+**Sixth and seventh vector-field-layer physical identities discharged —
+all 7 now closed.**  Time chain rule and Danskin envelope at argmax
+complete the set.
+
+- `BLW/TimeChainRuleDot.lean` — new file (~130 LOC).
+  * `hasDerivAt_Vec3_sqNorm_half` — per-component `HasDerivAt.pow 2`
+    + `HasDerivAt.sum` over Fin 3 + `div_const 2`; gives
+    `HasDerivAt (fun τ => |ω(τ)|²/2) (Vec3.dot ω ω_dot) t`.
+  * `time_chain_rule_Vec3_dot` — `deriv`-form of identity #4:
+    `Vec3.dot ω ω_dot = deriv (|ω|²/2) t`.
+  * `envelope_identity_sqNorm_half_at_argmax` — identity #5 via
+    specialization of `EnvelopeIdentity.envelope_identity_via_chainRule_deriv`
+    (the pre-existing Danskin machinery).
+
+Total progress: **7 of 7 vector-field-layer identities derived**.
+The scalar capstone's seven `h_*` hypotheses are now all discharged
+from `NSEvolutionAxioms` + `IsLocalMax |ω|²` + alignment (ω₀=0,
+ω₁=0, ω₂=M) + positivity (0 < M) + growth regime (0 ≤ Ṁ) + per-
+component slice differentiability (from `NS_time_analyticity`
+axiom).  The three classical axioms
+(`biot_savart_self_strain_bound`, `seregin_type_one_exclusion`,
+`NS_time_analyticity`) remain the only load-bearing external inputs.
+
 ## v0.17 — 2026-04-25
 
 **Fifth vector-field-layer physical identity discharged.**  Under
