@@ -85,14 +85,6 @@ theorem step_iii_identity_from_NSEvolution
       xStar)
     -- Scalar fields:
     (M σ Mdot laplaceOmega3 : ℝ) (hM_pos : 0 < M)
-    -- Hypothesis: contracted vorticity equation.
-    (h_contracted :
-      Vec3.dot (vorticity u t xStar)
-               (materialDerivative u (vorticity u) t xStar) =
-        Vec3.dot (vorticity u t xStar)
-                 (vortexStretching u (vorticity u) t xStar)
-          + ν * Vec3.dot (vorticity u t xStar)
-                         (fun j => vectorLaplacian (vorticity u t) xStar j))
     -- Hypothesis: material derivative splits as time + advection.
     (h_material_split :
       Vec3.dot (vorticity u t xStar)
@@ -140,10 +132,12 @@ theorem step_iii_identity_from_NSEvolution
   -- RHS of (2) = ω·(ω·∇u) + ν · ω·Δω = M²·σ + ν·M·laplaceOmega3.
   -- So M·Mdot = M²·σ + ν·M·laplaceOmega3, then divide by M > 0.
   have h_combined : M * Mdot = M ^ 2 * σ + ν * (M * laplaceOmega3) := by
-    have h1 := h_contracted
+    -- Derive h_contracted from ax via vorticity_equation_contracted_with_omega
+    -- (rather than taking it as a hypothesis).
+    have h_contracted := ax.vorticity_equation_contracted_with_omega ht htT xStar
     rw [h_material_split, h_time_chain_rule, h_envelope, h_advection,
-        h_strain, h_laplace] at h1
-    linarith [h1]
+        h_strain, h_laplace] at h_contracted
+    linarith [h_contracted]
   -- Divide by M > 0 to get the step-iii identity.
   have hM_ne : M ≠ 0 := ne_of_gt hM_pos
   -- Rewrite h_combined as M * Mdot = M * (M · σ + ν · laplaceOmega3).
