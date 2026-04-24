@@ -9,7 +9,10 @@ $\mathbb{T}^3$ and on $\mathbb{R}^3$.  Companion paper:
 `paper/ns_regularity.md` in the `noethersolve` project, with supplements
 `ns_regularity_caveats_formal.md` and `ns_regularity_blw_derivations.md`.
 
-**Status: v0.11 (2026-04-24).** ~90 files, ~12,700 LOC, all CI-green.
+**Status: v0.12 (2026-04-25).** ~92 files, ~12,900 LOC, all CI-green.
+Full L8 + gradient-bound capstone composing tonight's step-iii
+derivation with L9 grand-compose.  Only `h_step_ii` (Hessian bound)
+remains as a taken hypothesis at the scalar capstone level.
 `step_iii_identity_from_NSEvolution` now takes 5 hypotheses; two
 formerly-taken hypotheses (h_contracted, h_material_split) are now
 derived internally.

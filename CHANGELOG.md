@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.12 — 2026-04-25 (overnight)
+
+**Full L8 + gradient-bound capstone with step-iii derived.**
+
+- `BLW/VorticityFrameFullFromNSEvolution.lean` — full L8 wrapper
+  `VorticityLocalFrameData.ofNSEvolutionAxioms_full`: composes
+  tonight's step-iii derivation with the thin L8.  Takes NSEv +
+  argmax + 4 physical identities + positivity; produces
+  `VorticityLocalFrameData` with step-iii derived internally.
+- `BLW/GradientBoundStepIIIDerived.lean` — capstone
+  `gradient_bound_of_NSEvolutionAxioms_step_iii_derived`: composes
+  `step_iii_identity_from_NSEvolution` with L9's
+  `gradient_bound_of_NSEvolutionAxioms_via_scalars`.  Takes NSEv +
+  argmax + step-(ii) inequality + 4 physical identities + sign +
+  positivity.  Delivers `gradSqNorm ≤ M² · σ / ν`.
+
+Remaining taken hypothesis at the scalar capstone level: `h_step_ii`
+(the Hessian bound).  Next tightening would derive via L3 + L6 +
+Hessian expansion.
+
 ## v0.11 — 2026-04-24 (evening)
 
 **step_iii_identity_from_NSEvolution tightened to 5 hypotheses.**
