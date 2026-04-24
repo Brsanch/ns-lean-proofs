@@ -5,6 +5,7 @@ import Mathlib
 import NSBlwChain.Setup.NSHypothesis
 import NSBlwChain.BLW.HessianExpansionFromC2
 import NSBlwChain.BLW.MaxPrincipleFromLocalMax
+import NSBlwChain.BLW.SliceSmoothness
 
 /-!
 # Hessian-expansion scalar bundle
@@ -337,5 +338,82 @@ noncomputable def HessianInputs.ofSliceDerivatives
     rw [h_omega_lap_match, Fin.sum_univ_three]
   · -- h_trace_decomp: hessian_trace_sqNorm = Σ_k (Σ_i deriv²(slice²) 0)
     rw [h_trace_match, Fin.sum_univ_three]
+
+/-! ### Full smoothness-side constructor from `NSEvolutionAxioms` -/
+
+/-- **`HessianInputs` from `NSEvolutionAxioms` + total matchings.**
+
+    Top-level smoothness-side constructor.  The user supplies only
+    the three definitional matchings of the abstract totals
+    (`gradSqNorm`, `omega_laplace_omega`, `hessian_trace_sqNorm`) to
+    concrete Fin 3 × Fin 3 sums over slice data; the per-component
+    `HasDerivAt` slice witnesses are discharged automatically from
+    `NSEvolutionAxioms.smooth_in_space` via
+
+    `ContDiff ℝ 4 (u t)`
+      ⇒ `ContDiff ℝ 3 (fun y => vorticity u t y k)`  (curl smoothness)
+      ⇒ `ContDiff ℝ 3 (slice (fun y => ω_k y) xStar i)`  (slice-composition)
+      ⇒ `Differentiable ℝ (slice ...)`            (iteratedDeriv₀)
+      ⇒ `Differentiable ℝ (deriv (slice ...))`    (iteratedDeriv₁). -/
+noncomputable def HessianInputs.ofNSEvolutionAxioms
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {t : ℝ} (ht : 0 ≤ t) (htT : t < T)
+    (xStar : Vec3)
+    (gradSqNorm omega_laplace_omega hessian_trace_sqNorm : ℝ)
+    (h_gradSq_match :
+      gradSqNorm
+        = ∑ k : Fin 3, ∑ i : Fin 3,
+            (deriv (slice (fun y => vorticity u t y k) xStar i) 0) ^ 2)
+    (h_omega_lap_match :
+      omega_laplace_omega
+        = ∑ k : Fin 3,
+            vorticity u t xStar k
+              * (∑ i : Fin 3,
+                  deriv (deriv
+                    (slice (fun y => vorticity u t y k) xStar i)) 0))
+    (h_trace_match :
+      hessian_trace_sqNorm
+        = ∑ k : Fin 3, ∑ i : Fin 3,
+            deriv (deriv (fun s =>
+              (slice (fun y => vorticity u t y k) xStar i s) ^ 2)) 0) :
+    HessianInputs u t xStar
+      gradSqNorm omega_laplace_omega hessian_trace_sqNorm := by
+  -- Per-component slice ContDiff.
+  have h_slice_cd : ∀ k i : Fin 3,
+      ContDiff ℝ 3 (slice (fun y => vorticity u t y k) xStar i) := by
+    intro k i
+    exact slice_contDiff_of_contDiff
+      (ax.vorticity_component_contDiff ht htT k) xStar i
+  -- Differentiability of the slice (iteratedDeriv 0).
+  have h_slice_diff : ∀ k i : Fin 3,
+      Differentiable ℝ (slice (fun y => vorticity u t y k) xStar i) := by
+    intro k i
+    have h_iter :
+        Differentiable ℝ (iteratedDeriv 0
+          (slice (fun y => vorticity u t y k) xStar i)) :=
+      (h_slice_cd k i).differentiable_iteratedDeriv 0 (by norm_num)
+    rw [iteratedDeriv_zero] at h_iter
+    exact h_iter
+  -- Differentiability of the slice-derivative (iteratedDeriv 1).
+  have h_slice_deriv_diff : ∀ k i : Fin 3,
+      Differentiable ℝ
+        (deriv (slice (fun y => vorticity u t y k) xStar i)) := by
+    intro k i
+    have h_iter :
+        Differentiable ℝ (iteratedDeriv 1
+          (slice (fun y => vorticity u t y k) xStar i)) :=
+      (h_slice_cd k i).differentiable_iteratedDeriv 1 (by norm_num)
+    rw [iteratedDeriv_one] at h_iter
+    exact h_iter
+  -- Delegate to the C²-slice constructor with derived witnesses.
+  exact HessianInputs.ofSliceDerivatives u t xStar
+    gradSqNorm omega_laplace_omega hessian_trace_sqNorm
+    (fun k i s =>
+      deriv (slice (fun y => vorticity u t y k) xStar i) s)
+    (fun k i =>
+      deriv (deriv (slice (fun y => vorticity u t y k) xStar i)) 0)
+    (fun k i s => (h_slice_diff k i s).hasDerivAt)
+    (fun k i => (h_slice_deriv_diff k i 0).hasDerivAt)
+    h_gradSq_match h_omega_lap_match h_trace_match
 
 end NSBlwChain.BLW
