@@ -40,10 +40,17 @@ be discharged at the wiring layer where the physical vectors
   algebraic assembly.  Three compositions over `k ∈ {0,1,2}` feed
   the `h_star_k` slots of `HessianExpansionData.ofScalarIdentities`
   to deliver the vector-level `Δ|ω|² = 2|∇ω|² + 2 ω·Δω`.
-- **Hessian trace ≤ 0 at max** (#2) — compose
-  `MaxPrincipleFromLocalMax.ScalarLocalMaxSecondDeriv.ofIsLocalMax` +
-  `ScalarLocalMaxSecondDeriv.trace_nonpos` + the scalar Hessian
-  expansion form.  Follow naturally from #1.
+- ~~**Hessian trace ≤ 0 at max** (#2)~~ — **CLOSED (v0.15)** via
+  `BLW/LaplaceOmega3Nonpos.lean` (`vec3_component_sq_le_normSq`,
+  `isLocalMax_omega3_of_isLocalMax_sqNorm`,
+  `laplaceOmega3_nonpos_from_IsLocalMax`, ~100 LOC).  The refined
+  paper §12.3 Step (ii) argument (componentwise Cauchy–Schwarz
+  `ω₃² ≤ |ω|²` + `IsLocalMax |ω|²` + alignment ⇒ `IsLocalMax ω₃`
+  locally, then 1-D 2nd-derivative test per Fin 3 direction) now
+  discharges the `h_laplace_nonpos : laplaceOmega3 ≤ 0` hypothesis
+  from `IsLocalMax (fun y => Vec3.dot (ω y) (ω y)) xStar` +
+  alignment + slice differentiability.  Closes the second of the 7
+  taken vector-field-layer identities.
 - **Alignment contractions** (#3, #6, #7) — pure alignment algebra;
   specializations of `AlignmentContraction.dot_of_aligned` and
   `StrainContractionAligned.laplace_contraction_of_aligned`.
