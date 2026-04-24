@@ -144,16 +144,18 @@ theorem step_iii_identity_from_NSEvolution
     rw [h_material_split, h_time_chain_rule, h_envelope, h_advection,
         h_strain, h_laplace] at h1
     linarith [h1]
-  -- Divide by M > 0.  M ≠ 0, so we can cancel.
+  -- Divide by M > 0 to get the step-iii identity.
   have hM_ne : M ≠ 0 := ne_of_gt hM_pos
-  -- From M·Mdot = M²·σ + ν·M·laplaceOmega3, get Mdot = M·σ + ν·laplaceOmega3
-  -- (divide by M), then rearrange.
-  have h_simplified : Mdot = M * σ + ν * laplaceOmega3 := by
-    have : M * Mdot = M * (M * σ) + M * (ν * laplaceOmega3) := by
-      linarith [h_combined, sq (M)]
-    have h_factor : M * (M * σ + ν * laplaceOmega3) = M * Mdot := by
-      rw [mul_add]; linarith [this]
-    exact (mul_left_cancel₀ hM_ne h_factor.symm).symm
-  linarith [h_simplified]
+  -- Rewrite h_combined as M * Mdot = M * (M · σ + ν · laplaceOmega3).
+  have h_factored : M * Mdot = M * (M * σ + ν * laplaceOmega3) := by
+    have h_sq : M ^ 2 * σ = M * (M * σ) := by ring
+    have h_nu : ν * (M * laplaceOmega3) = M * (ν * laplaceOmega3) := by ring
+    rw [h_sq, h_nu] at h_combined
+    linarith [h_combined]
+  -- Cancel M (nonzero) on both sides.
+  have h_mdot : Mdot = M * σ + ν * laplaceOmega3 :=
+    mul_left_cancel₀ hM_ne h_factored
+  -- Rearrange to step (iii) form.
+  linarith [h_mdot]
 
 end NSBlwChain.BLW
