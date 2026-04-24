@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.15 — 2026-04-25
+
+**Second of 7 vector-field-layer physical identities discharged.**
+The `h_laplace_nonpos : Δω₃(x*) ≤ 0` hypothesis is now derivable from
+`IsLocalMax (fun y => |ω(y)|²) x*` + alignment `ω(x*) = M·ê₃` +
+componentwise Cauchy–Schwarz + per-slice differentiability.
+
+- `BLW/LaplaceOmega3Nonpos.lean` — new file (~100 LOC).
+  * `vec3_component_sq_le_normSq` — `(v k)² ≤ Vec3.dot v v` via `nlinarith`.
+  * `isLocalMax_omega3_of_isLocalMax_sqNorm` — the main structural
+    lemma: `|ω|²` local-max + alignment ⇒ `ω₃` local-max, via
+    Cauchy–Schwarz + `Real.sqrt_le_sqrt` + `Real.sqrt_sq_eq_abs`.
+  * `laplaceOmega3_nonpos_from_IsLocalMax` — three-direction
+    application of `isLocalMax_second_deriv_nonpos`, summed over
+    `Fin 3`.
+
+This derivation matches the paper §12.3 Step (ii) argument tightened
+on 2026-04-23 (third-pass audit): the missing global reasoning
+`ω₃ ≤ |ω| ≤ M` is now explicit at both paper and Lean levels.
+
+**Docstring updates for paper alignment (Setup/ClassicalAxioms.lean):**
+- `seregin_type_one_exclusion` — added §12.5 Caveat C6 / `(H_{C6})`
+  framing (the axiom's strength equivalent to assuming C6 holds).
+- `biot_savart_self_strain_bound` — added correspondence note that
+  the Lean `DecayAtInfinity` polynomial-decay hypothesis is a
+  specialization of paper Prop 12.1's `ω ∈ L¹(ℝ³) ∩ L∞(ℝ³)`.
+
 ## v0.14 — 2026-04-25
 
 **First vector-field-layer physical identity discharged at the

@@ -113,6 +113,16 @@ at an argmax `x*` of `|ω(·, t)|` *in the growth regime* `dM/dt ≥ 0`.
 (Biot–Savart identity), which is a pointwise equality and does not
 produce a log-absorption bound by itself.  The axiom consumes the
 composite paper §12.4 theorem including the growth-regime restriction.
+
+**Decay hypothesis — correspondence with paper Proposition 12.1.**
+Paper Prop 12.1 (as revised after second-pass audit 2026-04-23)
+explicitly requires `ω(·,t) ∈ L^1(ℝ³) ∩ L^∞(ℝ³)` for the
+Biot–Savart integral to converge absolutely.  The Lean
+`DecayAtInfinity` structure below asks for polynomial decay faster
+than `|x|^{-3}`, which is a *specialization* satisfying the paper's
+`L^1 ∩ L^∞` hypothesis: the polynomial rate directly gives
+integrability in `L^1`, and smoothness of the solution gives local
+`L^∞`.  On the torus, decay is automatic from periodicity.
 -/
 
 /-- Consumed form of the §12.4 log-absorption output.  Provides a
@@ -189,6 +199,22 @@ implies (via Biot–Savart + weighted estimates) `‖u(t)‖_{L³} = O(1)`
 as `t → T⁻`, which ESS 2003 / Seregin 2012 then excludes.  The
 bridging step is classical but should be noted in any external
 review.
+
+**Paper §12.5 Caveat C6 — what this axiom absorbs.**  The bridging
+step from `L^∞`-vorticity sub-Type-I to `L^3`-velocity boundedness
+is named *Caveat C6* in the companion paper
+(`noethersolve/paper/ns_regularity.md` §12.5, added 2026-04-23 after
+third-pass adversarial audit).  C6 identifies the residual
+conditional-on hypothesis
+
+  `(H_{C6})  ∃ t_0 < T* such that  sup_{t ∈ [t_0, T*)} ‖ω(·,t)‖_{L²} < ∞`
+
+as the step not derivable from the sub-Type-I rate + energy identity
+alone; it is strictly weaker than Leray–Hopf enstrophy-boundedness
+but is itself an open sub-problem.  The axiom below is
+**equivalent in strength to assuming `(H_{C6})` holds for every smooth
+NS solution that reaches the sub-Type-I rate.**  External review
+should treat invocations of this axiom as absorbing `(H_{C6})`.
 
 Journal-hunt cross-check (2026-04-22,
 `noethersolve/docs/findings/ns_journal_theorem_statements_2026_04_22.md`)
