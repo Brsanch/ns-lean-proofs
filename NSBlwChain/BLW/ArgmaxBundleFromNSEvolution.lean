@@ -93,8 +93,10 @@ noncomputable def ArgmaxAnalyticalBundle.ofNSEvolutionAxioms
 
 /-- **Gradient bound from the grand-compose.**  Immediate corollary:
     `gradSqNorm ≤ M² · σ / ν` when the analytical bundle is produced
-    from `NSEvolutionAxioms`. -/
-theorem gradient_bound_of_NSEvolutionAxioms
+    from `NSEvolutionAxioms` via the **scalar-data** grand-compose
+    (as opposed to the earlier `FromNSEvolution.gradient_bound_of_NSEvolutionAxioms`
+    which consumes an `NSArgmaxInputs` record). -/
+theorem gradient_bound_of_NSEvolutionAxioms_via_scalars
     {u : VelocityField} {ν T : ℝ}
     (ax : NSEvolutionAxioms u ν T)
     (t : ℝ) (ht : 0 ≤ t) (htT : t < T)
