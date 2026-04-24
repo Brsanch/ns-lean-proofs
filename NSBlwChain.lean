@@ -83,6 +83,7 @@ import NSBlwChain.BLW.GradientBoundStepIIIDerived
 import NSBlwChain.BLW.StepIIInequalityDerivation
 import NSBlwChain.BLW.GradientBoundAllScalarDerived
 import NSBlwChain.BLW.HessianExpansionFromC2
+import NSBlwChain.BLW.HessianExpansionScalar
 import NSBlwChain.BLW.FullDischargePipeline
 import NSBlwChain.BLW.FromNSEvolution
 import NSBlwChain.Analyticity.IdentityTheorem

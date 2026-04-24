@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.14 — 2026-04-25
+
+**First vector-field-layer physical identity discharged at the
+scalar level:** per-component Hessian-expansion `(★)` identity
+derivable from 3 one-dimensional `scalar_sq_second_deriv_eq`
+slice applications + Fin 3 algebraic assembly.
+
+- `BLW/HessianExpansionScalar.lean` — new file.
+  * `laplace_sq_eq_of_slice_identities` — algebraic assembly of
+    `Δ(f²) = 2|∇f|² + 2 f · Δf` from three slice identities, via
+    `ring`.
+  * `laplace_sq_eq_of_slice_identities_fin3` — `Fin 3`-indexed
+    packaging of the same assembly (`simp [Fin.sum_univ_three]` +
+    `ring`).
+  * `laplace_sq_eq_of_C2_slices` — `(★)` produced from 1-D
+    `HasDerivAt` slice data via three applications of
+    `HessianExpansionFromC2.scalar_sq_second_deriv_eq`.
+
+This closes the first of the 7 remaining vector-field-layer taken
+hypotheses — specifically the per-component shape consumed by
+`HessianExpansionData.ofScalarIdentities`'s `h_star_k` slots.
+
 ## v0.13 — 2026-04-25 (overnight)
 
 **All scalar-level Props now derived.**  Tonight's last scalar
