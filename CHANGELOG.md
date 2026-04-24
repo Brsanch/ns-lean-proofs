@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.13 — 2026-04-25 (overnight)
+
+**All scalar-level Props now derived.**  Tonight's last scalar
+hypothesis (`h_step_ii`, the Hessian bound) eliminated via
+`StepIIInequalityDerivation.step_ii_inequality_derived`.
+
+- `BLW/StepIIInequalityDerivation.lean` — scalar-level derivation of
+  `gradSqNorm ≤ M · |laplaceOmega3|` from Hessian expansion +
+  Hessian trace non-positive + alignment + sign + positivity.
+- `BLW/GradientBoundAllScalarDerived.lean` — ultimate capstone
+  `gradient_bound_of_NSEvolutionAxioms_all_scalar_derived`: composes
+  step-ii + step-iii derivations into a single gradient-bound
+  producer with zero taken scalar Props.
+
+**Hypothesis count at the all-scalar-derived capstone:**
+- Scalar Props taken: **0** (down from 5 at v0.10).
+- Vector-field-layer physical identities taken: 7 (3 for step (ii),
+  4 for step (iii)).
+- Positivity / sign / argmax: 3 (hM_pos, h_laplace_nonpos,
+  h_growth_nonneg, IsLocalMax).
+
+All remaining taken hypotheses are physical identities that unfold
+to pointwise vector-field algebra on `∂_tω`, `(ω·∇)u`, `Δω`, and
+`∇²(|ω|²)`; none are scalar-level analytical content.
+
 ## v0.12 — 2026-04-25 (overnight)
 
 **Full L8 + gradient-bound capstone with step-iii derived.**
