@@ -90,6 +90,7 @@ import NSBlwChain.BLW.StrainAlignScalar
 import NSBlwChain.BLW.TimeChainRuleDot
 import NSBlwChain.BLW.GradientBoundWithAlignmentDischarged
 import NSBlwChain.BLW.GradientBoundSignAlignDischarged
+import NSBlwChain.BLW.GradientBoundTimeEnvelopeDischarged
 import NSBlwChain.BLW.FullDischargePipeline
 import NSBlwChain.BLW.FromNSEvolution
 import NSBlwChain.Analyticity.IdentityTheorem
