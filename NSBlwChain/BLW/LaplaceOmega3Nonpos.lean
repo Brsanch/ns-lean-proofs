@@ -51,13 +51,17 @@ open scoped BigOperators Topology
     `(v k)² ≤ Vec3.dot v v = Σ_i (v i)²`. -/
 theorem vec3_component_sq_le_normSq (v : Fin 3 → ℝ) (k : Fin 3) :
     (v k) ^ 2 ≤ Vec3.dot v v := by
-  have hdot : Vec3.dot v v = v 0 * v 0 + v 1 * v 1 + v 2 * v 2 := by
-    simp [Vec3.dot, Fin.sum_univ_three]
-  rw [hdot, sq]
-  fin_cases k
-  all_goals nlinarith [sq_nonneg (v 0), sq_nonneg (v 1), sq_nonneg (v 2),
-                        mul_self_nonneg (v 0), mul_self_nonneg (v 1),
-                        mul_self_nonneg (v 2)]
+  -- Direct via Finset.single_le_sum on the sum of non-negative terms,
+  -- avoiding `fin_cases` which leaves unreduced `Fin.mk` indices.
+  calc (v k) ^ 2
+      = v k * v k                      := by ring
+    _ ≤ ∑ i : Fin 3, v i * v i         :=
+        Finset.single_le_sum
+          (f := fun i : Fin 3 => v i * v i)
+          (s := Finset.univ)
+          (h := fun i _ => mul_self_nonneg (v i))
+          (Finset.mem_univ k)
+    _ = Vec3.dot v v                   := rfl
 
 /-- **Local max of `ω₃` from local max of `|ω|²` + alignment.**
 
