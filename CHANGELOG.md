@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## v0.17 — 2026-04-25
+
+**Fifth vector-field-layer physical identity discharged.**  Under
+alignment `ω(x*) = (0, 0, M)`, the strain contraction
+`Vec3.dot ω (vortexStretching u ω)(x*) = M² · σ` (with
+`σ := ∂₃ u₃(x*)`) now derivable via two applications of the
+alignment contraction.
+
+- `BLW/StrainAlignScalar.lean` — new file (~50 LOC).
+  * `strain_contraction_of_aligned` — outer `dot_of_aligned_direct`
+    on `Vec3.dot ω vortexStretching`, inner `Fin.sum_univ_three`
+    expansion of `vortexStretching u ω t x 2 = Σᵢ ω t x i · ∂ᵢ u₃(x)`
+    with alignment zeroing out two of the three summands.
+
+Pure alignment algebra; no analytical content.  Total progress:
+5 of 7 vector-field-layer identities now discharged.  Remaining:
+#4 (time chain rule, needs `NS_time_analyticity`) and #5 (envelope
+identity, needs Danskin + time-differentiability).
+
 ## v0.16 — 2026-04-25
 
 **Third and fourth vector-field-layer physical identities discharged.**
