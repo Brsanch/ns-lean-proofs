@@ -5,9 +5,6 @@ import Mathlib
 import NSBlwChain.BLW.VorticityFrameFromNSEvolution
 import NSBlwChain.BLW.StepIIIFromNSEvolution
 
-set_option diagnostics true
-set_option diagnostics.threshold 100
-
 /-!
 # Full `VorticityLocalFrameData` wrapper from `NSEvolutionAxioms`
 
