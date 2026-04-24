@@ -60,8 +60,14 @@ be discharged at the wiring layer where the physical vectors
   single application of the `Vec3`-direct alignment contraction
   plus substitution of the scalar definitions.  Closes the third
   and fourth of the 7 taken vector-field-layer identities.
-- **Alignment strain contraction** (#6) — pure alignment algebra;
-  specialization of `StrainContractionAligned.laplace_contraction_of_aligned`.
+- ~~**Alignment strain contraction** (#6)~~ — **CLOSED (v0.17)** via
+  `BLW/StrainAlignScalar.lean` (`strain_contraction_of_aligned`,
+  ~50 LOC).  Under alignment `ω(x*) = (0, 0, M)`, two applications
+  of the alignment contraction (outer via `dot_of_aligned_direct`,
+  inner via `Fin.sum_univ_three` on `vortexStretching`) give
+  `Vec3.dot ω (vortexStretching u ω)(x*) = M² · σ` where
+  `σ := ∂₃ u₃(x*)`.  Closes the fifth of the 7 taken vector-field-
+  layer identities.
 - **Time chain rule + envelope** (#4, #5) — require
   time-differentiability of ω at xStar (from `NS_time_analyticity`
   axiom).  More involved.
