@@ -177,24 +177,14 @@ theorem gradient_bound_fully_discharged
     -- Growth regime:
     (h_growth_nonneg : 0 ≤ Mdot) :
     gradSqNorm ≤ M ^ 2 * σ / ν := by
-  -- Discharge #1 (h_hessian_expansion) via the bundle constructor.
+  -- Discharge #1 (h_hessian_expansion) via direct algebraic substitution.
+  -- Chain of decompositions + (★) identities, as in
+  -- HessianExpansionData.ofScalarIdentities's sum_scalar_identity.
   have h_hessian_expansion :
       hessian_trace_sqNorm = 2 * gradSqNorm + 2 * omega_laplace_omega := by
-    have d := HessianExpansionData.ofScalarIdentities
-      (vorticity u t xStar 0) (vorticity u t xStar 1)
-      (vorticity u t xStar 2)
-      gradSqNorm_0 gradSqNorm_1 gradSqNorm_2
-      laplace_0 laplace_1 laplace_2
-      ((vorticity u t xStar 0) ^ 2 + (vorticity u t xStar 1) ^ 2
-        + (vorticity u t xStar 2) ^ 2)
-      gradSqNorm hessian_trace_sqNorm omega_laplace_omega
-      laplace_sq_0 laplace_sq_1 laplace_sq_2
-      rfl
-      h_gradSq_decomp
-      h_omega_lap_decomp
-      h_star_0 h_star_1 h_star_2
-      h_trace_decomp
-    exact d.hessian_expansion_packed
+    rw [h_trace_decomp, h_star_0, h_star_1, h_star_2,
+        h_gradSq_decomp, h_omega_lap_decomp]
+    ring
   -- Delegate to the 7-of-8 capstone.
   exact gradient_bound_time_envelope_discharged
     ax t ht htT xStar hmax M σ Mdot gradSqNorm laplaceOmega3
