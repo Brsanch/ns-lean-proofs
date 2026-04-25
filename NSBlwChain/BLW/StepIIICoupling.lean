@@ -104,4 +104,62 @@ theorem Mdot_le_4Msq_logM_via_step_iii
     Mdot_le_M_sigma_scalar hM_pos hν_nn h_envelope h_step_iii h_lap_nonpos
   exact Mdot_le_4Msq_logM_scalar (le_of_lt hM_pos) h_step h_strain
 
+/-! ### Step-(iii) data bundle
+
+Bundles the four scalar identities into a single structure for
+ergonomic consumption. -/
+
+/-- **Step-(iii) scalar data bundle at the argmax `(t, xStar)`.**
+
+    Packages the four scalar identities the step-(iii) coupling
+    consumes:
+
+    * `derivPsi : ℝ` — the time-derivative of `|ω(_, xStar)|²/2`
+      at `t`.
+    * `M` — the vorticity envelope value at `(t, xStar)`.
+    * `Mdot` — the time-derivative of the envelope at `t`.
+    * `σ` — the aligned strain `∂₃ u₃(xStar)`.
+    * `Δω₃` — the third-component vorticity Laplacian at `xStar`.
+    * `ν` — viscosity.
+
+    Encapsulates the four hypotheses `Mdot_le_M_sigma_scalar`
+    consumes, plus positivity of `M` and viscosity. -/
+structure StepIIIData where
+  /-- Envelope value `M = |ω(t, xStar)|`. -/
+  M : ℝ
+  /-- Time-derivative of the envelope at `t`. -/
+  Mdot : ℝ
+  /-- Aligned strain `σ = ∂₃ u₃(xStar)`. -/
+  σ : ℝ
+  /-- Viscosity. -/
+  ν : ℝ
+  /-- Third-component vorticity Laplacian `Δω₃(xStar)`. -/
+  Δω₃ : ℝ
+  /-- The slice time-derivative `deriv(|ω(_,xStar)|²/2) t`. -/
+  derivPsi : ℝ
+  /-- Positivity of the envelope. -/
+  M_pos : 0 < M
+  /-- Non-negativity of viscosity. -/
+  ν_nn  : 0 ≤ ν
+  /-- Envelope identity (Danskin output). -/
+  envelope : M * Mdot = derivPsi
+  /-- Step-(iii) decomposition (vorticity equation + alignment). -/
+  step_iii : derivPsi = M ^ 2 * σ + ν * M * Δω₃
+  /-- Laplacian sign at the argmax (max-principle output). -/
+  lap_nonpos : Δω₃ ≤ 0
+
+/-- **`Mdot ≤ M · σ` from the step-(iii) bundle.**  One-line
+    consumption of `Mdot_le_M_sigma_scalar` via the bundle. -/
+theorem StepIIIData.Mdot_le_M_sigma (D : StepIIIData) :
+    D.Mdot ≤ D.M * D.σ :=
+  Mdot_le_M_sigma_scalar D.M_pos D.ν_nn D.envelope D.step_iii D.lap_nonpos
+
+/-- **`Mdot ≤ 4·M²·log M` from the step-(iii) bundle + strain bound.**  -/
+theorem StepIIIData.Mdot_le_4Msq_logM
+    (D : StepIIIData) (hlogM_nn : 0 ≤ Real.log D.M)
+    (h_strain : D.σ ≤ 4 * D.M * Real.log D.M) :
+    D.Mdot ≤ 4 * D.M ^ 2 * Real.log D.M :=
+  Mdot_le_4Msq_logM_via_step_iii D.M_pos D.ν_nn hlogM_nn
+    D.envelope D.step_iii D.lap_nonpos h_strain
+
 end NSBlwChain.BLW
