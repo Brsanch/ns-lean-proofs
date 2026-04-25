@@ -164,4 +164,75 @@ theorem PerTimeInstantData.M_differentiableAt
     ∀ s ∈ Set.Ioo t_start T, DifferentiableAt ℝ M s := fun s hs =>
   (D.M_diff s hs.1 hs.2).differentiableAt
 
+/-! ### Convenience: smooth extension from `PerTimeInstantData` -/
+
+/-- **One-call convenience theorem.**
+
+    Given a `PerTimeInstantData` bundle plus the standard FTC /
+    boundary / log-blowup hypotheses, conclude that the velocity
+    field extends smoothly past `T`.
+
+    This delegates to `NS_regularity_extension_from_tight_ODE`
+    by extracting all the data fields the threading theorem
+    consumes.  Pure structural composition. -/
+theorem NS_regularity_extension_from_PerTimeInstantData
+    {u : VelocityField} {ν T : ℝ} (ax : NSEvolutionAxioms u ν T)
+    {M Mdot : ℝ → ℝ} {t_start : ℝ}
+    (ht_start_pos : 0 < t_start) (ht_start_lt_T : t_start < T)
+    (D : PerTimeInstantData u ν T M Mdot t_start)
+    (hM_nonneg_full : ∀ t : ℝ, 0 < t → t < T → 0 ≤ M t)
+    -- Standard FTC / boundary / integrability hypotheses for the
+    -- `hW_lower_bound_of_rate_equality` step:
+    (hM_cont : ContinuousOn (fun s => 1 / (M s * Real.log (M s)))
+                  (Set.Icc t_start T))
+    (hW_boundary :
+      Filter.Tendsto (fun s => 1 / (M s * Real.log (M s)))
+        (𝓝[<] T) (𝓝 0))
+    (h_tail_nonneg :
+      ∀ t : ℝ, t_start < t → t < T →
+        0 ≤ ∫ s in t..T, 4 / Real.log (M s))
+    (h_FTC :
+      ∀ ⦃a b : ℝ⦄, t_start < a → a ≤ b → b < T →
+        1 / (M b * Real.log (M b)) - 1 / (M a * Real.log (M a)) =
+          ∫ s in a..b, deriv (fun r => 1 / (M r * Real.log (M r))) s)
+    (h_derivW_int :
+      ∀ ⦃a b : ℝ⦄, t_start < a → a ≤ b → b < T →
+        IntervalIntegrable
+          (fun s => deriv (fun r => 1 / (M r * Real.log (M r))) s)
+          MeasureTheory.volume a b)
+    (h_tailPiece_int :
+      ∀ ⦃a b : ℝ⦄, t_start < a → a ≤ b → b < T →
+        IntervalIntegrable (fun s => (-4 : ℝ) - 4 / Real.log (M s))
+          MeasureTheory.volume a b)
+    (h_partialTail_nonneg :
+      ∀ ⦃a b : ℝ⦄, t_start < a → a ≤ b → b < T →
+        0 ≤ ∫ s in a..b, 4 / Real.log (M s))
+    -- Log-blowup encoding:
+    (δ_of_ε : ℝ → ℝ)
+    (δ_pos : ∀ ε : ℝ, 0 < ε → 0 < δ_of_ε ε)
+    (δ_le : ∀ ε : ℝ, 0 < ε → δ_of_ε ε ≤ T)
+    (h_log_large :
+      ∀ ε : ℝ, 0 < ε →
+        ∀ t : ℝ, T - δ_of_ε ε < t → t < T →
+          1 / (4 * ε) ≤ Real.log (M t))
+    -- Bridge for the (0, T) form:
+    (h_logM_pos : ∀ t : ℝ, 0 < t → t < T → 0 < Real.log (M t))
+    (h_bound_full :
+      ∀ t : ℝ, 0 < t → t < T →
+        (T - t) * M t * Real.log (M t) ≤ 1 / 4) :
+    ∃ T' : ℝ, T < T' ∧
+      ∃ u' : VelocityField, NSEvolutionAxioms u' ν T' ∧
+        ∀ t : ℝ, 0 ≤ t → t < T → ∀ x : Vec3, u' t x = u t x :=
+  NS_regularity_extension_from_tight_ODE
+    ax ht_start_pos ht_start_lt_T
+    D.dom
+    D.M_differentiableAt
+    D.M_gt_one_Ioo
+    D.tight_ODE_at
+    hM_nonneg_full
+    hM_cont hW_boundary h_tail_nonneg
+    h_FTC h_derivW_int h_tailPiece_int h_partialTail_nonneg
+    δ_of_ε δ_pos δ_le h_log_large
+    h_logM_pos h_bound_full
+
 end NSBlwChain.BLW
