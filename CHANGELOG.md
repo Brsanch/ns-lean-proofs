@@ -5,6 +5,46 @@ will be archived on Zenodo once a publishable milestone is reached.
 
 ## Unreleased — 2026-04-26
 
+**Theorem 1 and Theorem 2 end-to-end discharges from named analytic hypotheses.**
+
+Both unconditional theorems now have multi-layer derivations from
+named analytical inputs to their respective algebraic conclusions.
+
+**Theorem 2 (far-field control):**
+
+- `Unconditional/KernelTailIntegral.lean` — proves
+  `∫ r in Set.Ioi R, r^(-2) = 1/R` for `R > 0` via mathlib's
+  `integral_Ioi_rpow_of_lt`. The radial collapse of the 3-D
+  Biot–Savart strain kernel `|∇K(y)| ≤ C_K · |y|^{-3}` after the
+  spherical Jacobian `r²`.
+- `Unconditional/FarFieldFromKernelTail.lean` — `BiotSavartKernelTailBundle`
+  packages decay constant + radial-integral identity into
+  `kernelTailSq = 4π · C_K² / R`. The
+  `farFieldControlBundle_of_kernelTail` constructor builds Theorem 2's
+  scalar bundle from the kernel-tail bundle plus a Cauchy–Schwarz
+  hypothesis. End-to-end:
+  `farField_le_sqrt_of_kernelTail : farNorm ≤ sqrt(4π · C_K² · E_ω / R)`.
+
+**Theorem 1 (blowup rate α ∈ (1,2)):**
+
+- `Unconditional/LerayEnergyEquality.lean` — `LerayEnergyEquality`
+  bundle (energy balance + integrability + terminal-energy non-neg).
+  `enstrophy_integral_bound` derives `∫₀^T Z ≤ E(0)/ν` from the
+  bundle by linarith.
+- `Unconditional/Theorem1FromLeray.lean` — `EnstrophyCrossoverHypothesis`
+  + `EnstrophyCrossoverRegularity` + `LerayEnergyEquality` →
+  `EnstrophyCrossoverBundle` constructor →
+  `blowup_rate_alpha_full : (Tstar - t) · M(t)^α ≤ E(0)/(ν·c_Z)`.
+- `Unconditional/PointwiseEnergyODE.lean` — derives the integrated
+  energy balance from the *pointwise* form `(d/dt) E(t) = -ν · Z(t)`
+  via mathlib's `integral_eq_sub_of_hasDerivAt` (FTC). Reduces the
+  Leray bundle's only non-trivial field to a pointwise hypothesis,
+  matching the natural output of the energy method on smooth NS
+  solutions.
+
+**Five consecutive first-try CI-green commits** (`b32b823`, `588ca35`,
+`be49932`, `965fe7c`, `ec7b053`) on real analytic content.
+
 **Build chain orphan-elimination + diagnostics-always-on policy.**
 
 Brought all 117 Lean files under `NSBlwChain/` into the import chain
