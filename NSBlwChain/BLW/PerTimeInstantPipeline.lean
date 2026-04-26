@@ -6,6 +6,9 @@ import NSBlwChain.BLW.GradientBoundTopLevelBundled
 import NSBlwChain.BLW.MdotODEInequality
 import NSBlwChain.BLW.Theorem3FullThreading
 
+set_option diagnostics true
+set_option diagnostics.threshold 100
+
 /-!
 # Per-time-instant pipeline skeleton
 

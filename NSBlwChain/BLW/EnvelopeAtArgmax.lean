@@ -4,6 +4,9 @@
 import Mathlib
 import NSBlwChain.Setup.NSHypothesis
 
+set_option diagnostics true
+set_option diagnostics.threshold 100
+
 /-!
 # Danskin envelope bundle at an argmax point
 

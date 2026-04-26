@@ -6,6 +6,9 @@ import NSBlwChain.BLW.Theorem3Conditional
 import NSBlwChain.BLW.ODEIntegration_ResidualDischarge
 import NSBlwChain.BLW.ODEIntegration_Discharge
 
+set_option diagnostics true
+set_option diagnostics.threshold 100
+
 /-!
 # Full Theorem-3 threading: tight ODE → smooth extension
 
