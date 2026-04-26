@@ -82,7 +82,7 @@ theorem Mdot_le_M_sigma_scalar
   have h_rhs_eq : M ^ 2 * σ = M * (M * σ) := by ring
   rw [h_rhs_eq] at h_M_Mdot_le
   -- Cancel M on the left.
-  exact (mul_le_mul_left hM_pos).mp h_M_Mdot_le
+  exact le_of_mul_le_mul_left h_M_Mdot_le hM_pos
 
 /-- **§12.4 ODE inequality with step-(iii) coupling internalized.**
 
