@@ -115,3 +115,4 @@ import NSBlwChain.BLW.Theorem3FullThreading
 import NSBlwChain.BLW.PerTimeInstantPipeline
 import NSBlwChain.Unconditional.Theorem1_SanityCheck
 import NSBlwChain.Unconditional.Theorem2_BundleConstructor
+import NSBlwChain.Unconditional.KernelTailIntegral
