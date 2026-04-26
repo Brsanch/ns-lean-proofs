@@ -102,3 +102,9 @@ import NSBlwChain.BLW.RpowThresholdFinder
 import NSBlwChain.BLW.SpatialArgmaxFromDecay
 import NSBlwChain.BLW.HessianInputsBundle
 import NSBlwChain.BLW.EnvelopeAtArgmax
+import NSBlwChain.BLW.GradientBoundFromNSAxioms
+import NSBlwChain.BLW.GradientBoundFromNSAxiomsTimeAnalytic
+import NSBlwChain.BLW.GradientBoundFromNSAxiomsHessianBundled
+import NSBlwChain.BLW.GradientBoundTopLevel
+import NSBlwChain.BLW.GradientBoundTopLevelBundled
+import NSBlwChain.BLW.GradientBoundLogForm
