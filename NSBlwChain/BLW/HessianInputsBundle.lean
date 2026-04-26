@@ -171,7 +171,7 @@ theorem HessianInputs.h_star_0_live
           gradSqNorm omega_laplace_omega hessian_trace_sqNorm) :
     H.laplace_sq_0
       = 2 * H.gradSqNorm_0 + 2 * vorticity u t xStar 0 * H.laplace_0 := by
-  linear_combination H.h_star_0 - 2 * H.laplace_0 * H.h_ω0_match
+  linear_combination H.h_star_0 + 2 * H.laplace_0 * H.h_ω0_match
 
 /-- Per-component `(★)_1` in live form. -/
 theorem HessianInputs.h_star_1_live
@@ -181,7 +181,7 @@ theorem HessianInputs.h_star_1_live
           gradSqNorm omega_laplace_omega hessian_trace_sqNorm) :
     H.laplace_sq_1
       = 2 * H.gradSqNorm_1 + 2 * vorticity u t xStar 1 * H.laplace_1 := by
-  linear_combination H.h_star_1 - 2 * H.laplace_1 * H.h_ω1_match
+  linear_combination H.h_star_1 + 2 * H.laplace_1 * H.h_ω1_match
 
 /-- Per-component `(★)_2` in live form. -/
 theorem HessianInputs.h_star_2_live
@@ -191,7 +191,7 @@ theorem HessianInputs.h_star_2_live
           gradSqNorm omega_laplace_omega hessian_trace_sqNorm) :
     H.laplace_sq_2
       = 2 * H.gradSqNorm_2 + 2 * vorticity u t xStar 2 * H.laplace_2 := by
-  linear_combination H.h_star_2 - 2 * H.laplace_2 * H.h_ω2_match
+  linear_combination H.h_star_2 + 2 * H.laplace_2 * H.h_ω2_match
 
 /-! ### Smoothness-side constructor from C²-slice derivatives
 
@@ -242,6 +242,8 @@ noncomputable def HessianInputs.ofSliceDerivatives
     (gradSqNorm omega_laplace_omega hessian_trace_sqNorm : ℝ)
     (g_first : Fin 3 → Fin 3 → ℝ → ℝ)
     (g_second : Fin 3 → Fin 3 → ℝ)
+    (h_g_first_eq_deriv : ∀ k i : Fin 3,
+      g_first k i = deriv (slice (fun y => vorticity u t y k) xStar i))
     (hasDerivAt_slice : ∀ k i : Fin 3, ∀ s : ℝ,
       HasDerivAt (slice (fun y => vorticity u t y k) xStar i)
         (g_first k i s) s)
@@ -275,9 +277,10 @@ noncomputable def HessianInputs.ofSliceDerivatives
         = 2 * (g_first k i 0) ^ 2
           + 2 * vorticity u t xStar k * g_second k i := by
     intro k i
+    have h_d := hasDerivAt_deriv_slice k i
+    rw [← h_g_first_eq_deriv k i] at h_d
     have h :=
-      scalar_sq_second_deriv_eq (hasDerivAt_slice k i 0)
-        (hasDerivAt_deriv_slice k i)
+      scalar_sq_second_deriv_eq (hasDerivAt_slice k i) h_d
     -- `h : deriv² (slice²) 0 = 2 (g_first k i 0)² + 2·(slice 0)·(g_second k i)`.
     rw [hslice0 k i] at h
     exact h
@@ -413,6 +416,7 @@ noncomputable def HessianInputs.ofNSEvolutionAxioms
       deriv (slice (fun y => vorticity u t y k) xStar i) s)
     (fun k i =>
       deriv (deriv (slice (fun y => vorticity u t y k) xStar i)) 0)
+    (fun _ _ => rfl)
     (fun k i s => (h_slice_diff k i s).hasDerivAt)
     (fun k i => (h_slice_deriv_diff k i 0).hasDerivAt)
     h_gradSq_match h_omega_lap_match h_trace_match
