@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## Unreleased — 2026-04-26
+
+**Build chain orphan-elimination + diagnostics-always-on policy.**
+
+Brought all 117 Lean files under `NSBlwChain/` into the import chain
+(zero orphans). Lake's import-chain-only build behavior had been
+silently skipping 13 orphan files — they compiled in isolation but
+weren't part of the green CI signal. Each was added to
+`NSBlwChain.lean` and verified.
+
+**Substantive proof fixes** (not just import additions):
+
+- `BLW/HessianInputsBundle.lean`: replaced rewrite-motive failures in
+  `hessian_expansion`, `omega_lap_decomp_live`, `h_star_*_live` with
+  `linear_combination` (correct signs derived). Added
+  `h_g_first_eq_deriv` parameter to `ofSliceDerivatives` constructor
+  to bridge the abstract `g_first` callback to the concrete
+  `deriv (slice ...)` Lean expects in
+  `scalar_sq_second_deriv_eq`. Updated `ofNSEvolutionAxioms` to
+  supply `fun _ _ => rfl`.
+- `BLW/EnvelopeAtArgmax.lean`: `set ψ := ...` did not propagate
+  through subsequent `have` introductions; replaced bare `linarith`
+  with `show <unfolded>; linarith`. Replaced `rw [deriv_sub ...]` with
+  direct term-mode `exact deriv_sub h_MSq_diff h_ψ_diff`.
+- `BLW/StepIIICoupling.lean`: `mul_le_mul_left` is no longer an `Iff`
+  in mathlib v4.29.0 (now a function `∀ a, c*a ≤ c'*a`). Replaced
+  `(mul_le_mul_left hM_pos).mp` with `le_of_mul_le_mul_left`.
+- `BLW/Theorem3FullThreading.lean` + `BLW/PerTimeInstantPipeline.lean`:
+  added `open Topology Filter` for `𝓝[<]` neighborhood-within-left
+  notation.
+
+**Diagnostics-always-on (per-file):**
+
+Added `set_option diagnostics true; set_option diagnostics.threshold 100`
+to all 5 files modified this session. Note: the equivalent
+`[leanOptions]` keys in `lakefile.toml` are *not* recognized as `-D`
+options at the lake-build level (every file errors `invalid -D
+parameter, unknown configuration option 'diagnostics.threshold'`),
+so the per-file form is the only path.
+
 ## v0.19 — 2026-04-25
 
 **All 8 scalar-capstone hypotheses discharged.**
