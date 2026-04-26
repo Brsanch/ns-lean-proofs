@@ -96,6 +96,7 @@ noncomputable def PerTimeInstantData.ofExplicitArgmax
     via `Classical.choose`. -/
 noncomputable def PerTimeInstantData.ofDecayContinuity_withCanonicalEnvelope
     {u : VelocityField} {ν T : ℝ} {M Mdot : ℝ → ℝ} {t_start : ℝ}
+    (ht_start_nn : 0 ≤ t_start)
     (h_cont : ∀ τ : ℝ, 0 < τ → τ < T →
       Continuous (fun y =>
         Vec3.dot (vorticity u τ y) (vorticity u τ y)))
@@ -159,8 +160,7 @@ noncomputable def PerTimeInstantData.ofDecayContinuity_withCanonicalEnvelope
   refine PerTimeInstantData.ofExplicitArgmax xStar h_dom ?_ h_growth h_diff h_sat
   -- envelope_attained from the supplied h_attained_at_argmax.
   intro τ hτ_start hτ_T
-  have hτ_pos : 0 < τ := lt_of_le_of_lt (le_refl 0)
-    (by linarith [hτ_start] : (0 : ℝ) < τ)
+  have hτ_pos : 0 < τ := lt_of_le_of_lt ht_start_nn hτ_start
   exact h_attained_at_argmax τ hτ_start hτ_T (xStar τ)
     (h_xStar_spec τ hτ_pos hτ_T)
 
