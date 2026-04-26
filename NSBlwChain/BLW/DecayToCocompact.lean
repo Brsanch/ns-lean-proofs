@@ -100,21 +100,19 @@ theorem tendsto_cocompact_zero_of_threshold
   rw [Filter.eventually_iff, Filter.mem_cocompact]
   refine ⟨Metric.closedBall (0 : Vec3) (R_of_ε ε),
     isCompact_closedBall _ _, ?_⟩
+  -- Goal: x ∈ closedBallᶜ → x ∈ {y | dist (f y) 0 < ε}.
   intro x hx_compl
-  -- `hx_compl : x ∉ {y | dist (f y) 0 < ε}` ⇔ `ε ≤ dist (f x) 0`.
-  -- `dist (f x) 0 = |f x|`.
-  have h_dist : dist (f x) 0 = |f x| := by simp [Real.dist_eq]
-  -- From hx_compl: ε ≤ |f x|.
-  have h_ε_le : ε ≤ |f x| := by
-    have : ¬ dist (f x) 0 < ε := hx_compl
-    push_neg at this
-    rw [h_dist] at this
-    exact this
-  -- Apply threshold: √(Vec3.dot x x) ≤ R_of_ε ε.
+  -- hx_compl : x ∈ closedBallᶜ, i.e., x ∉ closedBall.
+  -- Goal: dist (f x) 0 < ε.  Contrapositive: if ε ≤ dist (f x) 0,
+  -- then x ∈ closedBall, contradicting hx_compl.
+  by_contra h_ge
+  have h_le : ε ≤ dist (f x) 0 := not_lt.mp h_ge
+  have h_dist : dist (f x) 0 = |f x| := by simp
+  rw [h_dist] at h_le
   have h_sqrt_le : Real.sqrt (Vec3.dot x x) ≤ R_of_ε ε :=
-    h_threshold ε hε x h_ε_le
-  -- Hence x ∈ Metric.closedBall 0 (R_of_ε ε).
-  exact euclidean_ball_subset_supnorm_ball
-    (le_of_lt (hR_pos ε hε)) x h_sqrt_le
+    h_threshold ε hε x h_le
+  have h_in_ball : x ∈ Metric.closedBall (0 : Vec3) (R_of_ε ε) :=
+    euclidean_ball_subset_supnorm_ball (le_of_lt (hR_pos ε hε)) x h_sqrt_le
+  exact hx_compl h_in_ball
 
 end NSBlwChain.BLW
