@@ -110,3 +110,5 @@ import NSBlwChain.BLW.GradientBoundTopLevelBundled
 import NSBlwChain.BLW.GradientBoundLogForm
 import NSBlwChain.BLW.MdotODEInequality
 import NSBlwChain.BLW.StepIIICoupling
+import NSBlwChain.BLW.Theorem3Conditional
+import NSBlwChain.BLW.Theorem3FullThreading
