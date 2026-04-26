@@ -53,7 +53,7 @@ theorem runningSupOn_mono
     runningSupOn f s ≤ runningSupOn f t := by
   unfold runningSupOn
   have hsubset : f '' Icc 0 s ⊆ f '' Icc 0 t :=
-    image_subset f (Icc_subset_Icc le_rfl hst)
+    Set.image_mono (Icc_subset_Icc le_rfl hst)
   -- `f '' Icc 0 s` is non-empty (contains `f 0`) and bounded above.
   have hne : (f '' Icc 0 s).Nonempty :=
     ⟨f 0, mem_image_of_mem f ⟨le_rfl, hs_nn⟩⟩
