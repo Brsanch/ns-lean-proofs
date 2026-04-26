@@ -127,13 +127,14 @@ theorem EnvelopeAtArgmax.deriv_scalar_half_eq
   have hg_nn : ∀ τ, 0 ≤ MSq τ - ψ τ := by
     intro τ
     have h := E.h_dom xStar τ
-    -- h : ψ τ ≤ MSq τ
+    show 0 ≤ (E.M_fn τ) ^ 2 / 2
+            - Vec3.dot (vorticity u τ xStar) (vorticity u τ xStar) / 2
     linarith
   -- (b) `g(t) = 0`: from h_hit.
   have hg_t : MSq t - ψ t = 0 := by
     have h := E.h_hit
-    -- h : ψ t = MSq t
-    show MSq t - ψ t = 0
+    show (E.M_fn t) ^ 2 / 2
+            - Vec3.dot (vorticity u t xStar) (vorticity u t xStar) / 2 = 0
     linarith
   -- (c) So `g` has a minimum at `t`: g(t) ≤ g(τ) for all τ.
   have hg_min : ∀ τ, MSq t - ψ t ≤ MSq τ - ψ τ := by
@@ -170,8 +171,8 @@ theorem EnvelopeAtArgmax.deriv_scalar_half_eq
   -- (h) `deriv (MSq - ψ) t = deriv MSq t - deriv ψ t = M·Mdot - deriv ψ t`.
   have h_deriv_gap_split :
       deriv (fun τ => MSq τ - ψ τ) t
-        = deriv MSq t - deriv ψ t := by
-    rw [deriv_sub h_MSq_diff h_ψ_diff]
+        = deriv MSq t - deriv ψ t :=
+    deriv_sub h_MSq_diff h_ψ_diff
   have h_MSq_deriv_eq : deriv MSq t = M * Mdot := h_MSq_deriv.deriv
   rw [h_deriv_gap_split, h_MSq_deriv_eq] at h_deriv_gap_zero
   -- h_deriv_gap_zero : M * Mdot - deriv ψ t = 0
