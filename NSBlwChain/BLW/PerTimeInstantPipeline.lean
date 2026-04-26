@@ -66,7 +66,7 @@ than re-listing the long signature each time.
 namespace NSBlwChain.BLW
 
 open scoped BigOperators
-open NSBlwChain
+open NSBlwChain Topology Filter
 
 /-- **Per-time-instant data bundle.**
 
