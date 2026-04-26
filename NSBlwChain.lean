@@ -95,3 +95,4 @@ import NSBlwChain.BLW.GradientBoundFullyDischarged
 import NSBlwChain.BLW.FullDischargePipeline
 import NSBlwChain.BLW.FromNSEvolution
 import NSBlwChain.Analyticity.IdentityTheorem
+import NSBlwChain.BLW.DecayToCocompact
