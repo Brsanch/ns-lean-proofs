@@ -122,3 +122,4 @@ import NSBlwChain.Unconditional.Theorem1FromLeray
 import NSBlwChain.Unconditional.PointwiseEnergyODE
 import NSBlwChain.Unconditional.Theorem1And2_NewChain_SanityCheck
 import NSBlwChain.Unconditional.RunningSupOn
+import NSBlwChain.Unconditional.RegularityFromRunningSup
