@@ -120,3 +120,4 @@ import NSBlwChain.Unconditional.FarFieldFromKernelTail
 import NSBlwChain.Unconditional.LerayEnergyEquality
 import NSBlwChain.Unconditional.Theorem1FromLeray
 import NSBlwChain.Unconditional.PointwiseEnergyODE
+import NSBlwChain.Unconditional.Theorem1And2_NewChain_SanityCheck
