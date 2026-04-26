@@ -77,12 +77,8 @@ theorem rpow_threshold_bound
   have h_inv_mul : (1 / (2 * p)) * (2 * p) = 1 := by
     field_simp
   have h_yPow_pow : yPow ^ (2 * p) = y := by
-    rw [hyPow_def]
-    rw [← Real.rpow_natCast y 1] at *
-    -- Use Real.rpow_mul: y^(a*b) = (y^a)^b for y ≥ 0 (or > 0).
-    rw [← Real.rpow_mul (le_of_lt hy_pos)]
-    rw [h_inv_mul]
-    exact Real.rpow_one y
+    rw [hyPow_def, ← Real.rpow_mul (le_of_lt hy_pos), h_inv_mul,
+        Real.rpow_one]
   -- Step 7: R_of_ε ^ (2*p) ≥ yPow ^ (2*p) by rpow monotonicity in
   -- the base (since yPow ≤ R_of_ε and 2*p ≥ 0).
   have h_pow_mono : yPow ^ (2 * p) ≤ R_of_ε ^ (2 * p) :=
