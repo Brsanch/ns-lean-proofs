@@ -55,12 +55,12 @@ namespace NSBlwChain.BLW
 
 open Real
 
-/-- **Generic ODE inequality with arbitrary non-negative coefficient.**
+/-- **Generic ODE inequality with arbitrary coefficient `k`.**
 
     From step-(iii) `Mdot ≤ M · σ` and a generic strain bound
     `σ ≤ k · M · log M` with `0 ≤ M`, conclude
-    `Mdot ≤ k · M² · log M`.
-
+    `Mdot ≤ k · M² · log M`.  Note that the proof works for ANY
+    real `k` (positive, zero, or negative); only `0 ≤ M` is needed.
     Mirrors `MdotODEInequality.Mdot_le_4Msq_logM_scalar` exactly
     except for the abstract coefficient `k`. -/
 theorem Mdot_le_kMsq_logM_scalar
