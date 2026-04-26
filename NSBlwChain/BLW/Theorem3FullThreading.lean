@@ -53,7 +53,7 @@ strictly weaker than equality and consumed here as a hypothesis.
 
 namespace NSBlwChain.BLW
 
-open Real
+open Real Topology Filter
 
 /-- **Gap (b) closer: integrated bound from tight ODE.**
 
