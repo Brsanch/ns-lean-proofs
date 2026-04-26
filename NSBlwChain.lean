@@ -97,3 +97,5 @@ import NSBlwChain.BLW.FromNSEvolution
 import NSBlwChain.Analyticity.IdentityTheorem
 import NSBlwChain.BLW.DecayToCocompact
 import NSBlwChain.BLW.SpatialArgmax
+import NSBlwChain.BLW.DecayThresholdBridge
+import NSBlwChain.BLW.RpowThresholdFinder
