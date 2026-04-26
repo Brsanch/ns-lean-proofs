@@ -101,3 +101,4 @@ import NSBlwChain.BLW.DecayThresholdBridge
 import NSBlwChain.BLW.RpowThresholdFinder
 import NSBlwChain.BLW.SpatialArgmaxFromDecay
 import NSBlwChain.BLW.HessianInputsBundle
+import NSBlwChain.BLW.EnvelopeAtArgmax
