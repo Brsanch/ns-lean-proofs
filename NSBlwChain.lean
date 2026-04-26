@@ -126,3 +126,4 @@ import NSBlwChain.Unconditional.RegularityFromRunningSup
 import NSBlwChain.BLW.AntiTwistChainSection13
 import NSBlwChain.Torus.PeriodicNSAxioms
 import NSBlwChain.Torus.PeriodicArgmaxExistence
+import NSBlwChain.Unconditional.PolarCoordsTailBound
