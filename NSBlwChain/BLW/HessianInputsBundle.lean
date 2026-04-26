@@ -139,9 +139,8 @@ theorem HessianInputs.hessian_expansion
     (H : HessianInputs u t xStar
           gradSqNorm omega_laplace_omega hessian_trace_sqNorm) :
     hessian_trace_sqNorm = 2 * gradSqNorm + 2 * omega_laplace_omega := by
-  rw [H.h_trace_decomp, H.h_star_0, H.h_star_1, H.h_star_2,
-      H.h_gradSq_decomp, H.h_omega_lap_decomp]
-  ring
+  linear_combination H.h_trace_decomp + H.h_star_0 + H.h_star_1 + H.h_star_2
+    - 2 * H.h_gradSq_decomp - 2 * H.h_omega_lap_decomp
 
 /-- **Omega-Laplace decomposition in the live `vorticity u t xStar k`
     form.**  Converts the bundle's internal `ω_k_val * laplace_k`
@@ -157,7 +156,10 @@ theorem HessianInputs.omega_lap_decomp_live
       = vorticity u t xStar 0 * H.laplace_0
         + vorticity u t xStar 1 * H.laplace_1
         + vorticity u t xStar 2 * H.laplace_2 := by
-  rw [H.h_omega_lap_decomp, H.h_ω0_match, H.h_ω1_match, H.h_ω2_match]
+  linear_combination H.h_omega_lap_decomp
+    + H.laplace_0 * H.h_ω0_match
+    + H.laplace_1 * H.h_ω1_match
+    + H.laplace_2 * H.h_ω2_match
 
 /-- **Per-component `(★)_k` in the live `vorticity u t xStar k` form.**
     `h_star_0` restated with `ω0_val` replaced by
@@ -169,7 +171,7 @@ theorem HessianInputs.h_star_0_live
           gradSqNorm omega_laplace_omega hessian_trace_sqNorm) :
     H.laplace_sq_0
       = 2 * H.gradSqNorm_0 + 2 * vorticity u t xStar 0 * H.laplace_0 := by
-  rw [H.h_star_0, H.h_ω0_match]
+  linear_combination H.h_star_0 - 2 * H.laplace_0 * H.h_ω0_match
 
 /-- Per-component `(★)_1` in live form. -/
 theorem HessianInputs.h_star_1_live
@@ -179,7 +181,7 @@ theorem HessianInputs.h_star_1_live
           gradSqNorm omega_laplace_omega hessian_trace_sqNorm) :
     H.laplace_sq_1
       = 2 * H.gradSqNorm_1 + 2 * vorticity u t xStar 1 * H.laplace_1 := by
-  rw [H.h_star_1, H.h_ω1_match]
+  linear_combination H.h_star_1 - 2 * H.laplace_1 * H.h_ω1_match
 
 /-- Per-component `(★)_2` in live form. -/
 theorem HessianInputs.h_star_2_live
@@ -189,7 +191,7 @@ theorem HessianInputs.h_star_2_live
           gradSqNorm omega_laplace_omega hessian_trace_sqNorm) :
     H.laplace_sq_2
       = 2 * H.gradSqNorm_2 + 2 * vorticity u t xStar 2 * H.laplace_2 := by
-  rw [H.h_star_2, H.h_ω2_match]
+  linear_combination H.h_star_2 - 2 * H.laplace_2 * H.h_ω2_match
 
 /-! ### Smoothness-side constructor from C²-slice derivatives
 
@@ -274,7 +276,7 @@ noncomputable def HessianInputs.ofSliceDerivatives
           + 2 * vorticity u t xStar k * g_second k i := by
     intro k i
     have h :=
-      scalar_sq_second_deriv_eq (hasDerivAt_slice k i)
+      scalar_sq_second_deriv_eq (hasDerivAt_slice k i 0)
         (hasDerivAt_deriv_slice k i)
     -- `h : deriv² (slice²) 0 = 2 (g_first k i 0)² + 2·(slice 0)·(g_second k i)`.
     rw [hslice0 k i] at h
@@ -303,7 +305,6 @@ noncomputable def HessianInputs.ofSliceDerivatives
           + 2 * vorticity u t xStar k
               * (∑ i : Fin 3, g_second k i) := by
               rw [← Finset.mul_sum, ← Finset.mul_sum]
-              ring
   refine
     { ω0_val := vorticity u t xStar 0
     , ω1_val := vorticity u t xStar 1
