@@ -115,7 +115,7 @@ theorem decay_threshold_property_from_explicit_constants
   have h_rx_2p_eq : rx ^ p * rx ^ p = rx ^ (2 * p) := by
     rw [← Real.rpow_add hrx_pos]; ring_nf
   have h_simplify : (C / rx ^ p) ^ 2 = C ^ 2 / rx ^ (2 * p) := by
-    rw [div_pow, sq, ← h_rx_2p_eq]
+    rw [div_pow, ← h_rx_2p_eq, pow_two (rx ^ p)]
   rw [h_simplify] at h_decay_sq
   -- So: Vec3.dot ω ω ≤ C^2 / rx^(2*p).
   -- Combined with ε ≤ |Vec3.dot ω ω| = Vec3.dot ω ω (positive):
