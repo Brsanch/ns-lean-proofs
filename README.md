@@ -9,8 +9,19 @@ $\mathbb{T}^3$ and on $\mathbb{R}^3$.  Companion paper:
 `paper/ns_regularity.md` in the `noethersolve` project, with supplements
 `ns_regularity_caveats_formal.md` and `ns_regularity_blw_derivations.md`.
 
-**Status: v0.19 + unreleased 2026-04-26.** 117 files (zero orphans;
-all in import chain), all CI-green.
+**Status: v0.19 + unreleased 2026-04-26.** 130 files / ~18,400 LOC
+(zero orphans; all in import chain), all CI-green.
+
+Recent additions (post-`b88e25b` revert): Theorem 1 + Theorem 2
+multi-layer discharges from named analytic hypotheses
+(KernelTailIntegral, FarFieldFromKernelTail, LerayEnergyEquality,
+Theorem1FromLeray, PointwiseEnergyODE via FTC, RunningSupOn,
+RegularityFromRunningSup); anti-twist BLW §13 corrected ODE
+(AntiTwistChainSection13); Torus overlay (PeriodicNSAxioms,
+PeriodicArgmaxExistence); polar-coords kernel-tail leaf reduction
+(PolarCoordsTailBound); PerTimeInstantData constructors
+(PerTimeInstantConstructor) — argmax now derivable from
+cocompact decay + continuity instead of taken as input.
 **All scalar Props derived.**  The gradient bound
 `|∇ω|² ≤ M²·σ/ν` is now producible via
 `gradient_bound_of_NSEvolutionAxioms_all_scalar_derived` from

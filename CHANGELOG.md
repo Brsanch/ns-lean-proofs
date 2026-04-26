@@ -45,6 +45,72 @@ named analytical inputs to their respective algebraic conclusions.
 **Five consecutive first-try CI-green commits** (`b32b823`, `588ca35`,
 `be49932`, `965fe7c`, `ec7b053`) on real analytic content.
 
+**Subsequent commits (post-`ec7b053`):**
+
+- `Unconditional/Theorem1And2_NewChain_SanityCheck.lean` — exercises
+  the new constructor chains end-to-end on numeric instances
+  (`ν=Tstar=E(0)=1`, `c_Z=4`, `β=2` for Theorem 1; `R=E_ω=C_K=1`
+  for Theorem 2).
+- `Unconditional/RunningSupOn.lean` — running-supremum wrapper
+  with monotonicity + lower-bound + non-negativity lemmas via
+  `csSup_le_csSup` and `le_csSup`.
+- `Unconditional/RegularityFromRunningSup.lean` —
+  `EnstrophyCrossoverRegularity` discharged from `runningSupOn`
+  + `Z_nonneg`, removing `M_mono` and `M_nonneg` from the
+  primitive hypothesis list.
+
+**Anti-twist BLW §13** (`BLW/AntiTwistChainSection13.lean`):
+
+- `AntiTwistBundle` packages twist `w ≥ 0`, quench `c_w > 0`,
+  strict `c_w · w² < 4`, plus the twist-quenched strain bound
+  `σ ≤ (4 - c_w · w²) · M · log M`.
+- `Mdot_le_kMsq_logM_scalar` generalizes `Mdot_le_4Msq_logM_scalar`
+  to arbitrary positive coefficient.
+- `AntiTwistBundle.Mdot_bound` derives the corrected ODE
+  `Ṁ ≤ (4 - c_w · w²) · M² · log M`.
+- `AntiTwistBundle.bound_le_no_twist` proves anti-twist is a
+  strict improvement over no-twist when both `c_w · w² > 0` and
+  `0 ≤ log M`.
+
+**Torus overlay** (`Torus/PeriodicNSAxioms.lean`,
+`Torus/PeriodicArgmaxExistence.lean`):
+
+- `IsPeriodic3D L f := ∀ i x, f (Function.update x i (x i + L)) = f x`.
+- `NSEvolutionAxiomsPeriodic` extends `NSEvolutionAxioms` with
+  spatial period, periodicity of `u` and `vorticity`, and zero
+  spatial mean.
+- `fundamental_cell_compact` via `isCompact_Icc` on `Vec3`.
+- `exists_argmax_on_fundamental_cell` via
+  `IsCompact.exists_isMaxOn` — argmax existence on torus without
+  the `DecayAtInfinity` hypothesis needed on ℝ³.
+
+**Polar-coords kernel-tail leaf reduction**
+(`Unconditional/PolarCoordsTailBound.lean`):
+
+- `KernelTailRadialIdentity R C_K kernelTailSq := kernelTailSq = 4π · C_K² · ∫_R^∞ r⁻²`
+  is the cleanly-isolated polar-coords identity.
+- `kernelTail_value_via_radial_identity` composes it with the
+  proven `kernel_tail_radial_integral` to give the closed-form
+  value `4π · C_K² / R`.
+- `BiotSavartKernelTailBundle.ofRadialIdentity` discharges the
+  bundle from the radial identity + positivity hypotheses.
+
+Result: `kernelTailSq_eq` is no longer a single bundled assumption;
+it reduces to one named *radial* identity (future cross-instance
+discharge target) + one fully-verified mathlib lemma.
+
+**`PerTimeInstantData` constructors**
+(`BLW/PerTimeInstantConstructor.lean`):
+
+- `ofExplicitArgmax` — convenience constructor with named-arg
+  signature.
+- `ofDecayContinuity_withCanonicalEnvelope` — derives `xStar`
+  from continuity + cocompact decay + positivity-witness via
+  `exists_argmax_of_continuous_tendsto_zero` (proven this
+  session) + `Classical.choose`. Removes `xStar` from the
+  primitive input list; `saturating_ODE` and `M_diff` remain
+  as the genuinely-classical leaves.
+
 **Build chain orphan-elimination + diagnostics-always-on policy.**
 
 Brought all 117 Lean files under `NSBlwChain/` into the import chain
