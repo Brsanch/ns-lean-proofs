@@ -3,6 +3,7 @@
 
 import Mathlib
 import NSBlwChain.Setup.VectorFields
+import NSBlwChain.Setup.NSHypothesis
 
 /-!
 # Spatial argmax existence on `Vec3` from decay-at-infinity
@@ -37,7 +38,7 @@ this lemma converts the per-τ analytical content into the
 
 namespace NSBlwChain.BLW
 
-open Filter Topology
+open Filter Topology NSBlwChain
 open scoped BigOperators
 
 /-- **Spatial argmax from decay at infinity (continuous case).**
