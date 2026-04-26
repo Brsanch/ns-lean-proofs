@@ -7,6 +7,9 @@ import NSBlwChain.BLW.HessianExpansionFromC2
 import NSBlwChain.BLW.MaxPrincipleFromLocalMax
 import NSBlwChain.BLW.SliceSmoothness
 
+set_option diagnostics true
+set_option diagnostics.threshold 100
+
 /-!
 # Hessian-expansion scalar bundle
 

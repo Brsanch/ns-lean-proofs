@@ -5,6 +5,9 @@ import Mathlib
 import NSBlwChain.BLW.EnvelopeAtArgmax
 import NSBlwChain.BLW.MdotODEInequality
 
+set_option diagnostics true
+set_option diagnostics.threshold 100
+
 /-!
 # Step-(iii) scalar coupling: `Mdot ≤ M · σ`
 
