@@ -18,10 +18,11 @@ work. The triggers are predictable and avoidable.
 - ❌ `du -sh` / `du -h` on `.lake/`, `.lake/packages/mathlib/`, or any
   directory with tens of thousands of `.olean` files → **instant panic**.
 - ❌ `find` with heavy predicates or `-exec` on big trees (`~`, `/Volumes/`).
-- ❌ `lake build` — the **finalization phase** (flushing `.olean`, `.ilean`,
-  `.c`, trace files across the dep graph) is many small writes in a
-  narrow window and saturates apfsd. Confirmed crashes with
-  `LEAN_NUM_THREADS=1 lake build` on a 3-file project.
+- ❌ *Unthrottled* `lake build` — the **finalization phase** (flushing `.olean`,
+  `.ilean`, `.c`, trace files across the dep graph) is many small writes in a
+  narrow window and saturates apfsd. Confirmed crashes with an unthrottled
+  `LEAN_NUM_THREADS=1 lake build` on a 3-file project. **The *throttled* form
+  `taskpolicy -b nice -n 19 ... lake build` IS safe — see Always, below.**
 - ❌ `lake exe cache get` — leantar decompresses ~8,000 small files in a
   burst. Every time.
 - ❌ Multi-threaded `lake env lean FILE.lean` — parallel `.olean` writes
@@ -39,8 +40,15 @@ work. The triggers are predictable and avoidable.
 - ✅ For size info: `ls -ldh /path` (directory itself, no recursion)
   or `df -h /Volumes/4TB\ SD` (free space only).
 - ✅ For finding files: use `Glob` / file browser, not `find`.
-- ✅ For any build-phase work: **push to CI** and let GitHub Actions
-  build the `.olean` cache.
+- ✅ **For full-graph build / CI-independent merge gate:**
+  `taskpolicy -b nice -n 19 env LEAN_NUM_THREADS=1 lake build`. The
+  `taskpolicy -b nice -n 19` throttle holds apfsd under the saturation
+  threshold during the `.olean` finalization burst, so the full build is
+  panic-safe. It elaborates every file fresh → catches the cross-file
+  duplicate-`namespace.declName` conflicts that single-file `lake env lean`
+  CANNOT (it reads pre-built `.olean`s). **This removes the need to depend on
+  CI** — run it green before merge. (Pushing to CI to build the cache remotely
+  still works, but is no longer required.)
 - ✅ For big copies: `rsync --bwlimit=30M`.
 
 ### If you forget and the machine panics
@@ -53,42 +61,53 @@ Restart the machine. Any unsaved Lean work is gone.
 
 ---
 
-## CI-as-default workflow
+## Local-verify-primary workflow
 
-**Policy:** CI is the authoritative build and the default verifier.
-Local compile is rare, only for tiny surgical checks, and only on files
-under ~5k lines. Do not run `lake build` on your workstation.
+**Policy (updated 2026-05-29, synced from `jacobian-lean-challenge`):** local
+verification is primary; CI is an **optional** final-confidence check, **not**
+the merge gate. The earlier "CI is the authoritative build" policy was set when
+`lake build` was believed to always panic — only the *unthrottled* form does;
+the throttled `taskpolicy -b nice -n 19 ... lake build` is panic-safe.
 
-### Why CI over local
+### The two local checks
 
-- CI runs on remote Linux runners with no shared filesystem to saturate.
-- CI caches `.lake/build/` between runs — incremental builds are fast.
-- CI never crashes your machine.
-- Slow (~3-5 min for `lake build` after cache warms; docgen step is
-  known to hang but is `continue-on-error: true`, so doesn't block
-  correctness).
+1. **Per-file iteration (primary loop):**
+   `LEAN_NUM_THREADS=1 lake env lean NSBlwChain/YOUR_FILE.lean` — no-write,
+   type-checks against the existing `.olean` cache, ~3-30s warm. Read the inline
+   error at the bottom of stdout, fix, repeat. Iterate as much as you want.
+2. **Merge gate (full graph):**
+   `taskpolicy -b nice -n 19 env LEAN_NUM_THREADS=1 lake build` — throttled,
+   panic-safe (see CRITICAL section). This is the **only** local check that
+   surfaces cross-file duplicate-`namespace.declName` conflicts (single-file
+   `lake env lean` reads pre-built `.olean`s and cannot). Run it green before
+   merging any chip that adds a new top-level `def`/`lemma`/`theorem`/
+   `instance`. Skip it only for pure proof-body iteration on names already in
+   `main`.
 
 ### The typical loop
 
 1. Write code in modular blocks, **≤ 150 lines per commit** ideally.
-2. `git add`, `git commit`, `git push`. Each push triggers the Lean
-   Action CI workflow (`.github/workflows/lean_action_ci.yml`).
-3. Poll CI status:
-   ```
-   gh run list --repo Brsanch/ns-lean-proofs --limit 3 \
-     --json status,conclusion,headSha,workflowName
-   ```
-4. Direct job view (`leanprover/lean-action@v1` step is the one that
-   matters; docgen is allowed to fail):
-   ```
-   gh run view --job=<JOB_ID> --repo Brsanch/ns-lean-proofs
-   ```
-   Green check on `leanprover/lean-action@v1` = build succeeded.
-5. On failure, pull the failed log:
-   ```
-   gh run view <RUN_ID> --repo Brsanch/ns-lean-proofs --log-failed
-   ```
-   Read the specific Lean error, patch, push.
+2. After each change:
+   `LEAN_NUM_THREADS=1 lake env lean NSBlwChain/YOUR_FILE.lean`. Fix inline
+   errors; re-run.
+3. Once the new file is green, single-file-check the manifest entry too.
+4. Before merge (new top-level declaration): run the throttled full build
+   (gate #2 above) and confirm "Build completed successfully".
+5. Commit (no AI-attribution trailer) and merge. **CI is optional** — push and
+   watch it only for a final external confirmation, after a mathlib-pin change,
+   or when you touched a cross-cutting import.
+
+### Optional: CI as final confirmation
+
+If you do want a CI run, push the branch and poll:
+```
+gh run list --repo Brsanch/ns-lean-proofs --limit 3 \
+  --json status,conclusion,headSha,workflowName
+gh run view --job=<JOB_ID> --repo Brsanch/ns-lean-proofs   # leanprover/lean-action@v1 is the gating step
+gh run view <RUN_ID> --repo Brsanch/ns-lean-proofs --log-failed   # on failure
+```
+The `leanprover/lean-action@v1` step is what determines build success;
+`docgen` / `dedupe-caches` jobs are allowed to fail and do not gate correctness.
 
 ### Cache hygiene
 
@@ -308,8 +327,12 @@ Before every `git push`:
    at the very top (above any `/-! ... -/` doc-comment).
 2. **Tiny commit?** Ideally ≤ 150 lines changed per commit. Large
    commits amplify CI retry cost if something fails.
-3. **No local `lake build`?** Verified you didn't run `lake build` or
-   `lake exe cache get` locally. Use CI.
+3. **Merge gate run?** For a chip adding a new top-level
+   `def`/`lemma`/`theorem`/`instance`, ran
+   `taskpolicy -b nice -n 19 env LEAN_NUM_THREADS=1 lake build` to "Build
+   completed successfully" (the only local check that catches cross-file
+   duplicate-name conflicts). Never run an *unthrottled* `lake build` or
+   `lake exe cache get`.
 4. **If consuming a structure field**: check for the `DecidableEq`
    class-parameter pattern (Step 3 above). If your theorem takes
    `[DecidableEq ...]` and calls `.bound` on a structure, remove the
