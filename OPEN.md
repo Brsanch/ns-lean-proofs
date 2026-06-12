@@ -1,5 +1,10 @@
 # Open items — ns-lean-proofs
 
+> **Before any new Lean work: read `CHIP_GATES.md` (repo root)** — vacuity
+> lint gate (mechanical, baseline-ratcheted; 10 documented placeholder
+> findings as of 2026-06-12, two flagged for review) + the 7 anti-paraphrase
+> gates.
+
 **v0.19 (2026-04-25 evening).**  Zero `sorry` in the BLW chain; all
 8 scalar-capstone hypotheses now **derivable** from structural
 inputs alone.  The gradient bound `|∇ω|² ≤ M²·σ/ν` producible via
