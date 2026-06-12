@@ -1,9 +1,12 @@
 # Open items — ns-lean-proofs
 
 > **Before any new Lean work: read `CHIP_GATES.md` (repo root)** — vacuity
-> lint gate (mechanical, baseline-ratcheted; 10 documented placeholder
-> findings as of 2026-06-12, two flagged for review) + the 7 anti-paraphrase
-> gates.
+> lint gate (mechanical, baseline-ratcheted; 7 documented placeholder
+> findings as of 2026-06-12) + the 7 anti-paraphrase gates. The former
+> "Theorem 1 + ESS" wrappers were removed as decoys the same day — the
+> Type-I exclusion (`NoTypeIBlowup`) is a citation-carrier consumed by
+> nothing; the honest Theorem 1 is `blowup_rate_alpha_of_bundle`/`_of_leray`
+> (algebraic upper bound only).
 
 **v0.19 (2026-04-25 evening).**  Zero `sorry` in the BLW chain; all
 8 scalar-capstone hypotheses now **derivable** from structural
