@@ -364,3 +364,40 @@ NSBlwChain/
 Each subdirectory is created on demand as content lands. New files
 must be added to the top-level `NSBlwChain.lean` import list for them
 to be included in the library build.
+
+---
+
+## Anti-vacuity audit probes (adopted 2026-06-12)
+
+Run these against every new Prop-carrying structure or conditional-theorem
+target before claiming it has content. Ported from
+`eric-wieser/navier-stokes-misformalization` (Olšák/Wieser/Skřivan, which
+formally refuted the lean-dojo NS Millennium statement with exactly these
+two moves, against their pinned rev `aca048ef`); the same failure class was
+found internally in sqg-lean-proofs (vacuous H-strain/H-bdry/H-α, audit
+2026-05-29). This repo's load-bearing structures (`NSEvolutionAxioms`,
+`NSArgmaxInputs`, `TorusCorrectionBundle`, `EpsteinZetaBundle`, …) are
+exactly the kind these probes target.
+
+1. **Degenerate instantiation.** Instantiate every field of the structure
+   with degenerate data (`∅`, `0`, `default`, trivial witnesses) and try to
+   discharge all Prop fields with `simp`/`trivial`. If it compiles, the
+   hypothesis is vacuous — every theorem "conditional" on it is
+   unconditional-but-empty. (The existing "zero datum verifies structural
+   consistency" checks in `OPEN.md` are the benign cousin: they verify
+   *composability*. The probe asks the hostile question: does a degenerate
+   instance also *satisfy* the hypothesis outright?)
+2. **Bounded refutation.** Attempt `¬ P` via `nofun`/`simp`/`decide` on each
+   top-level target Prop. Catches type-level unsatisfiability (their case:
+   `Solution.T : ℝ` while the existence branch demands `T = (⊤ : WithTop ℝ)`).
+
+Anti-patterns to grep for (defects, not style):
+
+- `:=`-defaults on load-bearing structure fields (e.g.
+  `domain : Set _ := {x | …}`) — defaults are overridable, never
+  constraints; state the equation as a separate Prop field `domain_eq`.
+- `A ∨ B` dichotomy targets — state and attack the branches separately.
+- `∃ c ≥ 0, …`-shaped hypothesis content where any `c` works (≡ `True`).
+- Keep the axiom ledger CI-checked: `#guard_msgs in #print axioms` (this
+  repo's three intentional axioms should be the only entries beyond
+  `propext`/`Classical.choice`/`Quot.sound`).
