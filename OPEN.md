@@ -282,3 +282,25 @@ focused ~200-400 LOC mathlib-backed pass.
 3. Drop Banach fixed-point derivation (keep as hypothesis).
 
 Each preserves the chain's structural completeness.
+
+## Ledger discipline for any future arc (adopted 2026-06-12)
+
+Any new proof arc here tracks obligations as a per-claim ledger (one file per
+claim, DAG of `dependencies`/`supports`), not by growing this file. Full
+schema: `../references/proof_obligation_ledger_schema.md` (local shared refs
+dir). The three load-bearing rules, self-contained:
+
+1. **No self-certification.** `verified` = Lean-proved, zero sorry, zero
+   external axiom, *per entry*. The central claim never carries more than
+   `speculative` + a confidence number until external review — note this
+   repo's three classical `axiom` declarations already mean every downstream
+   theorem is at best `literature-import`-conditioned, and the gradient-bound
+   capstone's honest status is "verified modulo the AX list", never "proven".
+2. **No paraphrase nodes.** An entry whose dependencies and supports match an
+   existing entry's is a reformulation, not progress; `supersedes` is for
+   corrections only, never parallel routes. (A "from N inputs" restatement of
+   an existing capstone is the canonical violation.)
+3. **Dead ends become AK entries** (approach / obstruction-with-mechanism /
+   history + named fix) and citation errors become CORR entries (including
+   phantom-citation audits of our own bibliography) — machine-checkable
+   claims, not prose.
