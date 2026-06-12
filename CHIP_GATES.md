@@ -21,7 +21,7 @@ Run, from the NoetherSolve repo:
 
 ```
 python3 "/Volumes/4TB SD/ClaudeCode/noethersolve/scripts/lean_vacuity_lint.py" \
-  "/Volumes/4TB SD/ClaudeCode/ns-lean-proofs" --no-color --max-findings 10
+  "/Volumes/4TB SD/ClaudeCode/ns-lean-proofs" --no-color --max-findings 7
 ```
 
 Rules: `True`-typed fields/binders; `Prop := True` defs; `True.intro` proof
@@ -29,9 +29,9 @@ terms; structures that cannot constrain their subject; structures none of
 whose fields mention their parameters; theorems with underscore-unused named
 hypotheses.
 
-**Baseline = 10 findings (audited 2026-06-12).** They are documented (the
-docstrings disclose each placeholder) but they mark exactly where stated
-obligations are not yet obligations:
+**Baseline = 7 findings (audited 2026-06-12; lowered 10 → 7 the same day).**
+They are documented (the docstrings disclose each placeholder) but they mark
+exactly where stated obligations are not yet obligations:
 
 - `Torus/EpsteinZeta.lean:102,117` — `latticeSumBounded : True` and
   `LatticeSumBounded := True`: the lattice-sum bound is NOT encoded; the
@@ -40,13 +40,19 @@ obligations are not yet obligations:
   `_xStar`, and its `ν_eq : True` "consistency" field asserts nothing.
 - `BLW/ArgmaxIdentities.lean:87` — step (i) is a `True` placeholder, consumed
   only via step (ii).
-- Five unused-hypothesis findings, of which two deserve review on any future
-  touch: `blowup_rate_alpha` (`Unconditional/Theorem1.lean:343`) and
-  `blowup_rate_alpha_full` (`Theorem1FromLeray.lean:132`) take `_hNoType1`
-  without using it — either the statements are stronger than their names
-  advertise (fine; rename or drop the hypothesis) or the no-Type-I content
-  is not where the name claims it is. Resolve before citing either as "the
-  Type-I-conditional rate theorem".
+- `BLW/EnvelopeFormFromNSEvolution.lean:49` (`_ax`) and
+  `Setup/LipschitzToAE.lean:36` (`_`) — unused-hypothesis, unreviewed.
+
+**Resolved 2026-06-12 (the 10 → 7 reduction):** the original baseline's two
+flagged-for-review findings traced decoy: `blowup_rate_alpha`,
+`blowup_rate_alpha_beta_two`, and `blowup_rate_alpha_full` took the ESS
+Type-I hypothesis `_hNoType1` (and `_hα_pos`) without using them, and their
+conclusions contained no Type-I content — "full Theorem 1" was the algebraic
+bound with a narrower `α`-range and an inert hypothesis. All three wrappers
+were removed; the honest theorems are `blowup_rate_alpha_of_bundle` /
+`blowup_rate_alpha_of_leray` (algebraic, `α ≤ β`), and `NoTypeIBlowup` is
+now explicitly a citation-carrier consumed by nothing (see the §"Type-I
+exclusion" banner in `Unconditional/Theorem1.lean`).
 
 **The count must never increase.** New code adds zero findings; deliberate
 exceptions get an inline `-- vacuity-ok: <reason>` waiver named in the chip

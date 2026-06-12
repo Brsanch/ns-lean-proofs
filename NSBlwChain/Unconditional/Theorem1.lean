@@ -45,19 +45,23 @@ scope.  Instead, this file:
 The upper bound `α < 2` is algebraic: it follows by applying the bundle
 with `β = 2` and converting the resulting inequality to an inequality
 in `M^α` via `rpow` monotonicity.  The lower bound `α > 1` (exclusion
-of Type I) is recorded as the named classical input
-`ESS_excludes_type_I` consumed downstream (it is a **hypothesis**, not
-a free axiom, so the file contains zero `sorry` and zero `axiom`).
+of Type I) is **classical and NOT formalized here**: it is recorded
+only as the citation-carrier structure `NoTypeIBlowup` (ESS 2003),
+which **no theorem in this repo consumes** (honesty pass 2026-06-12 —
+earlier wrappers `blowup_rate_alpha` / `blowup_rate_alpha_beta_two` /
+`blowup_rate_alpha_full` listed it as an unused `_hNoType1` binder
+while concluding only the algebraic bound; they were removed as
+decoys, vacuity-lint `unused-hypothesis`).
 
 ## Main results
 
 * `EnstrophyCrossoverBundle`   — the scalar-hypothesis bundle.
 * `blowup_rate_algebraic`      — `(T* − t) · M(t)^β ≤ E₀/(ν·c_Z)` from
   the bundle.
-* `blowup_rate_alpha_of_bundle` — hypothesis-taking algebraic Theorem 1
-  for any `α ∈ (0, β]` and `M ≥ 1`.
-* `blowup_rate_alpha`          — the full Theorem 1 statement, hypothesis
-  form (combines the algebraic bound with the named ESS exclusion).
+* `blowup_rate_alpha_of_bundle` — algebraic Theorem 1 for any `α ≤ β`
+  on the subregion `M ≥ 1`.
+* `NoTypeIBlowup`              — citation-carrier for the ESS Type-I
+  exclusion (records the α > 1 strictness; consumed by nothing).
 
 ## References
 
@@ -250,10 +254,16 @@ theorem blowup_rate_algebraic
 /-- **Theorem 1 — hypothesis-taking form (algebraic).**
 
     *Given the enstrophy-crossover bundle with exponent `β` and any
-    `α ∈ (0, β]`, the blowup rate with exponent `α` is bounded on the
+    `α ≤ β`, the blowup rate with exponent `α` is bounded on the
     subregion `{t : M(t) ≥ 1}`:*
 
     `(Tstar − t) · M(t)^α ≤ E₀ / (ν · c_Z)`     whenever   `1 ≤ M(t)`.
+
+    The classical statement quotes the range `α ∈ (0, β]`, but
+    positivity of `α` is not load-bearing in the algebra: on `M ≥ 1`,
+    `rpow` monotonicity in the exponent needs only `α ≤ β`, so the
+    hypothesis is not taken (an earlier `_hα_pos` binder was removed
+    as unused, 2026-06-12).
 
     **Why the `M(t) ≥ 1` restriction is harmless.**  Theorem 1 is a
     blowup-rate statement, so it is *vacuous* outside any neighborhood
@@ -264,7 +274,7 @@ theorem blowup_rate_algebraic
 theorem blowup_rate_alpha_of_bundle
     {ν E₀ Tstar : ℝ} {M Z : ℝ → ℝ} {β c_Z α : ℝ}
     (B : EnstrophyCrossoverBundle ν E₀ Tstar M Z β c_Z)
-    (_hα_pos : 0 < α) (hα_le_β : α ≤ β)
+    (hα_le_β : α ≤ β)
     {t : ℝ} (ht_nn : 0 ≤ t) (htT : t ≤ Tstar) (hMt : 1 ≤ M t) :
     (Tstar - t) * M t ^ α ≤ E₀ / (ν * c_Z) := by
   -- From `1 ≤ M t` and `α ≤ β`, `M t ^ α ≤ M t ^ β`.
@@ -281,7 +291,7 @@ theorem blowup_rate_alpha_of_bundle
     mul_le_mul_of_nonneg_left hMt_rpow_le hdt_nn
   linarith
 
-/-! ## Type-I exclusion via ESS (hypothesis)
+/-! ## Type-I exclusion via ESS — citation-carrier ONLY (not consumed)
 
 The lower bound `α > 1` for Theorem 1 is the **Type-I exclusion**
 theorem of Escauriaza, Seregin, Šverák (2003).  It states:
@@ -290,23 +300,38 @@ theorem of Escauriaza, Seregin, Šverák (2003).  It states:
 >   `(Tstar − t) · ‖ω(·,t)‖_∞ ≤ C`   (Type I),
 > then it extends smoothly across `Tstar`, contradicting blowup.*
 
-We consume this as a **named hypothesis** `NoTypeIBlowup` and do not
-prove it in this file.  It is identical in content to the
-`seregin_type_one_exclusion` axiom declared in
-`NSBlwChain.Setup.ClassicalAxioms` (Seregin 2012), up to the variant
-Type-I vs. Type-I' formulation.  ESS is the original Type-I exclusion
-(the `α = 1` case); Seregin 2012 is the sub-Type-I refinement
-(`(Tstar − t) · M → 0`). -/
+⚠️ **This file does NOT formalize or consume that theorem.**  The
+structure `NoTypeIBlowup` below records its conclusion as a named,
+cited statement and nothing more: **no theorem in this repo takes a
+`NoTypeIBlowup` argument and uses it** (verified 2026-06-12).  Earlier
+wrappers (`blowup_rate_alpha`, `blowup_rate_alpha_beta_two` here;
+`blowup_rate_alpha_full` in `Theorem1FromLeray.lean`) listed it as an
+underscore-unused binder while concluding only the algebraic upper
+bound — the "full Theorem 1" they advertised was the algebraic
+theorem with a narrower `α`-range and a decoy hypothesis.  They were
+removed in the 2026-06-12 honesty pass (vacuity-lint rule
+`unused-hypothesis`); the sanity checks now call the algebraic
+theorems directly.
 
-/-- **Named classical hypothesis: Type-I exclusion (ESS 2003).**
+It is identical in content to the `seregin_type_one_exclusion` axiom
+declared in `NSBlwChain.Setup.ClassicalAxioms` (Seregin 2012), up to
+the variant Type-I vs. Type-I' formulation.  ESS is the original
+Type-I exclusion (the `α = 1` case); Seregin 2012 is the sub-Type-I
+refinement (`(Tstar − t) · M → 0`). -/
 
-    If the blowup rate is exactly Type I, then there is no blowup.
-    This contradicts the assumption that `Tstar` is the blowup time,
-    so every genuine blowup has `α > 1` in the sense of Theorem 1.
+/-- **Citation-carrier: Type-I exclusion (ESS 2003). NOT consumed.**
 
-    Stated here as a `Prop`-valued structure that downstream consumers
-    can hypothesize.  The witness is *not* constructed in this file —
-    it is discharged by citing ESS 2003. -/
+    Records, as a named `Prop`, the conclusion of ESS 2003: at a
+    genuine blowup, the Type-I bound `(Tstar − t) · M(t) ≤ C` cannot
+    hold uniformly near `Tstar` — hence the `α > 1` strictness in the
+    classical Theorem 1 statement.
+
+    The witness is not constructed and the structure is consumed by
+    **no theorem in this repo** (2026-06-12): it marks, in the type,
+    exactly which classical fact the paper's `α ∈ (1, β]` range
+    borrows.  Any future genuine "full Theorem 1" must *derive*
+    something from this structure — merely listing it as a `_`-unused
+    binder is the decoy pattern the vacuity linter flags. -/
 structure NoTypeIBlowup
     (M : ℝ → ℝ) (Tstar : ℝ) : Prop where
   /-- `(Tstar − t) · M(t) ≤ C` cannot hold uniformly near `Tstar` at
@@ -314,49 +339,5 @@ structure NoTypeIBlowup
       with this bound on a left neighborhood of `Tstar`. -/
   no_uniform_type_I :
     ¬ ∃ C : ℝ, ∀ t : ℝ, 0 ≤ t → t < Tstar → (Tstar - t) * M t ≤ C
-
-/-- **Theorem 1 — Unconditional blowup-rate bound.**
-
-    Under the scalar bundle plus the ESS Type-I exclusion, any genuine
-    blowup has `α ∈ (1, β]` (with `β = 2` for the generic case, from
-    the general `Z ≥ c · M²` enstrophy-crossover bound).
-
-    This file proves the *upper bound* algebraically:
-    `(Tstar − t) · M(t)^α ≤ E₀ / (ν · c_Z)` for any `α ∈ (0, β]` on
-    the subregion `M ≥ 1`.  The *strict* lower bound `α > 1` (ruling
-    out the Type-I case) is encoded in the hypothesis `NoTypeIBlowup`
-    and consumed at face value: for `α = 1`, the would-be Type-I bound
-    contradicts `NoTypeIBlowup`.
-
-    We state the full Theorem 1 as a conjunction:
-
-    * (a)  `(Tstar − t) · M(t)^α ≤ E₀ / (ν · c_Z)`  for `α ≤ β`
-          (algebraic upper bound);
-    * (b)  `α = 1` is excluded (ESS).
-
-    Part (a) is proven.  Part (b) is passed through from the named
-    hypothesis — it is the statement "if `α = 1` were to work, ESS
-    would contradict `Tstar` being a true blowup time". -/
-theorem blowup_rate_alpha
-    {ν E₀ Tstar : ℝ} {M Z : ℝ → ℝ} {β c_Z α : ℝ}
-    (B : EnstrophyCrossoverBundle ν E₀ Tstar M Z β c_Z)
-    (_hNoType1 : NoTypeIBlowup M Tstar)
-    (hα_gt_one : 1 < α) (hα_le_β : α ≤ β)
-    {t : ℝ} (ht_nn : 0 ≤ t) (htT : t ≤ Tstar) (hMt : 1 ≤ M t) :
-    (Tstar - t) * M t ^ α ≤ E₀ / (ν * c_Z) := by
-  exact blowup_rate_alpha_of_bundle B (lt_trans zero_lt_one hα_gt_one)
-    hα_le_β ht_nn htT hMt
-
-/-- **Corollary (numerical alias).**  For the generic enstrophy
-    crossover `β = 2`, Theorem 1 gives the bound in the form used by
-    downstream BLW-chain arguments. -/
-theorem blowup_rate_alpha_beta_two
-    {ν E₀ Tstar : ℝ} {M Z : ℝ → ℝ} {c_Z α : ℝ}
-    (B : EnstrophyCrossoverBundle ν E₀ Tstar M Z 2 c_Z)
-    (hNoType1 : NoTypeIBlowup M Tstar)
-    (hα_gt_one : 1 < α) (hα_le_two : α ≤ 2)
-    {t : ℝ} (ht_nn : 0 ≤ t) (htT : t ≤ Tstar) (hMt : 1 ≤ M t) :
-    (Tstar - t) * M t ^ α ≤ E₀ / (ν * c_Z) :=
-  blowup_rate_alpha B hNoType1 hα_gt_one hα_le_two ht_nn htT hMt
 
 end NSBlwChain.Unconditional

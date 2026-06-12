@@ -11,11 +11,11 @@ set_option diagnostics.threshold 100
 /-!
 # `EnstrophyCrossoverBundle` from Leray equality + spherical crossover
 
-End-to-end discharge for Theorem 1 (`blowup_rate_alpha`):
+End-to-end discharge for Theorem 1 (`blowup_rate_alpha_of_leray`):
 
   `LerayEnergyEquality + EnstrophyCrossover + scalar regularity`
        `⇒ EnstrophyCrossoverBundle`
-       `⇒ blowup_rate_alpha` (algebraic Theorem 1).
+       `⇒ blowup_rate_alpha_of_leray` (algebraic Theorem 1).
 
 Two analytic inputs:
 
@@ -80,7 +80,7 @@ structure EnstrophyCrossoverRegularity
 /-- **`EnstrophyCrossoverBundle` from Leray + crossover + regularity.**
 
     Composes the three analytic inputs into the scalar bundle
-    consumed by `blowup_rate_alpha`. -/
+    consumed by `blowup_rate_alpha_of_leray`. -/
 theorem enstrophyCrossoverBundle_of_leray
     {E M Z : ℝ → ℝ} {ν Tstar β c_Z : ℝ}
     (L : LerayEnergyEquality E Z ν Tstar)
@@ -102,38 +102,25 @@ theorem enstrophyCrossoverBundle_of_leray
     Z_integrable := L.Z_integrable
   }
 
-/-- **Theorem 1 from named analytic inputs (no NoTypeI).**
+/-- **Theorem 1 from named analytic inputs (algebraic).**
 
-    Algebraic upper-bound form, before composition with ESS. -/
+    Algebraic upper-bound form, for any `α ≤ β` on `M ≥ 1`.  The
+    `α > 1` strictness of the classical statement is the ESS Type-I
+    exclusion — a citation-carrier (`NoTypeIBlowup`, `Theorem1.lean`)
+    that no theorem in this repo consumes; an earlier wrapper
+    (`blowup_rate_alpha_full`) that listed it as an unused binder was
+    removed in the 2026-06-12 honesty pass. -/
 theorem blowup_rate_alpha_of_leray
     {E M Z : ℝ → ℝ} {ν Tstar β c_Z α : ℝ}
     (L : LerayEnergyEquality E Z ν Tstar)
     (X : EnstrophyCrossoverHypothesis M Z β c_Z Tstar)
     (R : EnstrophyCrossoverRegularity M Z Tstar)
     (hE0_nn : 0 ≤ E 0)
-    (hα_pos : 0 < α) (hα_le_β : α ≤ β)
+    (hα_le_β : α ≤ β)
     {t : ℝ} (ht_nn : 0 ≤ t) (htT : t ≤ Tstar) (hMt : 1 ≤ M t) :
     (Tstar - t) * M t ^ α ≤ E 0 / (ν * c_Z) :=
   blowup_rate_alpha_of_bundle
     (enstrophyCrossoverBundle_of_leray L X R hE0_nn)
-    hα_pos hα_le_β ht_nn htT hMt
-
-/-- **Theorem 1 from named analytic inputs + ESS Type-I exclusion.**
-
-    Full Theorem 1 conclusion: under Leray + crossover + regularity
-    + ESS, every genuine blowup has `(Tstar - t) · M(t)^α ≤ E(0)/(ν·c_Z)`
-    for `α ∈ (1, β]`. -/
-theorem blowup_rate_alpha_full
-    {E M Z : ℝ → ℝ} {ν Tstar β c_Z α : ℝ}
-    (L : LerayEnergyEquality E Z ν Tstar)
-    (X : EnstrophyCrossoverHypothesis M Z β c_Z Tstar)
-    (R : EnstrophyCrossoverRegularity M Z Tstar)
-    (hE0_nn : 0 ≤ E 0)
-    (_hNoType1 : NoTypeIBlowup M Tstar)
-    (hα_gt_one : 1 < α) (hα_le_β : α ≤ β)
-    {t : ℝ} (ht_nn : 0 ≤ t) (htT : t ≤ Tstar) (hMt : 1 ≤ M t) :
-    (Tstar - t) * M t ^ α ≤ E 0 / (ν * c_Z) :=
-  blowup_rate_alpha_of_leray L X R hE0_nn
-    (lt_trans zero_lt_one hα_gt_one) hα_le_β ht_nn htT hMt
+    hα_le_β ht_nn htT hMt
 
 end NSBlwChain.Unconditional

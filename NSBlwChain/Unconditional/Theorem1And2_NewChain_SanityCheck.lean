@@ -69,23 +69,24 @@ theorem theorem2_at_unit_kernel
     regularity composes via:
 
     `LerayEnergyPointwise → LerayEnergyEquality →
-     EnstrophyCrossoverBundle → blowup_rate_alpha_full`
+     EnstrophyCrossoverBundle → blowup_rate_alpha_of_leray`
 
-    delivering `(1 - t) · M(t)^α ≤ 1 / (1 · 4) = 1/4`. -/
+    delivering `(1 - t) · M(t)^α ≤ 1 / (1 · 4) = 1/4`.  (The former
+    target `blowup_rate_alpha_full` carried an unused ESS hypothesis
+    and was removed in the 2026-06-12 honesty pass.) -/
 theorem theorem1_via_pointwise_at_unit
     {E M Z : ℝ → ℝ} {α : ℝ}
     (P : LerayEnergyPointwise E Z 1 1)
     (X : EnstrophyCrossoverHypothesis M Z 2 4 1)
     (R : EnstrophyCrossoverRegularity M Z 1)
     (hE0_nn : 0 ≤ E 0)
-    (hNoType1 : NoTypeIBlowup M 1)
-    (hα_gt_one : 1 < α) (hα_le_two : α ≤ 2)
+    (hα_le_two : α ≤ 2)
     {t : ℝ} (ht_nn : 0 ≤ t) (htT : t ≤ 1) (hMt : 1 ≤ M t) :
     (1 - t) * M t ^ α ≤ E 0 / 4 := by
   -- Compose: pointwise → integrated → bundle → Theorem 1.
   have L : LerayEnergyEquality E Z 1 1 := lerayEnergyEquality_of_pointwise P
-  have h := blowup_rate_alpha_full L X R hE0_nn hNoType1
-    hα_gt_one hα_le_two ht_nn htT hMt
+  have h := blowup_rate_alpha_of_leray L X R hE0_nn
+    hα_le_two ht_nn htT hMt
   -- h : (1 - t) * M t ^ α ≤ E 0 / (1 * 4)
   have h_simp : E 0 / ((1 : ℝ) * 4) = E 0 / 4 := by ring
   rw [h_simp] at h
