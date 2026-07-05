@@ -6,12 +6,15 @@ import NSBlwChain.Setup.VectorFields
 import NSBlwChain.Setup.NSHypothesis
 
 /-!
-# Spatial argmax existence on `Vec3` from decay-at-infinity
+# Spatial argmax existence from decay-at-infinity (domain-polymorphic)
 
 Genuine analytical content: prove that a continuous function
-`f : Vec3 → ℝ` that tends to `0` at the cocompact filter and is
-strictly positive at some point achieves its maximum at some
-`xStar : Vec3`.
+`f : X → ℝ` on **any** topological space `X` that tends to `0` at the
+cocompact filter and is strictly positive at some point achieves its
+maximum at some `xStar : X`. Stated at this generality (only
+`[TopologicalSpace X]`) so it is reusable across active-scalar domains
+(NS's `Vec3 = Fin 3 → ℝ`, an SQG/Euler torus `𝕋ᵈ`, `ℝᵈ`, …); the
+`Vec3` specialization for `|ω|²` is `exists_vorticity_argmax_of_decay`.
 
 This is the **compactness-via-decay** lemma that the
 `PerTimeInstantData.xStar` constructor needs at every `τ ∈ (0, T)`
@@ -43,10 +46,17 @@ open scoped BigOperators
 
 /-- **Spatial argmax from decay at infinity (continuous case).**
 
-    Given a continuous `f : Vec3 → ℝ` that tends to `0` at the
-    `cocompact` filter and is strictly positive at some `y₀`, there
-    exists `xStar : Vec3` at which `f` achieves its maximum over the
-    whole space.
+    Given a continuous `f : X → ℝ` on **any** topological space `X` that
+    tends to `0` at the `cocompact` filter and is strictly positive at
+    some `y₀`, there exists `xStar : X` at which `f` achieves its maximum
+    over the whole space.
+
+    Domain-polymorphic: only `[TopologicalSpace X]` is required (the proof
+    uses just `cocompact`, `isCompact_singleton`, and
+    `IsCompact.exists_isMaxOn`). The `Vec3` case that the BLW chain needs
+    (see `exists_vorticity_argmax_of_decay`) is one instance; the same
+    lemma is reusable for any active-scalar domain (a torus `𝕋ᵈ`, `ℝᵈ`, …),
+    which is why it is stated at this generality rather than on `Vec3`.
 
     The strict-positivity hypothesis ensures the global max is
     strictly positive (and hence not attained "at infinity" where
@@ -54,16 +64,17 @@ open scoped BigOperators
     y₀` and use `f y ≤ 0` from decay, but this requires one-sided
     bounds at infinity which are not assumed). -/
 theorem exists_argmax_of_continuous_tendsto_zero
-    {f : Vec3 → ℝ}
+    {X : Type*} [TopologicalSpace X]
+    {f : X → ℝ}
     (hf_cont : Continuous f)
-    (hf_decay : Tendsto f (cocompact Vec3) (𝓝 0))
-    {y₀ : Vec3} (hy₀_pos : 0 < f y₀) :
-    ∃ xStar : Vec3, ∀ y : Vec3, f y ≤ f xStar := by
+    (hf_decay : Tendsto f (cocompact X) (𝓝 0))
+    {y₀ : X} (hy₀_pos : 0 < f y₀) :
+    ∃ xStar : X, ∀ y : X, f y ≤ f xStar := by
   -- Step 1: from the decay, find a compact set `K` such that
   -- `f y < f y₀ / 2` outside `K`.
   have h_eps : 0 < f y₀ / 2 := half_pos hy₀_pos
   have h_decay_form :
-      ∀ᶠ y in cocompact Vec3, |f y - 0| < f y₀ / 2 := by
+      ∀ᶠ y in cocompact X, |f y - 0| < f y₀ / 2 := by
     have := (Metric.tendsto_nhds.mp hf_decay) (f y₀ / 2) h_eps
     simpa using this
   rw [Filter.eventually_iff] at h_decay_form
@@ -88,7 +99,7 @@ theorem exists_argmax_of_continuous_tendsto_zero
   · exact hxStar_max hy_in
   · -- `y ∉ K ∪ {y₀}` means `y ∉ K` (in particular).
     have hy_notin_K : y ∉ K := fun h => hy_in (Or.inl h)
-    have hy_in_compl : y ∈ (Kᶜ : Set Vec3) := hy_notin_K
+    have hy_in_compl : y ∈ (Kᶜ : Set X) := hy_notin_K
     have h_y_decay : |f y - 0| < f y₀ / 2 := hK_sub hy_in_compl
     -- So `f y < f y₀ / 2 < f y₀ ≤ f xStar` (since `y₀ ∈ K ∪ {y₀}`).
     have h_fy_lt : f y < f y₀ / 2 := by
