@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## Unreleased — 2026-07-04 (shared `fourier_analysis` infrastructure)
+
+`ns-lean-proofs` now `[[require]]`s the shared `fourier_analysis` package
+(git `rev=main`; the same package `sqg-lean-proofs` uses) and consumes two
+axiom-free primitives from it, replacing per-repo duplicates:
+
+- **Lattice Epstein-zeta bound.** `Torus/EpsteinZeta.lean`'s `LatticeSumBounded`
+  went from `:= True` (a vacuous placeholder flagged by the vacuity lint) to the
+  real per-finset inequality, discharged as the `d = 3, p = s` instance of the
+  arbitrary-dimension `FourierAnalysis.latticeSum_le_latticeZetaConstD`. Vacuity
+  lint 7 → 5; `CHIP_GATES.md` `--max-findings` ratcheted 7 → 5. The interim
+  ~300-LOC bespoke ℤ³ shell proof (`Torus/EpsteinZetaZ3.lean`) was replaced by a
+  thin instantiation.
+- **Spatial argmax primitive.** `BLW/SpatialArgmax.lean`'s
+  `exists_argmax_of_continuous_tendsto_zero` was generalized off `Vec3` to any
+  `[TopologicalSpace X]`, relocated into the shared package, and re-exported; the
+  `Vec3` `|ω|²` specialization `exists_vorticity_argmax_of_decay` is retained.
+
+All axiom-clean (`propext` / `Classical.choice` / `Quot.sound` only); full
+merge-gate build green. Commits `2ca56f0`, `639524b`, `d26e9df`, `86cf5f5`.
+
 ## Unreleased — 2026-04-26
 
 **Theorem 1 and Theorem 2 end-to-end discharges from named analytic hypotheses.**
