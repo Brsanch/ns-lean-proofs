@@ -21,7 +21,7 @@ Run, from the NoetherSolve repo:
 
 ```
 python3 "/Volumes/4TB SD/ClaudeCode/noethersolve/scripts/lean_vacuity_lint.py" \
-  "/Volumes/4TB SD/ClaudeCode/ns-lean-proofs" --no-color --max-findings 7
+  "/Volumes/4TB SD/ClaudeCode/ns-lean-proofs" --no-color --max-findings 5
 ```
 
 Rules: `True`-typed fields/binders; `Prop := True` defs; `True.intro` proof
@@ -29,13 +29,17 @@ terms; structures that cannot constrain their subject; structures none of
 whose fields mention their parameters; theorems with underscore-unused named
 hypotheses.
 
-**Baseline = 7 findings (audited 2026-06-12; lowered 10 → 7 the same day).**
+**Baseline = 5 findings (audited 2026-06-12 at 7; lowered 7 → 5 on
+2026-07-04 by discharging the `EpsteinZeta` `True` placeholders).**
 They are documented (the docstrings disclose each placeholder) but they mark
 exactly where stated obligations are not yet obligations:
 
-- `Torus/EpsteinZeta.lean:102,117` — `latticeSumBounded : True` and
-  `LatticeSumBounded := True`: the lattice-sum bound is NOT encoded; the
-  `s = 4, C_s = 17` witness is an open discharge.
+- ~~`Torus/EpsteinZeta.lean:102,117`~~ — **DISCHARGED 2026-07-04.**
+  `LatticeSumBounded` is now the real per-finset inequality
+  `∀ finite A ⊆ ℤ³\{0}, ∑ ‖a‖^{-s} ≤ C`, proved unconditionally (zero axioms)
+  for every `s > 3` in `Torus/EpsteinZetaZ3.lean`
+  (`latticeSum_le_latticeZetaConstZ3`, the ℤ³ mirror of the SQG project's
+  §11.26.A–H); the `s = 4` witness is wired into `exampleBundleAt4`.
 - `BLW/FromNSEvolution.lean:125,137` — `NSArgmaxInputs` cannot constrain
   `_xStar`, and its `ν_eq : True` "consistency" field asserts nothing.
 - `BLW/ArgmaxIdentities.lean:87` — step (i) is a `True` placeholder, consumed

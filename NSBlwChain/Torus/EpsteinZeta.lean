@@ -2,6 +2,7 @@
 -- Released under MIT License (see LICENSE in repo root).
 
 import Mathlib
+import NSBlwChain.Torus.EpsteinZetaZ3
 
 /-!
 # Torus correction: 3D Epstein-zeta lattice sum (paper §12.4 step 4, §D.4)
@@ -32,22 +33,19 @@ log-absorption chain as
 
   `|σ(x*)| ≤ M · (1 + C_2 + log(L/δ_ν))`.
 
-This file is a **skeleton**: the lattice-sum numeric value and the
-pointwise bound `|R_L| ≤ C_2 · M` are carried as *hypotheses* (scalar
-bundles), mirroring the SQG project's `HasLatticeZetaBound` pattern.
-Only the algebraic composition (near + far + torus) is proven unconditionally.
+The lattice-sum bound `LatticeSumBounded` is now the **real** statement and
+is discharged unconditionally in `NSBlwChain/Torus/EpsteinZetaZ3.lean`
+(`latticeSum_le_latticeZetaConstZ3`, zero axioms). The remaining hypothesis
+in this file is the pointwise torus correction `|R_L| ≤ C_2 · M`
+(`TorusCorrectionBundle`); the algebraic composition (near + far + torus)
+is proven unconditionally.
 
-Open discharges (see end of file):
+Remaining open discharge (see end of file):
 
-* Construct a concrete witness of `LatticeSumBounded` at `s = 4` with
-  `C_s = 17` (safe over-estimate of `16.533`). Requires p-series
-  `Summable (fun k : ℕ ↦ (k : ℝ)^(-4))` plus the 3D shell partition.
 * Construct a concrete witness of `TorusCorrectionBundle` (i.e. derive
   the bound `|R_L| ≤ C_2 · M` from the Ewald decomposition + energy-
   enstrophy bound + an `EpsteinZetaBundle` at `s = 3`). Requires
   mathlib-level Green's-function machinery not yet present.
-
-These are not in scope for this skeleton file.
 
 ## References
 
@@ -62,26 +60,39 @@ namespace NSBlwChain.Torus
 
 /-! ### Epstein-zeta scalar bundle -/
 
+/-- **3D lattice Epstein-zeta bound** (real proposition).
+
+`LatticeSumBounded s C` says: for every finite `A ⊆ ℤ³ \ {0}`,
+
+  `∑_{a ∈ A} ‖a‖^{-s} ≤ C`,
+
+where `‖·‖ = latticeNormZ3` is the Euclidean norm on `ℤ³ = (Fin 3 → ℤ)`.
+
+This **replaces** the former `:= True` placeholder. It is the genuine
+lattice-sum statement, discharged unconditionally (for the paper's `s = 4`)
+by `EpsteinZetaZ3.latticeSum_le_latticeZetaConstZ3` — no axioms, no `sorry`. -/
+def LatticeSumBounded (s : ℕ) (C : ℝ) : Prop :=
+  ∀ A : Finset (Fin 3 → ℤ), (0 : Fin 3 → ℤ) ∉ A →
+    ∑ a ∈ A, (latticeNormZ3 a) ^ (-(s : ℝ)) ≤ C
+
 /-- **Epstein-zeta lattice bundle.**
 
 Packages a 3D lattice Epstein-zeta bound at integer exponent `s`:
 
-  `∑_{n ∈ ℤ^3 \ {0}} |n|^{-s} ≤ C_s`.
+  `∑_{a ∈ A} ‖a‖^{-s} ≤ C_s` for every finite `A ⊆ ℤ³ \ {0}`.
 
 For our use (§D.4.7 + Taylor-remainder upgrade) the relevant exponent is
-`s = 4`, with numerical value `≈ 16.533` tabulated. For the `s = 3`
-version (conditionally convergent, Cesàro-summable) we still package it
-as a scalar upper bound because the consumer only needs the bound.
+`s = 4`. The `latticeSumBounded` field now carries the **real** statement
+(`LatticeSumBounded`), discharged in `exampleBundleAt4` via the concrete
+`EpsteinZetaZ3` proof.
 
 Fields:
 
 * `s` — integer exponent `≥ 2` (typically `3` or `4`).
 * `C_s` — a scalar upper bound for the lattice sum.
+* `s_ge_two` — `2 ≤ s`.
 * `nonneg` — `0 ≤ C_s`.
-* `latticeSumBounded` — the bound statement, **taken as hypothesis**.
-  Since this is a skeleton, we model the lattice-sum statement as an
-  abstract proposition parameterised by `(s, C_s)` (see
-  `LatticeSumBounded` below).
+* `latticeSumBounded` — the real per-finset bound `LatticeSumBounded s C_s`.
 
 Note: `EpsteinZetaBundle` is a **data-carrying** structure, not
 `Prop`-valued: the scalar `s` and `C_s` are data.
@@ -96,43 +107,30 @@ structure EpsteinZetaBundle where
   s_ge_two : 2 ≤ s
   /-- The bound constant is nonnegative. -/
   nonneg : 0 ≤ C_s
-  /-- **Hypothesis:** the lattice sum `∑_{n ≠ 0} |n|^{-s}` is bounded
-      above by `C_s`. Modeled as an abstract proposition; a concrete
-      witness at `s = 4, C_s = 17` is left as an open discharge. -/
-  latticeSumBounded : True -- placeholder predicate; see note below
-
-/--
-Rationale for the `True` placeholder:
-
-A literal Lean statement of `∑_{n ∈ ℤ^3 \ {0}} |n|^{-s} ≤ C_s` requires
-committing to a specific encoding of `ℤ^3`, a specific norm
-(`Euclidean` vs `ℓ^∞`), and a specific summability infrastructure
-(`tsum` over a filtered type). The SQG project uses
-`Finset (Fin 2 → ℤ)` with a `latticeNorm` helper and a **per-finset**
-bound (not a global `tsum`); that choice balloons the file to 500+ LOC.
-
-For this skeleton we abstract the statement away entirely. A concrete
-downstream file can refine `latticeSumBounded` to the desired form.
--/
-def LatticeSumBounded (_s : ℕ) (_C_s : ℝ) : Prop := True
+  /-- The lattice sum `∑_{a ∈ A} ‖a‖^{-s} ≤ C_s` over every finite
+      `A ⊆ ℤ³ \ {0}`. Now the **real** statement (`LatticeSumBounded`),
+      not a `True` placeholder; discharged at `s = 4` in `exampleBundleAt4`. -/
+  latticeSumBounded : LatticeSumBounded s C_s
 
 /-! ### Sanity-check scalar bundle at `s = 4` -/
 
 /-- Tabulated numerical value (Glasser-Zucker 1980): `ζ_{ℤ^3}(4) ≈ 16.533`. -/
 noncomputable def epsteinZetaZ3At4 : ℝ := 16.533
 
-/-- Safe rounded-up upper bound used as the scalar in examples. -/
+/-- Safe rounded-up over-estimate of the tabulated value, kept for reference. -/
 def epsteinZetaZ3At4_upper : ℝ := 17
 
-/-- **Example bundle** at `s = 4` with a safe upper bound of `17`.
-Demonstrates that the bundle packages non-trivially even though the
-lattice-sum proof itself is deferred. -/
-def exampleBundleAt4 : EpsteinZetaBundle where
+/-- **Example bundle** at `s = 4`, carrying the genuinely-proved unconditional
+constant `latticeZetaConstZ3 4` (`= 54·ζ(2) = 9π² ≈ 88.8`, the crude
+shell-counting over-estimate; the exact sum is `≈ 16.533`). The
+`latticeSumBounded` field is discharged by the concrete 3D lattice-zeta
+theorem, so this bundle is **no longer a placeholder**. -/
+noncomputable def exampleBundleAt4 : EpsteinZetaBundle where
   s := 4
-  C_s := 17
+  C_s := latticeZetaConstZ3 ((4 : ℕ) : ℝ)
   s_ge_two := by decide
-  nonneg := by norm_num
-  latticeSumBounded := trivial
+  nonneg := latticeZetaConstZ3_nonneg _
+  latticeSumBounded := fun A hA => latticeSum_le_latticeZetaConstZ3_four A hA
 
 /-! ### Torus correction scalar bundle -/
 
@@ -250,10 +248,9 @@ lemma c2_of_nonneg (z : EpsteinZetaBundle) : 0 ≤ c2_of z := by
 
 /-! ### Sanity-check examples -/
 
-/-- At `s = 4` the paper tabulates `ζ_{ℤ^3}(4) ≈ 16.533`; our upper
-bound `17` is a safe over-estimate, and `exampleBundleAt4` packages it.
-The resulting `c2_of` is `51 / (4π) ≈ 4.06`. -/
-example : c2_of exampleBundleAt4 = 3 * 17 / (4 * Real.pi) := by
+/-- At `s = 4`, `exampleBundleAt4` carries the proved unconditional constant
+`latticeZetaConstZ3 4`, and `c2_of` reads it off definitionally. -/
+example : c2_of exampleBundleAt4 = 3 * latticeZetaConstZ3 ((4 : ℕ) : ℝ) / (4 * Real.pi) := by
   unfold c2_of
   rfl
 
@@ -282,21 +279,22 @@ example :
 /-! ### Open discharges
 
 Listed here rather than in a separate `OPEN.md` entry for local
-traceability. The *scalar* hypotheses below are the only `True`-flavoured
-gaps in this file; their *mathematical* content lives in §D.4 of the
-paper.
+traceability. `LatticeSumBounded` is now discharged (see below); the
+remaining hypothesis is `TorusCorrectionBundle.RL_bound`, whose
+*mathematical* content lives in §D.4 of the paper.
 
-1. **`LatticeSumBounded s C_s` (abstract).** Modeled as `True`.
-   A concrete form should assert `∑_{n ∈ ℤ^3 \ {0}} ‖n‖^{-s} ≤ C_s`.
-   At `s = 4` with `C_s = 17`, a proof route is:
-   (a) partition `ℤ^3 \ {0}` into dyadic shells `{2^k ≤ ‖n‖_∞ < 2^{k+1}}`;
-   (b) shell `k` has at most `(2·2^{k+1} + 1)^3 - (2·2^k + 1)^3 ≤ 56·8^k`
-       points and minimum `‖·‖_∞ ≥ 2^k`, so contributes at most
-       `56·8^k · 2^{-4k} = 56·2^{-k}`;
-   (c) sum: `∑_{k ≥ 0} 56·2^{-k} = 112 < 17 · 8 = 136` (very loose;
-       tighter analysis gives ≤ 17). This requires p-series + shell
-       counting lemmas not yet in mathlib *directly* but derivable.
-   Mirrors SQG project §11.26.G/H pattern (closed there, ≈ 200 LOC).
+1. **`LatticeSumBounded s C_s` — DISCHARGED.** Now the real statement
+   `∀ finite A ⊆ ℤ³ \ {0}, ∑_{a ∈ A} ‖a‖^{-s} ≤ C`, proved unconditionally
+   for every `s > 3` in `NSBlwChain/Torus/EpsteinZetaZ3.lean`
+   (`latticeSum_le_latticeZetaConstZ3`; witness at `s = 4` via
+   `latticeSum_le_latticeZetaConstZ3_four`, wired into `exampleBundleAt4`).
+   Route (the ℤ³ mirror of the SQG project's §11.26.A–H): partition
+   `ℤ³ \ {0}` into `ℓ∞`-annular shells (`|shell k| ≤ 6(2k+1)² ≤ 54k²`,
+   Euclidean norm `≥ k`), bound each shell sum by `54 k^{-(s-2)}`, and sum
+   via `Real.summable_one_div_nat_rpow` (`s > 3 ⟹ s - 2 > 1`). The proved
+   constant `latticeZetaConstZ3 s = 54·ζ(s-2)` is loose (`9π² ≈ 88.8` at
+   `s = 4` vs the exact `ζ_{ℤ³}(4) ≈ 16.533`); the consumer needs only
+   finiteness.
 
 2. **`TorusCorrectionBundle.RL_bound` discharge.** A concrete construction
    of `TorusCorrectionBundle` from a given NS configuration requires:
