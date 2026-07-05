@@ -2,128 +2,51 @@
 -- Released under MIT License (see LICENSE in repo root).
 
 import Mathlib
+import FourierAnalysis.ArgmaxFromDecay
 import NSBlwChain.Setup.VectorFields
 import NSBlwChain.Setup.NSHypothesis
 
 /-!
-# Spatial argmax existence from decay-at-infinity (domain-polymorphic)
+# Spatial argmax existence from decay-at-infinity (consumes shared package)
 
-Genuine analytical content: prove that a continuous function
-`f : X → ℝ` on **any** topological space `X` that tends to `0` at the
-cocompact filter and is strictly positive at some point achieves its
-maximum at some `xStar : X`. Stated at this generality (only
-`[TopologicalSpace X]`) so it is reusable across active-scalar domains
-(NS's `Vec3 = Fin 3 → ℝ`, an SQG/Euler torus `𝕋ᵈ`, `ℝᵈ`, …); the
-`Vec3` specialization for `|ω|²` is `exists_vorticity_argmax_of_decay`.
+The domain-polymorphic compactness-via-decay lemma now lives once in the shared
+`fourier_analysis` package (`FourierAnalysis.exists_argmax_of_continuous_tendsto_zero`,
+proved for any `[TopologicalSpace X]`), which both `ns-lean-proofs` and
+`sqg-lean-proofs` `require`. This file **consumes** it:
 
-This is the **compactness-via-decay** lemma that the
-`PerTimeInstantData.xStar` constructor needs at every `τ ∈ (0, T)`
-to produce a spatial argmax of `|ω(τ, ·)|²`.  Together with
-joint continuity of `(τ, y) ↦ |ω(τ, y)|²` (from `vorticity_contDiff`)
-and polynomial decay (from `DecayAtInfinity` in `ClassicalAxioms`),
-this lemma converts the per-τ analytical content into the
-`xStar τ` field of `PerTimeInstantData`.
+* re-exports it into the `NSBlwChain.BLW` namespace (so the existing call sites —
+  `PerTimeInstantConstructor`, `DecayToCocompact`, `SpatialArgmaxFromDecay`,
+  `PeriodicArgmaxExistence` — are unchanged), and
+* provides the `Vec3 = Fin 3 → ℝ` specialization for `|ω|²` that the BLW chain
+  needs at every `τ ∈ (0, T)`.
 
-## Strategy
-
-* From `Tendsto f (cocompact Vec3) (𝓝 0)`: outside some compact
-  set `K`, `f < f y₀ / 2`.
-* `K ∪ {y₀}` is compact.
-* `IsCompact.exists_isMaxOn` gives a max `xStar` on `K ∪ {y₀}`.
-* `f xStar ≥ f y₀ > f y₀ / 2 > f y` for `y ∉ K`, so `xStar` is also
-  the global max.
-
-## Main result
-
-* `exists_argmax_of_continuous_tendsto_zero` — the decay-to-argmax
-  lemma.
+The relocation is the shared-infra half of the SQG↔NS link: the argmax primitive
+is proved once and imported by both programs rather than duplicated per repo.
 -/
 
 namespace NSBlwChain.BLW
 
 open Filter Topology NSBlwChain
-open scoped BigOperators
 
-/-- **Spatial argmax from decay at infinity (continuous case).**
-
-    Given a continuous `f : X → ℝ` on **any** topological space `X` that
-    tends to `0` at the `cocompact` filter and is strictly positive at
-    some `y₀`, there exists `xStar : X` at which `f` achieves its maximum
-    over the whole space.
-
-    Domain-polymorphic: only `[TopologicalSpace X]` is required (the proof
-    uses just `cocompact`, `isCompact_singleton`, and
-    `IsCompact.exists_isMaxOn`). The `Vec3` case that the BLW chain needs
-    (see `exists_vorticity_argmax_of_decay`) is one instance; the same
-    lemma is reusable for any active-scalar domain (a torus `𝕋ᵈ`, `ℝᵈ`, …),
-    which is why it is stated at this generality rather than on `Vec3`.
-
-    The strict-positivity hypothesis ensures the global max is
-    strictly positive (and hence not attained "at infinity" where
-    `f → 0`); without it, the conclusion is trivial (take `xStar :=
-    y₀` and use `f y ≤ 0` from decay, but this requires one-sided
-    bounds at infinity which are not assumed). -/
-theorem exists_argmax_of_continuous_tendsto_zero
-    {X : Type*} [TopologicalSpace X]
-    {f : X → ℝ}
-    (hf_cont : Continuous f)
-    (hf_decay : Tendsto f (cocompact X) (𝓝 0))
-    {y₀ : X} (hy₀_pos : 0 < f y₀) :
-    ∃ xStar : X, ∀ y : X, f y ≤ f xStar := by
-  -- Step 1: from the decay, find a compact set `K` such that
-  -- `f y < f y₀ / 2` outside `K`.
-  have h_eps : 0 < f y₀ / 2 := half_pos hy₀_pos
-  have h_decay_form :
-      ∀ᶠ y in cocompact X, |f y - 0| < f y₀ / 2 := by
-    have := (Metric.tendsto_nhds.mp hf_decay) (f y₀ / 2) h_eps
-    simpa using this
-  rw [Filter.eventually_iff] at h_decay_form
-  -- `h_decay_form : {y | |f y - 0| < f y₀/2} ∈ cocompact Vec3`.
-  -- A set is in `cocompact` iff its complement is compact.
-  rw [Filter.mem_cocompact] at h_decay_form
-  obtain ⟨K, hK_cpt, hK_sub⟩ := h_decay_form
-  -- `hK_sub : Kᶜ ⊆ {y | |f y - 0| < f y₀ / 2}`.
-  -- Step 2: `K ∪ {y₀}` is compact.
-  have hKy₀_cpt : IsCompact (K ∪ {y₀}) := hK_cpt.union isCompact_singleton
-  -- Step 3: `K ∪ {y₀}` is non-empty (contains `y₀`).
-  have hKy₀_ne : (K ∪ {y₀}).Nonempty := ⟨y₀, Or.inr rfl⟩
-  -- Step 4: max on `K ∪ {y₀}` exists by compactness + continuity.
-  obtain ⟨xStar, hxStar_in, hxStar_max⟩ :=
-    hKy₀_cpt.exists_isMaxOn hKy₀_ne hf_cont.continuousOn
-  -- `hxStar_max : ∀ y ∈ K ∪ {y₀}, f y ≤ f xStar`.
-  refine ⟨xStar, ?_⟩
-  intro y
-  -- Two cases: `y ∈ K ∪ {y₀}` (then `hxStar_max` directly) or
-  --            `y ∉ K ∪ {y₀}` (then `y ∉ K`, so `f y < f y₀ / 2`).
-  by_cases hy_in : y ∈ K ∪ {y₀}
-  · exact hxStar_max hy_in
-  · -- `y ∉ K ∪ {y₀}` means `y ∉ K` (in particular).
-    have hy_notin_K : y ∉ K := fun h => hy_in (Or.inl h)
-    have hy_in_compl : y ∈ (Kᶜ : Set X) := hy_notin_K
-    have h_y_decay : |f y - 0| < f y₀ / 2 := hK_sub hy_in_compl
-    -- So `f y < f y₀ / 2 < f y₀ ≤ f xStar` (since `y₀ ∈ K ∪ {y₀}`).
-    have h_fy_lt : f y < f y₀ / 2 := by
-      have := abs_lt.mp h_y_decay
-      linarith
-    have h_fy₀_le : f y₀ ≤ f xStar :=
-      hxStar_max (Or.inr rfl)
-    linarith
+/-- **Spatial argmax from decay at infinity** — re-export of the shared
+`FourierAnalysis.exists_argmax_of_continuous_tendsto_zero` (proved once in the
+`fourier_analysis` package for any `[TopologicalSpace X]`). Kept under the
+`NSBlwChain.BLW` name so downstream call sites are unaffected. -/
+alias exists_argmax_of_continuous_tendsto_zero :=
+  FourierAnalysis.exists_argmax_of_continuous_tendsto_zero
 
 /-- **Spatial argmax for `|ω|²` over `Vec3` from polynomial decay.**
 
-    Specialization to the squared-vorticity field that the BLW chain
-    needs.  Assumes:
+    Specialization to the squared-vorticity field that the BLW chain needs.
+    Assumes:
     * `(t, y) ↦ |ω(t, y)|²` is continuous in `y` at fixed `t`,
     * the field decays at infinity (encoded as `Tendsto ... (𝓝 0)`),
     * `|ω(t, ·)|²` is strictly positive at some witness point.
 
-    Conclusion: there exists `xStar` at which `|ω(t, xStar)|²` is the
-    maximum.
-
-    This is the operational form of the classical "smooth NS solution
-    on `\mathbb R³` with vorticity decay achieves its `L^∞` max" — a
-    standard PDE fact, formalized here from compactness-via-decay
-    primitives. -/
+    Conclusion: there exists `xStar` at which `|ω(t, xStar)|²` is the maximum.
+    This is the operational form of the classical "smooth NS solution on `ℝ³`
+    with vorticity decay achieves its `L^∞` max", obtained by instantiating the
+    shared compactness-via-decay primitive at `X := Vec3`. -/
 theorem exists_vorticity_argmax_of_decay
     {u : VelocityField} {t : ℝ}
     (h_cont : Continuous (fun y =>
@@ -137,6 +60,6 @@ theorem exists_vorticity_argmax_of_decay
       ∀ y : Vec3,
         Vec3.dot (vorticity u t y) (vorticity u t y)
           ≤ Vec3.dot (vorticity u t xStar) (vorticity u t xStar) :=
-  exists_argmax_of_continuous_tendsto_zero h_cont h_decay hy₀_pos
+  FourierAnalysis.exists_argmax_of_continuous_tendsto_zero h_cont h_decay hy₀_pos
 
 end NSBlwChain.BLW

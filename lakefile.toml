@@ -14,5 +14,13 @@ name = "mathlib"
 scope = "leanprover-community"
 rev = "v4.29.0"
 
+# Shared active-scalar infrastructure package (also required by sqg-lean-proofs).
+# Supplies the domain-polymorphic `FourierAnalysis.exists_argmax_of_continuous_tendsto_zero`
+# consumed in `NSBlwChain/BLW/SpatialArgmax.lean`.
+[[require]]
+name = "fourier_analysis"
+git = "https://github.com/Brsanch/sqg-lean-proofs-fourier.git"
+rev = "main"
+
 [[lean_lib]]
 name = "NSBlwChain"
