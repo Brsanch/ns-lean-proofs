@@ -172,35 +172,22 @@ example : HasLatticeZetaBoundAt (fun _ _ => True) 4 :=
 
 /-- **Compatibility example with `EpsteinZeta.LatticeSumBounded`.**
 
-`EpsteinZeta.LatticeSumBounded s C_s` is currently `True`; plugging it
-into `HasLatticeZetaBoundAt` as the witness predicate gives a trivially-
-discharged bundle. Once that definition is sharpened to a real lattice
-inequality, this example will continue to typecheck and simply require
-a non-trivial `hP`. -/
+`EpsteinZeta.LatticeSumBounded s C` is now the real lattice inequality
+`∀ finite A ⊆ ℤ³ \ {0}, ∑ ‖a‖^{-s} ≤ C`. This example discharges it
+non-trivially at `s = 4` using the genuinely-proved constant
+`latticeZetaConstZ3 4` (`EpsteinZetaZ3`), replacing the former `trivial`. -/
 example :
     HasLatticeZetaBoundAt (fun s C => LatticeSumBounded s C) 4 :=
-  epsteinZetaBundleAt4_bound
-    (fun s C => LatticeSumBounded s C)
-    (by unfold LatticeSumBounded; trivial)
+  ⟨latticeZetaConstZ3 ((4 : ℕ) : ℝ), latticeZetaConstZ3_nonneg _,
+    fun A hA => latticeSum_le_latticeZetaConstZ3_four A hA⟩
 
 /-! ### 5. Wiring note for `EpsteinZetaBundle`
 
-`EpsteinZetaBundle` in `EpsteinZeta.lean` carries `latticeSumBounded :
-True`. To replace the `True` with `HasLatticeZetaBoundAt P s`, the
-structure declaration would need to be generalised:
-
-```lean
-structure EpsteinZetaBundle (P : ℕ → ℝ → Prop) where
-  s : ℕ
-  C_s : ℝ
-  s_ge_two : 2 ≤ s
-  nonneg : 0 ≤ C_s
-  latticeSumBounded : P s C_s
-```
-
-and `exampleBundleAt4` updated to carry the explicit `P`. Because that
-touches a file not in scope here, we leave this as a structural note.
-A cleaner witness (non-`True`) is available via the
-`epsteinZetaBundleAt4_bound` theorem above. -/
+`EpsteinZetaBundle` in `EpsteinZeta.lean` now carries the **real**
+`latticeSumBounded : LatticeSumBounded s C_s` field (no longer `True`),
+discharged at `s = 4` in `exampleBundleAt4` via the concrete 3D
+lattice-zeta theorem in `EpsteinZetaZ3.lean`. This file's abstract
+`HasLatticeZetaBoundAt P s` predicate is retained as the general
+`∃ C, 0 ≤ C ∧ P s C` shell for other witness predicates `P`. -/
 
 end NSBlwChain.Torus

@@ -45,6 +45,7 @@ import NSBlwChain.BLW.ChainHypotheses
 import NSBlwChain.BLW.AnalyticalToImplicit
 import NSBlwChain.Unconditional.Theorem1
 import NSBlwChain.Unconditional.Theorem2
+import NSBlwChain.Torus.EpsteinZetaZ3
 import NSBlwChain.Torus.EpsteinZeta
 import NSBlwChain.Torus.EpsteinZetaBounds
 import NSBlwChain.BLW.TorusToC4
