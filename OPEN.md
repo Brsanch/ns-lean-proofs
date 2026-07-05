@@ -265,10 +265,27 @@ These stay as `axiom` declarations per project scope:
 ## By design (hypothesis-taking structural fields)
 
 - `TorusCorrectionBundle.RL_bound` — periodic-kernel correction bound
-  (Ewald splitting).
-- `EpsteinZetaBundle.bound` — numeric bound on `∑_{n ≠ 0} |n|^{-s}`
-  (p-series framework already in place; specific numeric value
-  taken as hypothesis).
+  (Ewald splitting). Still open.
+
+The `EpsteinZetaBundle` lattice-sum bound (`Torus/EpsteinZeta.LatticeSumBounded`)
+is **no longer a hypothesis** — it was `:= True`, and is now the real per-finset
+inequality, discharged unconditionally (see "Shared infrastructure" below).
+
+## Shared infrastructure (`fourier_analysis`) — added 2026-07-04
+
+`ns-lean-proofs` now `[[require]]`s the shared `fourier_analysis` package
+([`sqg-lean-proofs-fourier`](https://github.com/Brsanch/sqg-lean-proofs-fourier),
+git `rev=main`) — the same package `sqg-lean-proofs` uses — and consumes two
+axiom-free primitives proved once there:
+
+- `FourierAnalysis.exists_argmax_of_continuous_tendsto_zero` — domain-polymorphic
+  compactness-via-decay spatial argmax (any `[TopologicalSpace X]`); re-exported
+  in `BLW/SpatialArgmax.lean` and specialized to `Vec3` for `|ω|²`.
+- `FourierAnalysis.latticeSum_le_latticeZetaConstD` — arbitrary-dimension lattice
+  Epstein-zeta bound (`d ≥ 1, p > d`: `∑_{a∈ℤᵈ\{0}} ‖a‖⁻ᵖ ≤ 2d·3^{d-1}·ζ(p-(d-1))`).
+  `Torus/EpsteinZetaZ3.lean` instantiates it at `d = 3, p = s`, discharging the
+  former `LatticeSumBounded := True` placeholder (vacuity lint 7 → 5, ratcheted
+  in `CHIP_GATES.md`). SQG instantiates the same theorem at `d = 2, p = 2s`.
 
 ## Paper §3/§4 unconditional backbone (optional extension)
 
