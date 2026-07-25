@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file. Releases
 will be archived on Zenodo once a publishable milestone is reached.
 
+## Unreleased — 2026-07-25 (vacuity V7 `identity-hyp` port)
+
+NoetherSolve proof-QA Phase 2 added vacuity rule **V7 `identity-hyp`**
+(`(h : P) : P := h` / `:= by exact h`). Re-lint of this tree surfaces **four**
+packaging tautologies that prior rules missed:
+
+- `BLW/AdvectionVanishes.lean` — `advection_dot_omega_eq_half_u_dot_grad_sqNorm`,
+  `advection_zero_of_u_grad_sqNorm_zero`
+- `BLW/VorticityFrameFromEnvelope.lean` — `envelope_form_from_chainRule_hypothesis`,
+  `time_deriv_half_sqN_eq_M_growth`
+
+`CHIP_GATES.md` Gate V ratcheted **5 → 9** (honest: newly visible, not newly
+written). Prefer real calculus consumers (e.g.
+`advection_vanishes_at_argmax_from_NSEvolution`); discharge path = prove or
+delete the packaging lemmas / waive with `-- vacuity-ok`. Requires NoetherSolve
+`lean_vacuity_lint.py` with V7. Source: NoetherSolve
+`docs/findings/proof_qa_phase2_sibling_adversarial_2026_07_25.md`.
+
 ## Unreleased — 2026-07-04 (shared `fourier_analysis` infrastructure)
 
 `ns-lean-proofs` now `[[require]]`s the shared `fourier_analysis` package
