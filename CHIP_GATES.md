@@ -17,22 +17,27 @@ any, REJECT and report `✗ REJECTED` with the failing gate.
 
 ## Gate V — vacuity lint (mechanical)
 
-Run, from the NoetherSolve repo:
+Run, from the NoetherSolve repo (requires NoetherSolve with vacuity rule
+**V7 `identity-hyp`**, landed 2026-07-25 — proof-QA Phase 2):
 
 ```
 python3 "/Volumes/4TB SD/ClaudeCode/noethersolve/scripts/lean_vacuity_lint.py" \
-  "/Volumes/4TB SD/ClaudeCode/ns-lean-proofs" --no-color --max-findings 5
+  "/Volumes/4TB SD/ClaudeCode/ns-lean-proofs" --no-color --max-findings 9
 ```
 
 Rules: `True`-typed fields/binders; `Prop := True` defs; `True.intro` proof
 terms; structures that cannot constrain their subject; structures none of
 whose fields mention their parameters; theorems with underscore-unused named
-hypotheses.
+hypotheses; **`identity-hyp`** — theorem/lemma whose conclusion type equals
+one hypothesis binder and whose proof is just that hypothesis
+(`:= h` / `:= by exact h`): a renamed assumption, not a proof.
 
-**Baseline = 5 findings (audited 2026-06-12 at 7; lowered 7 → 5 on
-2026-07-04 by discharging the `EpsteinZeta` `True` placeholders).**
-They are documented (the docstrings disclose each placeholder) but they mark
-exactly where stated obligations are not yet obligations:
+**Baseline = 9 findings (was 5; raised 5 → 9 on 2026-07-25 when V7
+`identity-hyp` was ported — four packaging tautologies newly visible, not
+newly introduced).** Prior history: audited 2026-06-12 at 7; lowered 7 → 5 on
+2026-07-04 by discharging the `EpsteinZeta` `True` placeholders. They are
+documented (the docstrings disclose each placeholder) but they mark exactly
+where stated obligations are not yet obligations:
 
 - ~~`Torus/EpsteinZeta.lean:102,117`~~ — **DISCHARGED 2026-07-04.**
   `LatticeSumBounded` is now the real per-finset inequality
@@ -46,6 +51,17 @@ exactly where stated obligations are not yet obligations:
   only via step (ii).
 - `BLW/EnvelopeFormFromNSEvolution.lean:49` (`_ax`) and
   `Setup/LipschitzToAE.lean:36` (`_`) — unused-hypothesis, unreviewed.
+- **`BLW/AdvectionVanishes.lean:46,72`** — **V7 `identity-hyp` (2026-07-25).**
+  `advection_dot_omega_eq_half_u_dot_grad_sqNorm` and
+  `advection_zero_of_u_grad_sqNorm_zero` are `(h : P) : P := h`. Docstrings
+  sell a product-rule identity; the formalization is a renamed assumption.
+  Prefer consumers of `advection_vanishes_at_argmax_from_NSEvolution` (real
+  calculus). Discharge = delete/replace with a proved identity, or waive
+  with `-- vacuity-ok` if kept as deliberate API sugar.
+- **`BLW/VorticityFrameFromEnvelope.lean:53,69`** — **V7 `identity-hyp`
+  (2026-07-25).** `envelope_form_from_chainRule_hypothesis` and
+  `time_deriv_half_sqN_eq_M_growth` same pattern (`h_envelope` / `h_slice`
+  re-exported as the conclusion).
 
 **Resolved 2026-06-12 (the 10 → 7 reduction):** the original baseline's two
 flagged-for-review findings traced decoy: `blowup_rate_alpha`,
@@ -60,11 +76,12 @@ exclusion" banner in `Unconditional/Theorem1.lean`).
 
 **The count must never increase.** New code adds zero findings; deliberate
 exceptions get an inline `-- vacuity-ok: <reason>` waiver named in the chip
-report. Refining a `True` placeholder into the real statement is real work —
-lower `--max-findings` here in the same commit.
+report. Refining a `True` placeholder / identity-hyp into the real statement
+is real work — lower `--max-findings` here in the same commit.
 
-What the linter CANNOT catch: circularity (hypothesis ≈ conclusion),
-misformalization, encoding mismatches. "Lint-clean" ≠ "content is real".
+What the linter CANNOT catch: deeper circularity (hypothesis ≈ conclusion
+beyond the trivial `h : P ⊢ P` form — that form is V7), misformalization,
+encoding mismatches. "Lint-clean" ≠ "content is real".
 
 ## Gates 1–7 (anti-paraphrase, adapted)
 
