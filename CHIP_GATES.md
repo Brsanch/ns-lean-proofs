@@ -114,12 +114,13 @@ encoding mismatches. "Lint-clean" ≠ "content is real".
    infrastructure; if a lemma is within ~50 LOC of glue, use it.
 
 7. **Frontier gate (repo-specific).** A chip on the BLW chain must either
-   (a) refine one of the baseline `True` placeholders into its real statement
-   and discharge it, (b) discharge a named capstone-adjacent hypothesis on
-   arbitrary data, or (c) prove a substantive classical lemma the chain
-   actually consumes. Re-packagings of the gradient bound, and any chip whose
-   conclusion needs C6-equivalent control (uniform enstrophy near `T*`) as an
-   input, are REJECT — that is the documented Seregin circle, not closure.
+   (a) refine one of the baseline `True` placeholders / `identity-hyp`
+   packaging tautologies into its real statement and discharge it,
+   (b) discharge a named capstone-adjacent hypothesis on arbitrary data, or
+   (c) prove a substantive classical lemma the chain actually consumes.
+   Re-packagings of the gradient bound, and any chip whose conclusion needs
+   C6-equivalent control (uniform enstrophy near `T*`) as an input, are
+   REJECT — that is the documented Seregin circle, not closure.
 
 ## Discipline rules (panic-safe build; non-negotiable)
 
