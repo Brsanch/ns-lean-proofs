@@ -54,18 +54,16 @@ open NSBlwChain
 
 /-- **Argmax analytical hypotheses.**
 
-    Packages the three pointwise identities that feed Theorem 12.2,
+    Packages the pointwise identities that feed Theorem 12.2,
     each stated as a scalar identity over the local-frame quantities.
-    The fields correspond directly to the fields of
-    `GradBoundHypotheses`:
+    The fields correspond to `GradBoundHypotheses`:
 
-    * `step_i`   — from `∇|ω|² = 0` and `ω = M ê₃`.
-    * `step_ii`  — from trace of Hessian.
+    * `step_ii`  — from trace of Hessian / local-frame reduction.
     * `step_iii` — from vorticity equation at `x*`.
 
-    Discharging this bundle from `NSEvolutionAxioms` is the content
-    of the analytical-pass files `BLW/ArgmaxCalculus.lean` (step i/ii)
-    and `BLW/VorticityAtArgmax.lean` (step iii), to be written. -/
+    Step (i) (`M · ∂ᵢω_3(x*) = 0` at an aligned argmax) is consumed
+    only through its effect on `step_ii`; it is not carried as a
+    vacuous `True` field (removed 2026-07-25). -/
 structure ArgmaxAnalyticalBundle where
   /-- Viscosity, `ν > 0`. -/
   ν             : ℝ
@@ -81,12 +79,6 @@ structure ArgmaxAnalyticalBundle where
   growth        : ℝ
   nu_pos        : 0 < ν
   M_nonneg      : 0 ≤ M
-  /-- Step (i): `M · ∂ᵢω_3(x*) = 0`.  In this scalar packaging, we
-      record only the *downstream* consequence: off-diagonal squared-
-      derivative contributions drop out of step (ii). -/
-  step_i_M_zero_or_zero :
-    True  -- placeholder: records that step (i) is consumed only
-          -- via its effect on step (ii).
   /-- Step (ii): `|∇ω|²(x*) ≤ M · |Δω_3(x*)|`. -/
   step_ii  : gradSqNorm ≤ M * |laplaceOmega3|
   /-- Step (iii): `ν · Δω_3(x*) = dM/dt - M · σ(x*)`. -/

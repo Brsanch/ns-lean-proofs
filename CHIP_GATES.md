@@ -22,7 +22,7 @@ Run, from the NoetherSolve repo (requires NoetherSolve with vacuity rule
 
 ```
 python3 "/Volumes/4TB SD/ClaudeCode/noethersolve/scripts/lean_vacuity_lint.py" \
-  "/Volumes/4TB SD/ClaudeCode/ns-lean-proofs" --no-color --max-findings 9
+  "/Volumes/4TB SD/ClaudeCode/ns-lean-proofs" --no-color --max-findings 3
 ```
 
 Rules: `True`-typed fields/binders; `Prop := True` defs; `True.intro` proof
@@ -32,36 +32,26 @@ hypotheses; **`identity-hyp`** — theorem/lemma whose conclusion type equals
 one hypothesis binder and whose proof is just that hypothesis
 (`:= h` / `:= by exact h`): a renamed assumption, not a proof.
 
-**Baseline = 9 findings (was 5; raised 5 → 9 on 2026-07-25 when V7
-`identity-hyp` was ported — four packaging tautologies newly visible, not
-newly introduced).** Prior history: audited 2026-06-12 at 7; lowered 7 → 5 on
-2026-07-04 by discharging the `EpsteinZeta` `True` placeholders. They are
-documented (the docstrings disclose each placeholder) but they mark exactly
-where stated obligations are not yet obligations:
+**Baseline = 3 findings (was 9; lowered 9 → 3 on 2026-07-25).** Prior history:
+audited 2026-06-12 at 7; lowered 7 → 5 on 2026-07-04 (`EpsteinZeta`); raised
+5 → 9 on 2026-07-25 when V7 `identity-hyp` was ported; lowered 9 → 3 by
+deleting four unused identity-hyp packaging lemmas + two write-only `True`
+fields. Remaining residue:
 
-- ~~`Torus/EpsteinZeta.lean:102,117`~~ — **DISCHARGED 2026-07-04.**
-  `LatticeSumBounded` is now the real per-finset inequality
-  `∀ finite A ⊆ ℤ³\{0}, ∑ ‖a‖^{-s} ≤ C`, proved unconditionally (zero axioms)
-  for every `s > 3` in `Torus/EpsteinZetaZ3.lean`
-  (`latticeSum_le_latticeZetaConstZ3`, the ℤ³ mirror of the SQG project's
-  §11.26.A–H); the `s = 4` witness is wired into `exampleBundleAt4`.
-- `BLW/FromNSEvolution.lean:125,137` — `NSArgmaxInputs` cannot constrain
-  `_xStar`, and its `ν_eq : True` "consistency" field asserts nothing.
-- `BLW/ArgmaxIdentities.lean:87` — step (i) is a `True` placeholder, consumed
-  only via step (ii).
+- `BLW/FromNSEvolution.lean` — `NSArgmaxInputs` cannot constrain `_xStar`
+  (parameter is locational metadata for constructors; unused-subject).
 - `BLW/EnvelopeFormFromNSEvolution.lean:49` (`_ax`) and
   `Setup/LipschitzToAE.lean:36` (`_`) — unused-hypothesis, unreviewed.
-- **`BLW/AdvectionVanishes.lean:46,72`** — **V7 `identity-hyp` (2026-07-25).**
-  `advection_dot_omega_eq_half_u_dot_grad_sqNorm` and
-  `advection_zero_of_u_grad_sqNorm_zero` are `(h : P) : P := h`. Docstrings
-  sell a product-rule identity; the formalization is a renamed assumption.
-  Prefer consumers of `advection_vanishes_at_argmax_from_NSEvolution` (real
-  calculus). Discharge = delete/replace with a proved identity, or waive
-  with `-- vacuity-ok` if kept as deliberate API sugar.
-- **`BLW/VorticityFrameFromEnvelope.lean:53,69`** — **V7 `identity-hyp`
-  (2026-07-25).** `envelope_form_from_chainRule_hypothesis` and
-  `time_deriv_half_sqN_eq_M_growth` same pattern (`h_envelope` / `h_slice`
-  re-exported as the conclusion).
+
+**Discharged 2026-07-25 (this chip):**
+- ~~`BLW/AdvectionVanishes.lean` identity-hyps~~ — deleted; kept real
+  `advection_vanishes_at_argmax`.
+- ~~`BLW/VorticityFrameFromEnvelope.lean`~~ — deleted entire hollow module
+  (consumers: `EnvelopeIdentity` + `ChainRuleMSquared` +
+  `VorticityFrameFromNSEvolution`).
+- ~~`ArgmaxAnalyticalBundle.step_i_M_zero_or_zero : True`~~ — removed
+  (step (i) only affects `step_ii`; was never read).
+- ~~`NSArgmaxInputs.ν_eq : True`~~ — removed (`ν` is the shared binder).
 
 **Resolved 2026-06-12 (the 10 → 7 reduction):** the original baseline's two
 flagged-for-review findings traced decoy: `blowup_rate_alpha`,
