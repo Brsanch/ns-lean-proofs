@@ -1,9 +1,9 @@
 # Open items — ns-lean-proofs
 
 > **Before any new Lean work: read `CHIP_GATES.md` (repo root)** — vacuity
-> lint gate (mechanical, baseline-ratcheted; **9 findings as of 2026-07-25**:
-> 5 prior placeholders + 4 V7 `identity-hyp` packaging tautologies newly
-> visible when NoetherSolve ported rule V7) + the 7 anti-paraphrase gates.
+> lint gate (mechanical, baseline-ratcheted; **3 findings as of 2026-07-25**:
+> lowered 9 → 3 by deleting four identity-hyp packaging lemmas + two
+> write-only `True` fields) + the 7 anti-paraphrase gates.
 > The former "Theorem 1 + ESS" wrappers were removed as decoys on 2026-06-12 —
 > the Type-I exclusion (`NoTypeIBlowup`) is a citation-carrier consumed by
 > nothing; the honest Theorem 1 is `blowup_rate_alpha_of_bundle`/`_of_leray`

@@ -67,7 +67,7 @@ Each step now has *three* layers of formalization:
 |---|---|---|---|
 | (i)  | `ArgmaxGradient` | `ArgmaxGradientFromFrame` / `DerivFrameFromProductRule` | `DerivFrameFromNSEvolution` |
 | (ii) | `HessianAtArgmax` + `ScalarLocalMaxSecondDeriv` | `HessianAtArgmaxFromFrame` / `HessianFrameFromMaxPrinciple` | `ScalarMaxFromNSEvolution` |
-| (iii)| `VorticityAtArgmax` | `VorticityAtArgmaxFromFrame` / `VorticityFrameFromEnvelope` | *taken structurally via `FromNSEvolution`* (time regularity not yet integrated) |
+| (iii)| `VorticityAtArgmax` | `VorticityAtArgmaxFromFrame` / `VorticityFrameFromNSEvolution` | *taken structurally via `FromNSEvolution`* (time regularity not yet integrated) |
 
 ### §12.4 log-absorption ODE — fully discharged
 
@@ -193,7 +193,7 @@ in `noethersolve/docs/findings/ns_journal_theorem_statements_2026_04_22.md`.
 **Local-frame wirings:**
 - `ArgmaxGradientFromFrame.lean` (+ `DerivFrameFromProductRule.lean`)
 - `HessianAtArgmaxFromFrame.lean` (+ `HessianFrameFromMaxPrinciple.lean`)
-- `VorticityAtArgmaxFromFrame.lean` (+ `VorticityFrameFromEnvelope.lean`)
+- `VorticityAtArgmaxFromFrame.lean` (+ `VorticityFrameFromNSEvolution.lean`)
 
 **Analytical discharges (mathlib-backed):**
 - `ScalarProductRule.lean` — `∂_i(f²) = 2f·∂_i f` via `HasDerivAt.pow`
