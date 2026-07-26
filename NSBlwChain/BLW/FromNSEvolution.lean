@@ -66,9 +66,9 @@ mechanical; no `sorry`, no new `axiom`.
 * `NSArgmaxInputs` does **not** carry `NSEvolutionAxioms`-level
   hypotheses.  The intended consumer provides both an
   `NSEvolutionAxioms u ν T` (for Seregin + smoothness) and an
-  `NSArgmaxInputs ax t xStar` (for step i/ii/iii).  The `ν` field
-  in the input record is required to agree with `ax.nu_pos`'s
-  viscosity by a named hypothesis `ν_eq`.
+  `NSArgmaxInputs u ν T t xStar` (for step ii/iii).  Viscosity is
+  the shared binder `ν` (with `nu_pos : 0 < ν`); there is no separate
+  consistency field.
 -/
 
 namespace NSBlwChain.BLW
@@ -99,9 +99,10 @@ noncomputable def MOfVelocityField (u : VelocityField) (t : ℝ) : ℝ :=
     (i)/(ii)/(iii) relationships at a fixed `(t, xStar)` where
     `xStar` is the spatial argmax of `|ω(t, ·)|`.
 
-    These fields mirror `ArgmaxAnalyticalBundle` one-for-one,
-    with the addition of an explicit `ν_eq` field that tags the
-    bundle's viscosity with the `NSEvolutionAxioms` viscosity.
+    These fields mirror `ArgmaxAnalyticalBundle` one-for-one.
+    Viscosity is the structure parameter `ν` (same binder as
+    `NSEvolutionAxioms`); a vacuous `ν_eq : True` tag was removed
+    2026-07-25.
 
     ## Design
 
@@ -133,8 +134,6 @@ structure NSArgmaxInputs
   laplaceOmega3 : ℝ
   /-- Envelope growth `Ṁ(t) := dM/dt(t)`. -/
   growth        : ℝ
-  /-- Consistency: `ν` agrees with the viscosity of the NS axioms. -/
-  ν_eq          : True
   /-- `ν > 0` (mirror of `NSEvolutionAxioms.nu_pos`). -/
   nu_pos        : 0 < ν
   /-- `M(t) ≥ 0` (norm non-negativity at the argmax). -/
@@ -160,9 +159,7 @@ variable {u : VelocityField} {ν T : ℝ} {t : ℝ} {xStar : Vec3}
 /-- **Structural-wiring constructor.**
 
     Assemble an `ArgmaxAnalyticalBundle` from an `NSArgmaxInputs`
-    record.  Every field is a pass-through; the `step_i_M_zero_or_zero`
-    field of `ArgmaxAnalyticalBundle` is the placeholder `True`
-    (step (i) is consumed only via its effect on step (ii)). -/
+    record.  Every field is a pass-through. -/
 def toArgmaxAnalyticalBundle (inputs : NSArgmaxInputs u ν T t xStar) :
     ArgmaxAnalyticalBundle where
   ν             := ν
@@ -173,7 +170,6 @@ def toArgmaxAnalyticalBundle (inputs : NSArgmaxInputs u ν T t xStar) :
   growth        := inputs.growth
   nu_pos        := inputs.nu_pos
   M_nonneg      := inputs.M_nonneg
-  step_i_M_zero_or_zero := trivial
   step_ii       := inputs.step_ii
   step_iii      := inputs.step_iii
   laplace_nonpos := inputs.laplace_nonpos
@@ -233,7 +229,6 @@ noncomputable def NSArgmaxInputs.zero
   gradSqNorm    := 0
   laplaceOmega3 := 0
   growth        := 0
-  ν_eq          := trivial
   nu_pos        := hν
   M_nonneg      := le_refl 0
   step_ii       := by simp

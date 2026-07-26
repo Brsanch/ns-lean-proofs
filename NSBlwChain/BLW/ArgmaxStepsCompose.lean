@@ -58,7 +58,6 @@ def ArgmaxAnalyticalBundle.ofSteps
   growth        := h₃.growth
   nu_pos        := h₃.nu_pos
   M_nonneg      := le_of_lt h₃.M_pos
-  step_i_M_zero_or_zero := trivial
   step_ii := by
     have h := h₂.step_ii
     -- h : h₂.gradSqNorm ≤ h₂.M * |h₂.laplaceOmega3|

@@ -82,7 +82,6 @@ noncomputable def ArgmaxAnalyticalBundle.ofNSEvolutionAxioms
   growth        := growth
   nu_pos                := hν
   M_nonneg              := hM_nonneg
-  step_i_M_zero_or_zero := trivial
   step_ii               := h_step_ii
   step_iii              := h_step_iii
   laplace_nonpos        := h_laplace_nonpos
