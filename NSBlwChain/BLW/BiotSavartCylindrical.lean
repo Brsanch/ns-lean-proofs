@@ -14,8 +14,9 @@ the aligned self-strain at an argmax of `|ω|`).  The *integral identity
 itself* — including the change of variables to cylindrical coordinates
 `(ρ, θ, Z)`, the θ-averaging that produces `ω̄_φ(ρ, Z)`, and the
 application of Fubini on `ℝ³` — is classical and is taken as the
-named axiom `NSBlwChain.biot_savart_self_strain_bound` in
-`Setup/ClassicalAxioms.lean`.
+named composite axiom `NSBlwChain.biot_savart_self_strain_bound` in
+`Setup/ClassicalAxioms.lean` (not the Biot–Savart identity; bound
+applies only to a `RealizedArgmaxStrain` witness).
 
 **What lives here.**  A Prop-valued hypothesis bundle packaging the four
 scalar inputs that the near/far split of §12.2 consumes:

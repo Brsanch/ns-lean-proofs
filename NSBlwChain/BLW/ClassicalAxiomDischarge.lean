@@ -17,8 +17,9 @@ to an `ImplicitBoundBundle` for specific `(M, σ, ν)`.
 
 ## Shape
 
-`BiotSavartSelfStrainBound u ν T` provides:
-  `∀ M σ, 0 ≤ M → 0 < σ → 0 < ν → σ ≤ M · (1 + C_L + log(L/√(ν/σ)))`,
+`BiotSavartSelfStrainBound u ν T` provides, for a
+`RealizedArgmaxStrain` witness of the field:
+  `σ ≤ M · (1 + C_L + log(L/√(ν/σ)))`,
 
 which after log-expansion via `log_L_over_sqrt_delta` becomes:
   `σ ≤ M · (1 + C_L + log L + (1/2) · log(σ/ν))`,
@@ -61,7 +62,8 @@ noncomputable def buildImplicitBundleFromAxiom
     {u : VelocityField} {ν T : ℝ}
     (bs : BiotSavartSelfStrainBound u ν T)
     (M σ Mdot : ℝ) (hM : 1 ≤ M) (hσ : 0 < σ) (hν : 0 < ν)
-    (hMdot_nonneg : 0 ≤ Mdot) :
+    (hMdot_nonneg : 0 ≤ Mdot)
+    (hReal : RealizedArgmaxStrain u T M σ Mdot) :
     ImplicitBoundBundle where
   ν := ν
   L := bs.L * Real.exp bs.C_L
@@ -78,7 +80,7 @@ noncomputable def buildImplicitBundleFromAxiom
   hImplicit := by
     -- Step 1: invoke the axiom bound for this specific (M, σ, Mdot),
     -- passing through the growth-regime hypothesis `0 ≤ Mdot`.
-    have h_ax := bs.bound M σ Mdot (le_trans zero_le_one hM) hσ hν hMdot_nonneg
+    have h_ax := bs.bound M σ Mdot hReal hν
     -- h_ax : σ ≤ M · (1 + C_L + log(L/√(ν/σ)))
     -- Step 2: log-expand via log_L_over_sqrt_delta.
     have h_log : Real.log (bs.L / Real.sqrt (ν / σ))
@@ -105,10 +107,11 @@ theorem sigma_le_4M_log_M_from_axiom
     (bs : BiotSavartSelfStrainBound u ν T)
     (M σ Mdot : ℝ) (hM : 1 ≤ M) (hσ : 0 < σ) (hν : 0 < ν)
     (hMdot_nonneg : 0 ≤ Mdot)
+    (hReal : RealizedArgmaxStrain u T M σ Mdot)
     (hLarge :
       1 + Real.log (bs.L * Real.exp bs.C_L) + (1 / 2) * Real.log (σ / ν)
         ≤ 4 * Real.log M - 0 / M) :
     σ ≤ 4 * M * Real.log M :=
-  (buildImplicitBundleFromAxiom bs M σ Mdot hM hσ hν hMdot_nonneg).σ_le_of_largeness hLarge
+  (buildImplicitBundleFromAxiom bs M σ Mdot hM hσ hν hMdot_nonneg hReal).σ_le_of_largeness hLarge
 
 end NSBlwChain.BLW

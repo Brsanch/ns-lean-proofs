@@ -17,14 +17,15 @@ them by name.
 
 ## The three axioms
 
-1. **Biot–Savart self-strain bound (§12.4 log-absorption output).**
+1. **Composite self-strain bound (§12.4 log-absorption output).**
    Named: `biot_savart_self_strain_bound`.  Packages the output of
    the paper's §12.4 log-absorption step *in the growth regime*
-   `dM/dt(t) ≥ 0`: at any argmax `x_star` of `|ω(·, t)|`, the aligned
-   self-strain is bounded by `σ(x_star, t) ≤ M · (1 + C_L + log(L / δ_ν))`
-   for some `C_L ≥ 0`.  Note this is the *composite* of Prop 12.1 +
-   cylindrical θ-averaging (§12.2) + Lemma B far-field bound +
-   growth-regime log absorption — not Prop 12.1 alone.
+   `dM/dt(t) ≥ 0`, **conditional on a `RealizedArgmaxStrain` witness**
+   that couples `M` to `|ω|` of the field.  This is a composite of
+   Prop 12.1 + cylindrical θ-averaging + far-field bound +
+   log absorption — **not** the Biot–Savart identity, and **not** a
+   universal inequality on independent abstract scalars (the form
+   `∀ M σ, M ≥ 0 → σ > 0 → σ ≤ M(…)` is uninhabited: `M=0, σ=1`).
 
 2. **Seregin type-one exclusion (vorticity form).**  Named:
    `seregin_type_one_exclusion`.  Given a smooth NS solution on
@@ -125,15 +126,43 @@ integrability in `L^1`, and smoothness of the solution gives local
 `L^∞`.  On the torus, decay is automatic from periodicity.
 -/
 
-/-- Consumed form of the §12.4 log-absorption output.  Provides a
-    constant `C_L ≥ 0` and a universal bound `σ(x*, t) ≤ M(t) · (1
-    + C_L + log(L / δ_ν(t)))` at every argmax point `x_star` in the
-    growth regime `0 ≤ Ṁ(t)`, with `δ_ν(t) := √(ν/σ(x_star, t))`.
+/-- Witness that `M` is attained as `|ω(t, xStar)|` for the field `u`
+    on `[0, T)`, with `σ > 0` and `Mdot ≥ 0`.  This couples `M` to the
+    field and blocks independent abstract scalars (in particular the
+    impossible pair `M = 0`, `σ = 1`).  It does **not** reconstruct
+    aligned strain from Biot–Savart; `σ` remains an input scalar.
+    Full strain identification is deferred. -/
+def RealizedArgmaxStrain (u : VelocityField) (T M σ Mdot : ℝ) : Prop :=
+  ∃ (t : ℝ) (xStar : Vec3),
+    0 ≤ t ∧ t < T ∧
+    0 < M ∧ 0 < σ ∧ 0 ≤ Mdot ∧
+    Real.sqrt (Vec3.dot (vorticity u t xStar) (vorticity u t xStar)) = M
 
-    The structure records only the *output* shape consumed by the
-    chain; the derivation of the identity from cylindrical
-    θ-averaging plus log-absorption is the content of the axiom
-    below. -/
+/-- The withdrawn universal-scalar form of the self-strain bound is
+    uninhabited: substitute `M = 0`, `σ = 1` to obtain `1 ≤ 0`.
+    This is a real algebraic lemma, independent of the composite
+    axiom below. -/
+theorem withdrawn_universal_self_strain_form_uninhabited
+    (L C_L ν : ℝ) (hν : 0 < ν) :
+    ¬ (∀ M σ Mdot : ℝ, 0 ≤ M → 0 < σ → 0 < ν → 0 ≤ Mdot →
+        σ ≤ M * (1 + C_L + Real.log (L / Real.sqrt (ν / σ)))) := by
+  intro h
+  have hσ : (0 : ℝ) < 1 := by norm_num
+  have := h 0 1 0 le_rfl hσ hν le_rfl
+  have hRHS : (0 : ℝ) * (1 + C_L + Real.log (L / Real.sqrt (ν / 1))) = 0 := by
+    ring
+  rw [hRHS] at this
+  exact absurd this (by norm_num : ¬ ((1 : ℝ) ≤ 0))
+
+/-- Consumed form of the §12.4 log-absorption *composite* (NOT the
+    Biot–Savart identity, and NOT a universal inequality on independent
+    reals).  Provides `C_L ≥ 0` and a bound
+    `σ ≤ M · (1 + C_L + log(L / δ_ν))` only for a
+    `RealizedArgmaxStrain` witness of the field `u`.
+
+    Week-1 correction (2026-09-11, Astra): the previous `∀ M σ`
+    quantification over abstract scalars admitted the impossible
+    witness `M = 0`, `σ = 1`. -/
 structure BiotSavartSelfStrainBound
     (u : VelocityField) (ν T : ℝ) where
   /-- Box size at which the torus correction is applied. -/
@@ -144,21 +173,19 @@ structure BiotSavartSelfStrainBound
   L_pos      : 0 < L
   /-- Torus correction non-negative. -/
   C_L_nonneg : 0 ≤ C_L
-  /-- The bound at every growth-regime argmax.  Stated with respect
-      to abstract scalars representing `M`, `σ`, `δ_ν = √(ν/σ)`, and
-      `Mdot` at a fixed time, with the **growth-regime hypothesis
-      `0 ≤ Mdot`** matching paper §12.4.  Downstream consumers pick
-      concrete values. -/
+  /-- Bound for a *realized* growth-regime pair of the field `u`.
+      Independent abstract scalars are not quantified. -/
   bound :
-    ∀ M σ Mdot : ℝ, 0 ≤ M → 0 < σ → 0 < ν → 0 ≤ Mdot →
+    ∀ M σ Mdot : ℝ,
+      RealizedArgmaxStrain u T M σ Mdot →
+      0 < ν →
       σ ≤ M * (1 + C_L + Real.log (L / Real.sqrt (ν / σ)))
 
-/-- **Axiom 1 — `biot_savart_self_strain_bound`.**  The exact Biot–
-    Savart pointwise identity of Prop 12.1, combined with the §12.4
-    log-absorption step (cylindrical θ-averaging, far-field Lemma B
-    bound, growth-regime hypothesis `dM/dt ≥ 0`), delivers a
-    growth-regime bound of the form recorded in
-    `BiotSavartSelfStrainBound`.
+/-- **Axiom 1 — `biot_savart_self_strain_bound`.**  A *composite*
+    analytic assumption (Prop 12.1 + §12.4 log-absorption), not the
+    Biot–Savart identity and not an inhabited NS theorem.  Delivers
+    `BiotSavartSelfStrainBound` whose `bound` applies only to a
+    `RealizedArgmaxStrain` witness of the field.
 
     **Decay hypothesis (explicit).**  The Biot–Savart integral
     requires `ω` to decay faster than `|x|^{-3}` at infinity; this
@@ -181,8 +208,8 @@ criterion**: if `limsup_{t → T⁻} ‖u(·, t)‖_{L³(ℝ³)} < ∞`, then th
 solution extends past `T`.
 
 The axiom below is stated in the **vorticity-Type-I form** actually
-consumed by the BLW chain.  This is *not* Seregin 2012 verbatim — it
-is the composite theorem
+consumed by the BLW chain.  This is *not* Seregin 2012 verbatim (that
+paper is an L³-velocity criterion) — it is the composite theorem
 
   *ESS 2003 + Seregin 2012 (L³ criterion)* + *Biot–Savart on ℝ³* + *Sobolev embedding*
   ⇒ vorticity-sub-Type-I rate excludes blow-up.

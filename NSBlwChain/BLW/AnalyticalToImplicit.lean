@@ -22,7 +22,8 @@ hypothesis.
 `ArgmaxAnalyticalBundle` guarantees:
   `|∇ω|²(x*) ≤ M² · σ / ν`     (via `gradient_bound`).
 
-`BiotSavartSelfStrainBound u ν T` guarantees (for every `(M, σ)`):
+`BiotSavartSelfStrainBound u ν T` guarantees, for a
+`RealizedArgmaxStrain` witness of the field:
   `σ ≤ M · (1 + C_L + log(L / √(ν/σ)))`.
 
 Discharging the Biot-Savart axiom output at the analytical-bundle's
@@ -49,6 +50,7 @@ theorem sigma_le_4M_log_M_of_analytical
     (a : ArgmaxAnalyticalBundle) (hν_agree : a.ν = ν)
     (bs : BiotSavartSelfStrainBound u ν T)
     (hM_ge_one : 1 ≤ a.M) (hσ_pos : 0 < a.sigma)
+    (hReal : RealizedArgmaxStrain u T a.M a.sigma a.growth)
     (hLarge :
       1 + Real.log (bs.L * Real.exp bs.C_L)
         + (1 / 2) * Real.log (a.sigma / ν)
@@ -56,6 +58,6 @@ theorem sigma_le_4M_log_M_of_analytical
     a.sigma ≤ 4 * a.M * Real.log a.M := by
   have hν_pos : 0 < ν := by rw [← hν_agree]; exact a.nu_pos
   exact sigma_le_4M_log_M_from_axiom bs a.M a.sigma a.growth
-    hM_ge_one hσ_pos hν_pos a.growth_nonneg hLarge
+    hM_ge_one hσ_pos hν_pos a.growth_nonneg hReal hLarge
 
 end NSBlwChain.BLW

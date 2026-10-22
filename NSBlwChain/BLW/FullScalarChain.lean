@@ -64,6 +64,7 @@ theorem full_scalar_chain
     (hν_agree : h₃.ν = ν)
     (hM_ge_one : 1 ≤ h₃.M)
     (hσ_pos : 0 < h₃.sigma)
+    (hReal : RealizedArgmaxStrain u T h₃.M h₃.sigma h₃.growth)
     (hLarge :
       1 + Real.log (bs.L * Real.exp bs.C_L)
         + (1 / 2) * Real.log (h₃.sigma / h₃.ν)
@@ -85,7 +86,7 @@ theorem full_scalar_chain
             ≤ 4 * Real.log h₃.M - 0 / h₃.M := by
       rw [h_rewrite]; exact hLarge
     have := sigma_le_4M_log_M_from_axiom bs h₃.M h₃.sigma h₃.growth
-      hM_ge_one hσ_pos hν_pos hg hLarge'
+      hM_ge_one hσ_pos hν_pos hg hReal hLarge'
     -- this : h₃.sigma ≤ 4 * h₃.M * Real.log h₃.M
     exact this
   -- Step 4: combine step (iii) with strain bound.

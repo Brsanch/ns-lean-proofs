@@ -3,11 +3,14 @@
 [![CI](https://github.com/Brsanch/ns-lean-proofs/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/Brsanch/ns-lean-proofs/actions/workflows/lean_action_ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-A Lean 4 + mathlib formalization of the Buaria–Lawson–Wilczek gradient
-chain for 3D incompressible Navier–Stokes regularity on the torus
-$\mathbb{T}^3$ and on $\mathbb{R}^3$.  Companion paper:
-`paper/ns_regularity.md` in the `noethersolve` project, with supplements
-`ns_regularity_caveats_formal.md` and `ns_regularity_blw_derivations.md`.
+A Lean 4 + mathlib formalization of *fragments* of the Buaria–Lawson–Wilczek
+gradient chain for 3D incompressible Navier–Stokes. This is **not** an
+unconditional regularity certificate and **not** a Millennium-class result.
+Companion paper (honest framing §§1.2–1.3): `paper/ns_regularity.md` in
+`noethersolve`, with supplements `ns_regularity_caveats_formal.md` and
+`ns_regularity_blw_derivations.md`. Three named classical axioms are
+**composite assumptions** (self-strain log bound is not Biot–Savart;
+Seregin-form axiom is not Seregin 2012 verbatim and absorbs C6).
 
 **Status: v0.19 + unreleased 2026-04-26.** 130 files / ~18,400 LOC
 (zero orphans; all in import chain), all CI-green.
@@ -69,17 +72,19 @@ Each step now has *three* layers of formalization:
 | (ii) | `HessianAtArgmax` + `ScalarLocalMaxSecondDeriv` | `HessianAtArgmaxFromFrame` / `HessianFrameFromMaxPrinciple` | `ScalarMaxFromNSEvolution` |
 | (iii)| `VorticityAtArgmax` | `VorticityAtArgmaxFromFrame` / `VorticityFrameFromNSEvolution` | *taken structurally via `FromNSEvolution`* (time regularity not yet integrated) |
 
-### §12.4 log-absorption ODE — fully discharged
+### §12.4 log-absorption ODE — algebraic pieces, not Type-I
 
 - **Step 5 → 6** (`LogAbsorption`): `log(L/√(ν/σ)) = log L + ½ log(σ/ν)`.
 - **Step 6 → 7**: C4 largeness.  Previously a hypothesis; now
   discharged in `Caveats/C4_GrowthDominance.lean` via elementary
   growth dominance (no Banach fixed-point machinery needed — that
   framing of the paper turned out to be structural scaffolding).
-- **Step 7 → 8** (`BLW/ODEIntegration_{,Residual}Discharge`):
-  `Ṁ ≤ 4 M² log M  ⇒  (T - t)·M·log M ≤ 1/4` via quotient rule on
-  `w = 1/(M log M)`, FTC on `[t, T-ε]`, limit passage `ε → 0⁺` with
-  `w(T⁻) = 0`.  Closed unconditionally tonight.
+- **Step 7 → 8** (`BLW/ODEIntegration_{,Residual}Discharge`): the
+  implication `Ṁ ≤ 4 M² log M ⇒ (T-t)·M·log M ≤ 1/4` is **not**
+  discharged. That would be a Type-I *upper* rate; the derived ODE is
+  an *upper* bound on `Ṁ` and yields only a **lower** blowup-rate bound.
+  The file already records the missing opposite inequality; the pipeline
+  takes it as `saturating_ODE`. Do not export this as Type-I exclusion.
 
 ### Five paper caveats (C1–C5)
 
@@ -93,8 +98,9 @@ Each step now has *three* layers of formalization:
 
 ### Unconditional backbone (Theorems 1, 2 — §3, §4)
 
-- **Theorem 1 (`Unconditional/Theorem1`)**: blowup rate α ∈ (1, 2).
-  Algebraic core proved from `EnstrophyCrossoverBundle`; bundle takes
+- **Theorem 1 (`Unconditional/Theorem1`)**: algebraic blowup-rate skeleton.
+  The paper's `α < 5/4` blob bound is **not** unconditional (missing
+  parabolic core-size `r_c ≥ c√(ντ)`; audit 2026-05-29). Bundle takes
   Leray energy identity + enstrophy-crossover as scalar hypotheses.
 - **Theorem 2 (`Unconditional/Theorem2`)**: far-field control via
   Cauchy–Schwarz on the Biot–Savart tail + energy identity.
@@ -105,8 +111,10 @@ Both are hypothesis-taking skeletons with zero `sorry`.
 
 `BLW/PropositionFour.propositionFour_skeleton` /
 `BLW/ChainHypotheses.proposition_four_of_hypotheses`: given the
-bundled hypotheses + three classical axioms, smooth NS extends
-past any candidate blowup time.
+bundled hypotheses + three classical *composite* axioms, the skeleton
+concludes an extension. This is a hypothesis-taking packaging of the
+paper's proof sketch, including C6-strength Seregin-form input. It is
+not a closed regularity theorem.
 
 ## Axiomatic footprint
 

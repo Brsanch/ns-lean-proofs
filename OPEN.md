@@ -1,5 +1,17 @@
 # Open items — ns-lean-proofs
 
+**Week-1 claim correction (2026-09-11).** `BiotSavartSelfStrainBound.bound`
+no longer quantifies over independent abstract scalars (the form `M=0, σ=1`
+was an impossible witness). The bound applies only to a `RealizedArgmaxStrain`
+witness coupling `M` to `|ω|` of the field. `withdrawn_universal_self_strain_form_uninhabited`
+is the algebraic lemma. The three classical axioms remain **composite
+assumptions**, not inhabited NS theorems: axiom 1 is not the Biot–Savart
+identity; axiom 2 is not Seregin 2012 verbatim (L³ velocity) and absorbs C6.
+Zero `sorry` does not certify regularity. `Ṁ ≤ 4 M² log M` does **not**
+imply a vorticity Type-I upper bound; the opposite inequality is an extra
+hypothesis (`saturating_ODE`). Honest analysis framing:
+`noethersolve/paper/ns_regularity.md` §§1.2–1.3.
+
 > **Before any new Lean work: read `CHIP_GATES.md` (repo root)** — vacuity
 > lint gate (mechanical, baseline-ratcheted; **3 findings as of 2026-07-25**:
 > lowered 9 → 3 by deleting four identity-hyp packaging lemmas + two

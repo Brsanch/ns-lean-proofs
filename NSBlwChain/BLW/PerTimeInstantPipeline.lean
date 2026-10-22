@@ -116,9 +116,12 @@ structure PerTimeInstantData
       function `Mdot`. -/
   M_diff :
     ∀ τ : ℝ, t_start < τ → τ < T → HasDerivAt M (Mdot τ) τ
-  /-- **Saturating tight ODE** (output of §12.4 implicit-bound at the
-      saturation regime): `4 M² log M ≤ Ṁ`.  This is the lower-bound
-      direction the chain genuinely consumes. -/
+  /-- **Saturating tight ODE** — an *additional analytic hypothesis*,
+      not a consequence of the derived upper bound `Ṁ ≤ 4 M² log M`.
+      The inequality `4 M² log M ≤ Ṁ` is the lower-bound direction
+      the Type-I-style integration consumes.  From `Ṁ ≤ C M²` alone
+      one gets only `(1/M)' ≥ -C`, a lower blowup-rate bound
+      (Week-1 / Astra 2026-09-10). -/
   saturating_ODE :
     ∀ τ : ℝ, t_start < τ → τ < T →
       4 * (M τ) ^ 2 * Real.log (M τ) ≤ Mdot τ
